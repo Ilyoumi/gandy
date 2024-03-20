@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /*!
   =========================================================
   * Muse Ant Design Dashboard - v1.0.0
@@ -11,7 +12,7 @@
 */
 
 // import { useState } from "react";
-import { Menu, Button } from "antd";
+import { Menu } from "antd";
 import { NavLink, useLocation } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 
