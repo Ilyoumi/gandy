@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable react/no-unknown-property */
 /*!
   =========================================================
   * Muse Ant Design Dashboard - v1.0.0
@@ -91,7 +93,7 @@ const wifi = [
     <g
       id="Page-1"
       stroke="none"
-      stroke-width="1"
+      strokeWidth="1"
       fill="none"
       fillRule="evenodd"
     >

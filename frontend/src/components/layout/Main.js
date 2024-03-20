@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /*!
   =========================================================
   * Muse Ant Design Dashboard - v1.0.0
