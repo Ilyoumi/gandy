@@ -10,15 +10,15 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 import { Switch, Route, Redirect } from "react-router-dom";
-import Home from "./pages/Home";
-import Tables from "./pages/Tables";
-import Billing from "./pages/Billing";
-import Rtl from "./pages/Rtl";
-import Profile from "./pages/Profile";
-import SignUp from "./pages/SignUp";
-import SignIn from "./pages/SignIn";
-import Main from "./components/layout/Main";
-import MyCalendar from './pages/MyCalendar'
+import Home from "./pages-gy/Home";
+import Tables from "./pages-gy/Tables";
+import Billing from "./pages-gy/Billing";
+import Rtl from "./pages-gy/Rtl";
+import Profile from "./pages-gy/Profile";
+import SignUp from "./pages-gy/SignUp";
+import SignIn from "./pages-gy/SignIn";
+import Main from "./components-gy/layouts/Main";
+import MyCalendar from './pages-gy/MyCalendar'
 // import "antd/dist/antd.css";
 import 'antd/dist/antd.min.css'
 import "./assets/styles/main.css";
