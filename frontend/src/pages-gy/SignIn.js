@@ -12,6 +12,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/images/logo.png"
+
 import {
   Layout,
   Menu,
@@ -38,8 +39,8 @@ const { Header, Footer, Content } = Layout;
 const template = [
   <svg
     data-v-4ebdc598=""
-    width="40"
-    height="40"
+    width="20"
+    height="42"
     viewBox="0 0 20 20"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -67,8 +68,8 @@ const template = [
 const profile = [
   <svg
     data-v-4ebdc598=""
-    width="40"
-    height="40"
+    width="20"
+    height="20"
     viewBox="0 0 20 20"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -86,8 +87,8 @@ const profile = [
 const signup = [
   <svg
     data-v-4ebdc598=""
-    width="40"
-    height="40"
+    width="20"
+    height="20"
     viewBox="0 0 20 20"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -105,8 +106,8 @@ const signup = [
 const signin = [
   <svg
     data-v-4ebdc598=""
-    width="40"
-    height="40"
+    width="20"
+    height="20"
     viewBox="0 0 20 20"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -133,7 +134,7 @@ export default class SignIn extends Component {
     return (
       <>
         <Layout className="layout-default layout-signin">
-          <Header>
+          <Header className="head">
             <div className="header-col header-brand">
               <img src={logo} alt="" style={{ width: '200px' , height: '200px', marginTop:"-60px", paddingBottom:"20px"}}/>
             </div>
