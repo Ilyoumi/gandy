@@ -9,6 +9,10 @@
 =========================================================
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 body {
   padding: 0 0 30px 0;
   background-color: #fafafa;
@@ -1071,6 +1075,7 @@ span.blue {
   align-items: center;
   justify-content: space-between;
 }
+
 
 .antd-pro-pages-dashboard-analysis-style-salesExtra a {
   display: inline-block;
@@ -2495,6 +2500,7 @@ section.ant-layout.layout-content .ant-layout-content.content-ant {
 .col-action {
   display: flex;
 }
+
 
 .card-billing-info .col-action button {
   height: 34px;
