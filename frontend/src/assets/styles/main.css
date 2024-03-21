@@ -2154,6 +2154,7 @@ body {
   display: block;
 }
 .layout-signin {
+  width: 100vw;
   height: 100vh;
   background: #fff;
 }

@@ -204,24 +204,35 @@ function Sidenav({ color }) {
     ];
 
     return (
-        <div >
-            <div className="brand" style={{ display:"flex", justifyContent:"space-between",alignItems:"center" }}>
+        <div>
+            <div
+                className="brand"
+                style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                }}
+            >
                 <img
                     src={logo}
                     alt=""
                     style={{
-                        width: expanded ? "150px" : "0",
-                        height: expanded ? "150px" : "0",
-                        marginTop: "-60px",marginLeft:"-20px"
+                        width: expanded ? "120px" : "0",
+                        height: expanded ? "120px" : "0",
+                        marginTop: "-60px",
+                        marginLeft: "-20px",
+                        overflow: "hidden",
+                        transition: "all",
                     }}
-                    className={`overflow-hidden transition-all ${
-                        expanded ? "w-32 h-32" : "w-0 h-0"
-                    }`}
                 />
 
                 <button
                     style={{
-                        marginRight: expanded ? "0" : "160px",marginLeft:"40px",
+                        marginRight: expanded ? "0" : "160px",
+                        marginLeft: "40px",
+                        padding: "10px",
+                        borderRadius: "5px",
+                        border: "none",
                     }}
                     onClick={() => setExpanded((curr) => !curr)}
                     className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 mb-5 border-none"
@@ -230,8 +241,19 @@ function Sidenav({ color }) {
                 </button>
             </div>
 
-            <Menu theme="light" mode="inline" style={{ marginTop: "-20px",width: expanded ? "200px" : "50px",  }} className="sidenav">
-                <Menu.Item key="1" style={{ width: expanded ? "200px" : "10px" }}>
+            <Menu
+                theme="light"
+                mode="inline"
+                style={{
+                    marginTop: "-20px",
+                    width: expanded ? "200px" : "50px",
+                }}
+                className="sidenav"
+            >
+                <Menu.Item
+                    key="1"
+                    style={{ width: expanded ? "200px" : "40px" }}
+                >
                     <NavLink
                         to="/dashboard"
                         className={` overflow-hidden transition-all ${
@@ -247,15 +269,16 @@ function Sidenav({ color }) {
                             {dashboard}
                         </span>
                         <span
-                            className={`label overflow-hidden transition-all ${
-                                expanded ? "w-32" : "w-0"
-                            }`}
+                            
                         >
                             Dashboard
                         </span>
                     </NavLink>
                 </Menu.Item>
-                <Menu.Item key="2" style={{ width: expanded ? "200px" : "10px" }}>
+                <Menu.Item
+                    key="2"
+                    style={{ width: expanded ? "200px" : "10px" }}
+                >
                     <NavLink
                         to="/tables"
                         className={` overflow-hidden transition-all ${
@@ -279,7 +302,10 @@ function Sidenav({ color }) {
                         </span>
                     </NavLink>
                 </Menu.Item>
-                <Menu.Item key="3" style={{ width: expanded ? "200px" : "10px" }}>
+                <Menu.Item
+                    key="3"
+                    style={{ width: expanded ? "200px" : "10px" }}
+                >
                     <NavLink
                         to="/calendar"
                         className={` overflow-hidden transition-all ${
@@ -303,7 +329,10 @@ function Sidenav({ color }) {
                         </span>
                     </NavLink>
                 </Menu.Item>
-                <Menu.Item key="4" style={{ width: expanded ? "200px" : "10px" }}>
+                <Menu.Item
+                    key="4"
+                    style={{ width: expanded ? "200px" : "10px" }}
+                >
                     <NavLink
                         to="/mycalendar"
                         className={` overflow-hidden transition-all ${
@@ -327,7 +356,10 @@ function Sidenav({ color }) {
                         </span>
                     </NavLink>
                 </Menu.Item>
-                <Menu.Item key="4" style={{ width: expanded ? "200px" : "10px" }}>
+                <Menu.Item
+                    key="4"
+                    style={{ width: expanded ? "200px" : "10px" }}
+                >
                     <NavLink
                         to="/mycalendar"
                         className={` overflow-hidden transition-all ${
@@ -351,7 +383,10 @@ function Sidenav({ color }) {
                         </span>
                     </NavLink>
                 </Menu.Item>
-                <Menu.Item key="4" style={{ width: expanded ? "200px" : "10px" }}>
+                <Menu.Item
+                    key="4"
+                    style={{ width: expanded ? "200px" : "10px" }}
+                >
                     <NavLink
                         to="/mycalendar"
                         className={` overflow-hidden transition-all ${
@@ -387,7 +422,10 @@ function Sidenav({ color }) {
                     </Menu.Item>
                 )}
 
-                <Menu.Item key="6" style={{ width: expanded ? "200px" : "10px" }}>
+                <Menu.Item
+                    key="6"
+                    style={{ width: expanded ? "200px" : "10px" }}
+                >
                     <NavLink
                         to="/profile"
                         className={` overflow-hidden transition-all ${
@@ -411,7 +449,10 @@ function Sidenav({ color }) {
                         </span>
                     </NavLink>
                 </Menu.Item>
-                <Menu.Item key="7" style={{ width: expanded ? "200px" : "10px" }}>
+                <Menu.Item
+                    key="7"
+                    style={{ width: expanded ? "200px" : "10px" }}
+                >
                     <NavLink
                         to="/sign-in"
                         className={` overflow-hidden transition-all ${
@@ -428,7 +469,10 @@ function Sidenav({ color }) {
                         </span>
                     </NavLink>
                 </Menu.Item>
-                <Menu.Item key="8" style={{ width: expanded ? "200px" : "10px" }}>
+                <Menu.Item
+                    key="8"
+                    style={{ width: expanded ? "200px" : "10px" }}
+                >
                     <NavLink
                         to="/sign-up"
                         className={` overflow-hidden transition-all ${
