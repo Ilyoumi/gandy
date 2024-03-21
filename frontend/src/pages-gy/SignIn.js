@@ -137,7 +137,7 @@ export default class SignIn extends Component {
             <div className="header-col header-brand">
               <img src={logo} alt="" style={{ width: '200px' , height: '200px', marginTop:"-60px", paddingBottom:"20px",marginLeft:"150px "}}/>
             </div>
-            <div className="header-col header-nav" style={{ marginRight:"-650px " }}>
+            <div className="header-col header-nav" style={{ marginRight:"-40px " }}>
               <Menu mode="horizontal" defaultSelectedKeys={["1"]}>
                 <Menu.Item key="1" className="">
                   <Link to="/dashboard">

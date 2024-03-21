@@ -62,24 +62,39 @@ const formProps = {
 // table code start
 const columns = [
   {
-    title: "AUTHOR",
+    title: "NOM",
     dataIndex: "name",
     key: "name",
     width: "32%",
   },
   {
-    title: "FUNCTION",
+    title: "SOCIETE",
     dataIndex: "function",
     key: "function",
   },
 
   {
-    title: "STATUS",
+    title: "TEL",
     key: "status",
     dataIndex: "status",
   },
   {
-    title: "EMPLOYED",
+    title: "GSM",
+    key: "employed",
+    dataIndex: "employed",
+  },
+  {
+    title: "DATE RDV",
+    key: "employed",
+    dataIndex: "employed",
+  },
+  {
+    title: "AGENT",
+    key: "employed",
+    dataIndex: "employed",
+  },
+  {
+    title: "AGENDA",
     key: "employed",
     dataIndex: "employed",
   },
