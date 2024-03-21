@@ -205,14 +205,14 @@ function Sidenav({ color }) {
 
     return (
         <div >
-            <div className="brand flex justify-between items-center">
+            <div className="brand" style={{ display:"flex", justifyContent:"space-between",alignItems:"center" }}>
                 <img
                     src={logo}
                     alt=""
                     style={{
                         width: expanded ? "150px" : "0",
                         height: expanded ? "150px" : "0",
-                        marginTop: "-60px",
+                        marginTop: "-60px",marginLeft:"-20px"
                     }}
                     className={`overflow-hidden transition-all ${
                         expanded ? "w-32 h-32" : "w-0 h-0"
@@ -221,10 +221,10 @@ function Sidenav({ color }) {
 
                 <button
                     style={{
-                        marginRight: expanded ? "0" : "160px",
+                        marginRight: expanded ? "0" : "160px",marginLeft:"40px",
                     }}
                     onClick={() => setExpanded((curr) => !curr)}
-                    className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 mb-5"
+                    className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 mb-5 border-none"
                 >
                     {expanded ? <MenuOutlined /> : <CloseOutlined />}
                 </button>

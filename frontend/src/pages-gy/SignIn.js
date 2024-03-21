@@ -12,7 +12,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/images/logo.png"
-
 import {
   Layout,
   Menu,
@@ -40,7 +39,7 @@ const template = [
   <svg
     data-v-4ebdc598=""
     width="20"
-    height="42"
+    height="20"
     viewBox="0 0 20 20"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -134,13 +133,13 @@ export default class SignIn extends Component {
     return (
       <>
         <Layout className="layout-default layout-signin">
-          <Header className="head">
+          <Header className="" >
             <div className="header-col header-brand">
-              <img src={logo} alt="" style={{ width: '200px' , height: '200px', marginTop:"-60px", paddingBottom:"20px"}}/>
+              <img src={logo} alt="" style={{ width: '200px' , height: '200px', marginTop:"-60px", paddingBottom:"20px",marginLeft:"150px "}}/>
             </div>
-            <div className="header-col header-nav">
+            <div className="header-col header-nav" style={{ marginRight:"-650px " }}>
               <Menu mode="horizontal" defaultSelectedKeys={["1"]}>
-                <Menu.Item key="1">
+                <Menu.Item key="1" className="">
                   <Link to="/dashboard">
                     {template}
                     <span > Sunlight PRDV</span>
@@ -241,7 +240,7 @@ export default class SignIn extends Component {
                 lg={{ span: 12 }}
                 md={{ span: 12 }}
               >
-                <img src={casque} alt="" style={{ width:"800px", height:"790px",marginTop:"-120px" }} />
+                <img src={casque} alt="" style={{ width:"800px", height:"600px",marginTop:"-120px" }} />
                 
               </Col>
             </Row>
