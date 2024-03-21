@@ -23,7 +23,7 @@ import {
   Input,
   Switch,
 } from "antd";
-import casque from "../assets/images/casque.png";
+import casque from "../assets/images/login3.png";
 import {
   DribbbleOutlined,
   TwitterOutlined,
@@ -171,8 +171,9 @@ export default class SignIn extends Component {
             <Row gutter={[24, 0]} justify="space-around">
               <Col
                 xs={{ span: 24, offset: 0 }}
-                lg={{ span: 6, offset: 2 }}
+                lg={{ span: 8, offset: 2 }}
                 md={{ span: 12 }}
+                style={{ marginLeft:"200px",marginTop:"50px" }}
               >
                 <Title className="mb-15">Sign In</Title>
                 <Title className="font-regular text-muted" level={5}>
@@ -240,7 +241,7 @@ export default class SignIn extends Component {
                 lg={{ span: 12 }}
                 md={{ span: 12 }}
               >
-                <img src={casque} alt="" style={{ width:"800px", height:"600px",marginTop:"-120px" }} />
+                <img src={casque} alt="" style={{ width:"850px", height:"850px",marginTop:"-120px",marginLeft:"120px" }} />
                 
               </Col>
             </Row>
