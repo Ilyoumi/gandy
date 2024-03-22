@@ -144,6 +144,23 @@ function Sidenav({ color }) {
             ></path>
         </svg>,
     ];
+    const user = [
+        <svg
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            key={0}
+        >
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M6 2C5.44772 2 5 2.44772 5 3V4H4C2.89543 4 2 4.89543 2 6V16C2 17.1046 2.89543 18 4 18H16C17.1046 18 18 17.1046 18 16V6C18 4.89543 17.1046 4 16 4H15V3C15 2.44772 14.5523 2 14 2C13.4477 2 13 2.44772 13 3V4H7V3C7 2.44772 6.55228 2 6 2ZM6 7C5.44772 7 5 7.44772 5 8C5 8.55228 5.44772 9 6 9H14C14.5523 9 15 8.55228 15 8C15 7.44772 14.5523 7 14 7H6Z"
+                fill={color}
+            ></path>
+        </svg>,
+    ];
 
     const signup = [
         <svg
@@ -245,7 +262,7 @@ function Sidenav({ color }) {
                 theme="light"
                 mode="inline"
                 style={{
-                    marginTop: "-20px",
+                    marginTop: "-30px",
                     width: expanded ? "200px" : "50px",
                 }}
                 className="sidenav"
@@ -280,7 +297,7 @@ function Sidenav({ color }) {
                     style={{ width: expanded ? "200px" : "10px" }}
                 >
                     <NavLink
-                        to="/tables"
+                        to="/rdv"
                         className={` overflow-hidden transition-all ${
                             expanded ? "w-48" : "w-16"
                         }`}
@@ -325,7 +342,7 @@ function Sidenav({ color }) {
                                 expanded ? "w-32" : "w-0"
                             }`}
                         >
-                            Calendar
+                            Calendrier
                         </span>
                     </NavLink>
                 </Menu.Item>
@@ -334,7 +351,7 @@ function Sidenav({ color }) {
                     style={{ width: expanded ? "200px" : "10px" }}
                 >
                     <NavLink
-                        to="/mycalendar"
+                        to="/history"
                         className={` overflow-hidden transition-all ${
                             expanded ? "w-48" : "w-16"
                         }`}
@@ -361,7 +378,7 @@ function Sidenav({ color }) {
                     style={{ width: expanded ? "200px" : "10px" }}
                 >
                     <NavLink
-                        to="/mycalendar"
+                        to="/agenda"
                         className={` overflow-hidden transition-all ${
                             expanded ? "w-48" : "w-16"
                         }`}
@@ -372,7 +389,7 @@ function Sidenav({ color }) {
                                 background: page === "rtl" ? color : "",
                             }}
                         >
-                            {rtl}
+                            {agenda}
                         </span>
                         <span
                             className={`label overflow-hidden transition-all ${
@@ -388,7 +405,7 @@ function Sidenav({ color }) {
                     style={{ width: expanded ? "200px" : "10px" }}
                 >
                     <NavLink
-                        to="/mycalendar"
+                        to="/contact"
                         className={` overflow-hidden transition-all ${
                             expanded ? "w-48" : "w-16"
                         }`}
@@ -399,7 +416,7 @@ function Sidenav({ color }) {
                                 background: page === "rtl" ? color : "",
                             }}
                         >
-                            {rtl}
+                            {contact}
                         </span>
                         <span
                             className={`label overflow-hidden transition-all ${
@@ -422,33 +439,7 @@ function Sidenav({ color }) {
                     </Menu.Item>
                 )}
 
-                <Menu.Item
-                    key="6"
-                    style={{ width: expanded ? "200px" : "10px" }}
-                >
-                    <NavLink
-                        to="/profile"
-                        className={` overflow-hidden transition-all ${
-                            expanded ? "w-48" : "w-16"
-                        }`}
-                    >
-                        <span
-                            className="icon"
-                            style={{
-                                background: page === "profile" ? color : "",
-                            }}
-                        >
-                            {profile}
-                        </span>
-                        <span
-                            className={`label overflow-hidden transition-all ${
-                                expanded ? "w-32" : "w-0"
-                            }`}
-                        >
-                            Profile
-                        </span>
-                    </NavLink>
-                </Menu.Item>
+                
                 <Menu.Item
                     key="7"
                     style={{ width: expanded ? "200px" : "10px" }}
@@ -460,6 +451,26 @@ function Sidenav({ color }) {
                         }`}
                     >
                         <span className="icon">{signin}</span>
+                        <span
+                            className={`label overflow-hidden transition-all ${
+                                expanded ? "w-32" : "w-0"
+                            }`}
+                        >
+                            Sign in
+                        </span>
+                    </NavLink>
+                </Menu.Item>
+                <Menu.Item
+                    key="7"
+                    style={{ width: expanded ? "200px" : "10px" }}
+                >
+                    <NavLink
+                        to="/add-user"
+                        className={` overflow-hidden transition-all ${
+                            expanded ? "w-48" : "w-16"
+                        }`}
+                    >
+                        <span className="icon">{user}</span>
                         <span
                             className={`label overflow-hidden transition-all ${
                                 expanded ? "w-32" : "w-0"

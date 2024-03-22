@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Input, Space, Button, Avatar,Typography,Radio } from "antd";
+import { Table, Input, Space, Button, Avatar, Typography, Radio } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import face from "../assets/images/face-1.jpg";
 import face2 from "../assets/images/face-2.jpg";
@@ -12,10 +12,9 @@ import Highlighter from "react-highlight-words";
 import { Link } from "react-router-dom";
 const { Search } = Input;
 const { Title } = Typography;
-const DataTable = () => {
+const History = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
-    
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -59,7 +58,6 @@ const DataTable = () => {
                     >
                         Search
                     </Button>
-                    
                 </Space>
             </div>
         ),
@@ -108,12 +106,7 @@ const DataTable = () => {
             key: "societe",
             ...getColumnSearchProps("societe"),
         },
-        {
-            title: "TEL",
-            key: "tel",
-            dataIndex: "tel",
-            ...getColumnSearchProps("tel"),
-        },
+
         {
             title: "GSM",
             key: "gsm",
@@ -121,22 +114,16 @@ const DataTable = () => {
             ...getColumnSearchProps("gsm"),
         },
         {
-            title: "DATE RDV",
-            key: "date",
-            dataIndex: "date",
-            ...getColumnSearchProps("date"),
+            title: "TVA",
+            key: "tva",
+            dataIndex: "tva",
+            ...getColumnSearchProps("tva"),
         },
         {
-            title: "AGENT",
-            key: "agent",
-            dataIndex: "agent",
-            ...getColumnSearchProps("agent"),
-        },
-        {
-            title: "AGENDA",
-            key: "agenda",
-            dataIndex: "agenda",
-            ...getColumnSearchProps("agenda"),
+            title: "SUPERVISEUR",
+            key: "superviseur",
+            dataIndex: "superviseur",
+            ...getColumnSearchProps("superviseur"),
         },
     ];
 
@@ -181,30 +168,29 @@ const DataTable = () => {
                     </Button>
                 </>
             ),
-            date: (
+            tva: (
                 <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
+                    <div className="ant-financial-info">
+                        <span>ES543210987</span>
                     </div>
                 </>
             ),
-            agent: (
+            superviseur: (
                 <>
-                    <div className="ant-employed">
-                        <span>Jennifer Smith</span>
-                    </div>
+                    <Avatar.Group>
+                        <Avatar
+                            className="shape-avatar"
+                            shape="square"
+                            size={40}
+                            src={face2}
+                        ></Avatar>
+                        <div className="avatar-info">
+                            <Title level={5}>Noah Thompson</Title>
+                            <p>noah@example.com</p>
+                        </div>
+                    </Avatar.Group>{" "}
                 </>
-            ),
-            agenda: (
-                <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
-                        <a href="#pablo" style={{ color: "#FFC700" }}>
-                            Editer
-                        </a>
-                    </div>
-                </>
-            ),
+            )
         },
         {
             key: "1",
@@ -246,30 +232,29 @@ const DataTable = () => {
                     </Button>
                 </>
             ),
-            date: (
+            tva: (
                 <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
+                    <div className="ant-financial-info">
+                        <span>IT765432109</span>
                     </div>
                 </>
             ),
-            agent: (
+            superviseur: (
                 <>
-                    <div className="ant-employed">
-                        <span>Jennifer Smith</span>
-                    </div>
+                    <Avatar.Group>
+                        <Avatar
+                            className="shape-avatar"
+                            shape="square"
+                            size={40}
+                            src={face3}
+                        ></Avatar>
+                        <div className="avatar-info">
+                            <Title level={5}>Olivia Smith</Title>
+                            <p>olivia@example.com</p>
+                        </div>
+                    </Avatar.Group>{" "}
                 </>
-            ),
-            agenda: (
-                <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
-                        <a href="#pablo" style={{ color: "#FFC700" }}>
-                            Editer
-                        </a>
-                    </div>
-                </>
-            ),
+            )
         },
         {
             key: "1",
@@ -311,30 +296,29 @@ const DataTable = () => {
                     </Button>
                 </>
             ),
-            date: (
+            tva: (
                 <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
+                    <div className="ant-financial-info">
+                        <span>FR876543210</span>
                     </div>
                 </>
             ),
-            agent: (
+            superviseur: (
                 <>
-                    <div className="ant-employed">
-                        <span>Jennifer Smith</span>
-                    </div>
+                    <Avatar.Group>
+                        <Avatar
+                            className="shape-avatar"
+                            shape="square"
+                            size={40}
+                            src={face6}
+                        ></Avatar>
+                        <div className="avatar-info">
+                            <Title level={5}>Emma Wilson</Title>
+                            <p>emma@example.com</p>
+                        </div>
+                    </Avatar.Group>{" "}
                 </>
-            ),
-            agenda: (
-                <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
-                        <a href="#pablo" style={{ color: "#FFC700" }}>
-                            Editer
-                        </a>
-                    </div>
-                </>
-            ),
+            )
         },
         {
             key: "1",
@@ -441,28 +425,27 @@ const DataTable = () => {
                     </Button>
                 </>
             ),
-            date: (
+            tva: (
                 <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
+                    <div className="ant-financial-info">
+                        <span>FR123456789</span>
                     </div>
                 </>
             ),
-            agent: (
+            superviseur: (
                 <>
-                    <div className="ant-employed">
-                        <span>Jennifer Smith</span>
-                    </div>
-                </>
-            ),
-            agenda: (
-                <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
-                        <a href="#pablo" style={{ color: "#FFC700" }}>
-                            Editer
-                        </a>
-                    </div>
+                    <Avatar.Group>
+                        <Avatar
+                            className="shape-avatar"
+                            shape="square"
+                            size={40}
+                            src={face} // Replace this with the actual path to the supervisor's avatar image
+                        ></Avatar>
+                        <div className="avatar-info">
+                            <Title level={5}>Sophie Turner</Title>
+                            <p>sophie.turner@example.com</p>
+                        </div>
+                    </Avatar.Group>
                 </>
             ),
         },
@@ -506,37 +489,34 @@ const DataTable = () => {
                     </Button>
                 </>
             ),
-            date: (
+            tva: (
                 <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
+                    <div className="ant-financial-info">
+                        <span>DE987654321</span>
                     </div>
                 </>
             ),
-            agent: (
+            superviseur: (
                 <>
-                    <div className="ant-employed">
-                        <span>Jennifer Smith</span>
-                    </div>
+                    <Avatar.Group>
+                        <Avatar
+                            className="shape-avatar"
+                            shape="square"
+                            size={40}
+                            src={face4}
+                        ></Avatar>
+                        <div className="avatar-info">
+                            <Title level={5}>Daniel Brown</Title>
+                            <p>daniel@example.com</p>
+                        </div>
+                    </Avatar.Group>{" "}
                 </>
-            ),
-            agenda: (
-                <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
-                        <a href="#pablo" style={{ color: "#FFC700" }}>
-                            Editer
-                        </a>
-                    </div>
-                </>
-            ),
+            )
         },
-        
     ];
 
     return (
         <div>
-            
             <Search
                 id="search-input"
                 placeholder="Search"
@@ -548,4 +528,4 @@ const DataTable = () => {
     );
 };
 
-export default DataTable;
+export default History;
