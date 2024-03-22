@@ -45,6 +45,7 @@ import team2 from "../assets/images/team-2.jpg";
 import team3 from "../assets/images/team-3.jpg";
 import team4 from "../assets/images/team-4.jpg";
 import card from "../assets/images/info-card-1.jpg";
+import History from "./History";
 
 function Home() {
   const { Title, Text } = Typography;
@@ -372,9 +373,14 @@ function Home() {
             </Col>
           ))}
         </Row>
+        <Row className="rowgap-vbox" gutter={[24, 0]}>
+          <Col xs={24} sm={24} md={24} lg={24} xl={24} className="mb-24 ">
+            <History/>
+          </Col>
+        </Row>
 
         <Row gutter={[24, 0]}>
-          <Col xs={24} sm={24} md={12} lg={12} xl={10} className="mb-24">
+          <Col xs={24} sm={24} md={12} lg={12} xl={10} className="mb-24 ">
             <Card bordered={false} className="criclebox h-full">
               <Echart />
             </Card>
@@ -386,7 +392,7 @@ function Home() {
           </Col>
         </Row>
 
-        <Row gutter={[24, 0]}>
+        {/* <Row gutter={[24, 0]}>
           <Col xs={24} sm={24} md={12} lg={12} xl={16} className="mb-24">
             <Card bordered={false} className="criclebox cardbody h-full">
               <div className="project-ant">
@@ -552,7 +558,7 @@ function Home() {
               </div>
             </Card>
           </Col>
-        </Row>
+        </Row> */}
       </div>
     </>
   );

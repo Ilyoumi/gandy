@@ -13,12 +13,10 @@
 
 // import { useState } from "react";
 import { Menu } from "antd";
-import { MenuOutlined, CloseOutlined } from "@ant-design/icons";
 
 import { NavLink, useLocation } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import React, { useState } from "react";
-
 function Sidenav({ color }) {
     const { pathname } = useLocation();
     const page = pathname.replace("/", "");
@@ -222,47 +220,26 @@ function Sidenav({ color }) {
 
     return (
         <div>
-            <div
-                className="brand"
-                style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                }}
-            >
+            <div className="brand">
                 <img
                     src={logo}
                     alt=""
                     style={{
                         width: expanded ? "120px" : "0",
                         height: expanded ? "120px" : "0",
-                        marginTop: "-60px",
+                        marginTop: "-57px",
                         marginLeft: "-20px",
                         overflow: "hidden",
                         transition: "all",
                     }}
                 />
-
-                <button
-                    style={{
-                        marginRight: expanded ? "0" : "160px",
-                        marginLeft: "40px",
-                        padding: "10px",
-                        borderRadius: "5px",
-                        border: "none",
-                    }}
-                    onClick={() => setExpanded((curr) => !curr)}
-                    className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 mb-5 border-none"
-                >
-                    {expanded ? <MenuOutlined /> : <CloseOutlined />}
-                </button>
             </div>
 
             <Menu
                 theme="light"
                 mode="inline"
                 style={{
-                    marginTop: "-30px",
+                    marginTop: "5px",
                     width: expanded ? "200px" : "50px",
                 }}
                 className="sidenav"
@@ -285,13 +262,52 @@ function Sidenav({ color }) {
                         >
                             {dashboard}
                         </span>
+                        <span>Dashboard</span>
+                    </NavLink>
+                </Menu.Item>
+                <Menu.Item
+                    collapsedWidth="0"
+                    onCollapse={(collapsed, type) => {
+                        console.log(collapsed, type);
+                    }}
+                    key="3"
+                    style={{ width: expanded ? "200px" : "10px" }}
+                >
+                    <NavLink
+                        to="/calendar"
+                        className={` overflow-hidden transition-all ${
+                            expanded ? "w-48" : "w-16"
+                        }`}
+                    >
                         <span
-                            
+                            className="icon"
+                            style={{
+                                background: page === "billing" ? color : "",
+                            }}
                         >
-                            Dashboard
+                            {mycalendar}
+                        </span>
+                        <span
+                            className={`label overflow-hidden transition-all ${
+                                expanded ? "w-32" : "w-0"
+                            }`}
+                        >
+                            Calendrier
                         </span>
                     </NavLink>
                 </Menu.Item>
+                
+                {expanded && (
+                    <Menu.Item
+                        className="menu-item-header"
+                        key="5"
+                        style={{
+                            width: expanded ? "50px" : "0",
+                        }}
+                    >
+                        Gestion des rendez-vous
+                    </Menu.Item>
+                )}
                 <Menu.Item
                     key="2"
                     style={{ width: expanded ? "200px" : "10px" }}
@@ -319,60 +335,9 @@ function Sidenav({ color }) {
                         </span>
                     </NavLink>
                 </Menu.Item>
-                <Menu.Item
-                    key="3"
-                    style={{ width: expanded ? "200px" : "10px" }}
-                >
-                    <NavLink
-                        to="/calendar"
-                        className={` overflow-hidden transition-all ${
-                            expanded ? "w-48" : "w-16"
-                        }`}
-                    >
-                        <span
-                            className="icon"
-                            style={{
-                                background: page === "billing" ? color : "",
-                            }}
-                        >
-                            {mycalendar}
-                        </span>
-                        <span
-                            className={`label overflow-hidden transition-all ${
-                                expanded ? "w-32" : "w-0"
-                            }`}
-                        >
-                            Calendrier
-                        </span>
-                    </NavLink>
-                </Menu.Item>
-                <Menu.Item
-                    key="4"
-                    style={{ width: expanded ? "200px" : "10px" }}
-                >
-                    <NavLink
-                        to="/history"
-                        className={` overflow-hidden transition-all ${
-                            expanded ? "w-48" : "w-16"
-                        }`}
-                    >
-                        <span
-                            className="icon"
-                            style={{
-                                background: page === "rtl" ? color : "",
-                            }}
-                        >
-                            {rtl}
-                        </span>
-                        <span
-                            className={`label overflow-hidden transition-all ${
-                                expanded ? "w-32" : "w-0"
-                            }`}
-                        >
-                            Historique
-                        </span>
-                    </NavLink>
-                </Menu.Item>
+
+                
+                
                 <Menu.Item
                     key="4"
                     style={{ width: expanded ? "200px" : "10px" }}
@@ -396,7 +361,41 @@ function Sidenav({ color }) {
                                 expanded ? "w-32" : "w-0"
                             }`}
                         >
-                            Agenda
+                            Liste des agendas
+                        </span>
+                    </NavLink>
+                </Menu.Item>
+                
+                {expanded && (
+                    <Menu.Item
+                        className="menu-item-header"
+                        key="5"
+                        style={{
+                            width: expanded ? "50px" : "0",
+                        }}
+                    >
+                        Gestion des utilisateurs
+                    </Menu.Item>
+                )}
+
+                
+                <Menu.Item
+                    key="7"
+                    style={{ width: expanded ? "200px" : "10px" }}
+                >
+                    <NavLink
+                        to="/add-user"
+                        className={` overflow-hidden transition-all ${
+                            expanded ? "w-48" : "w-16"
+                        }`}
+                    >
+                        <span className="icon">{user}</span>
+                        <span
+                            className={`label overflow-hidden transition-all ${
+                                expanded ? "w-32" : "w-0"
+                            }`}
+                        >
+                            Créer utilisateur
                         </span>
                     </NavLink>
                 </Menu.Item>
@@ -423,83 +422,11 @@ function Sidenav({ color }) {
                                 expanded ? "w-32" : "w-0"
                             }`}
                         >
-                            Contacts
+                            Liste des contacts
                         </span>
                     </NavLink>
                 </Menu.Item>
-                {expanded && (
-                    <Menu.Item
-                        className="menu-item-header"
-                        key="5"
-                        style={{
-                            width: expanded ? "50px" : "0",
-                        }}
-                    >
-                        Gestion des utilisateurs
-                    </Menu.Item>
-                )}
-
                 
-                <Menu.Item
-                    key="7"
-                    style={{ width: expanded ? "200px" : "10px" }}
-                >
-                    <NavLink
-                        to="/sign-in"
-                        className={` overflow-hidden transition-all ${
-                            expanded ? "w-48" : "w-16"
-                        }`}
-                    >
-                        <span className="icon">{signin}</span>
-                        <span
-                            className={`label overflow-hidden transition-all ${
-                                expanded ? "w-32" : "w-0"
-                            }`}
-                        >
-                            Sign in
-                        </span>
-                    </NavLink>
-                </Menu.Item>
-                <Menu.Item
-                    key="7"
-                    style={{ width: expanded ? "200px" : "10px" }}
-                >
-                    <NavLink
-                        to="/add-user"
-                        className={` overflow-hidden transition-all ${
-                            expanded ? "w-48" : "w-16"
-                        }`}
-                    >
-                        <span className="icon">{user}</span>
-                        <span
-                            className={`label overflow-hidden transition-all ${
-                                expanded ? "w-32" : "w-0"
-                            }`}
-                        >
-                            User
-                        </span>
-                    </NavLink>
-                </Menu.Item>
-                <Menu.Item
-                    key="8"
-                    style={{ width: expanded ? "200px" : "10px" }}
-                >
-                    <NavLink
-                        to="/sign-up"
-                        className={` overflow-hidden transition-all ${
-                            expanded ? "w-48" : "w-16"
-                        }`}
-                    >
-                        <span className="icon">{signup}</span>
-                        <span
-                            className={`label overflow-hidden transition-all ${
-                                expanded ? "w-32" : "w-0"
-                            }`}
-                        >
-                            Gestion des roles
-                        </span>
-                    </NavLink>
-                </Menu.Item>
             </Menu>
         </div>
     );

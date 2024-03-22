@@ -12,7 +12,7 @@ import Highlighter from "react-highlight-words";
 import { Link } from "react-router-dom";
 const { Search } = Input;
 const { Title } = Typography;
-const DataTable = () => {
+const Agenda = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
 
@@ -137,42 +137,15 @@ const DataTable = () => {
             width: "32%",
             ...getColumnSearchProps("name"),
         },
-        {
-            title: "SOCIETE",
-            dataIndex: "societe",
-            key: "societe",
-            ...getColumnSearchProps("societe"),
-        },
-        {
-            title: "TEL",
-            key: "tel",
-            dataIndex: "tel",
-            ...getColumnSearchProps("tel"),
-        },
-        {
-            title: "GSM",
-            key: "gsm",
-            dataIndex: "gsm",
-            ...getColumnSearchProps("gsm"),
-        },
-        {
-            title: "DATE RDV",
-            key: "date",
-            dataIndex: "date",
-            ...getColumnSearchProps("date"),
-        },
+        
+        
         {
             title: "AGENT",
             key: "agent",
             dataIndex: "agent",
             ...getColumnSearchProps("agent"),
         },
-        {
-            title: "AGENDA",
-            key: "agenda",
-            dataIndex: "agenda",
-            ...getColumnSearchProps("agenda"),
-        },
+        
         {
             title: "ACTION",
             key: "action",
@@ -184,7 +157,7 @@ const DataTable = () => {
     const data = [
         {
             key: "1",
-            name: (
+            agent: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -229,7 +202,7 @@ const DataTable = () => {
                     </div>
                 </>
             ),
-            agent: (
+            name: (
                 <>
                     <div className="ant-employed">
                         <span>Jennifer Smith</span>
@@ -261,7 +234,7 @@ const DataTable = () => {
         },
         {
             key: "1",
-            name: (
+            agent: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -306,7 +279,7 @@ const DataTable = () => {
                     </div>
                 </>
             ),
-            agent: (
+            name: (
                 <>
                     <div className="ant-employed">
                         <span>Jennifer Smith</span>
@@ -338,7 +311,7 @@ const DataTable = () => {
         },
         {
             key: "1",
-            name: (
+            agent: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -383,7 +356,7 @@ const DataTable = () => {
                     </div>
                 </>
             ),
-            agent: (
+            name: (
                 <>
                     <div className="ant-employed">
                         <span>Jennifer Smith</span>
@@ -415,7 +388,7 @@ const DataTable = () => {
         },
         {
             key: "1",
-            name: (
+            agent: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -460,7 +433,7 @@ const DataTable = () => {
                     </div>
                 </>
             ),
-            agent: (
+            name: (
                 <>
                     <div className="ant-employed">
                         <span>Jennifer Smith</span>
@@ -492,7 +465,7 @@ const DataTable = () => {
         },
         {
             key: "1",
-            name: (
+            agent: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -537,7 +510,7 @@ const DataTable = () => {
                     </div>
                 </>
             ),
-            agent: (
+            name: (
                 <>
                     <div className="ant-employed">
                         <span>Jennifer Smith</span>
@@ -570,7 +543,7 @@ const DataTable = () => {
         },
         {
             key: "1",
-            name: (
+            agent: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -615,7 +588,7 @@ const DataTable = () => {
                     </div>
                 </>
             ),
-            agent: (
+            name: (
                 <>
                     <div className="ant-employed">
                         <span>Jennifer Smith</span>
@@ -666,4 +639,4 @@ const DataTable = () => {
     );
 };
 
-export default DataTable;
+export default Agenda;
