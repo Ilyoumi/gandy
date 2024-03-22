@@ -56,7 +56,6 @@ function Main({ children }) {
         onClose={() => setVisible(false)}
         visible={visible}
         key={placement === "right" ? "left" : "right"}
-        width={250}
         className={`drawer-sidebar ${
           pathname === "rtl" ? "drawer-sidebar-rtl" : ""
         } `}
@@ -68,12 +67,11 @@ function Main({ children }) {
         >
           <Sider
             trigger={null}
-            width={250}
             theme="light"
             className={`sider-primary ant-layout-sider-primary ${
               sidenavType === "#fff" ? "active-route" : ""
             }`}
-            style={{ background: sidenavType }}
+            style={{ background: "sidenavType" }}
           >
             <Sidenav color={sidenavColor} />
           </Sider>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Input, Space, Button, Avatar,Typography,Radio } from "antd";
+import { Table, Input, Space, Button, Avatar, Typography, Radio } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import face from "../assets/images/face-1.jpg";
 import face2 from "../assets/images/face-2.jpg";
@@ -12,10 +12,9 @@ import Highlighter from "react-highlight-words";
 import { Link } from "react-router-dom";
 const { Search } = Input;
 const { Title } = Typography;
-const DataTable = () => {
+const Contacts = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
-    
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -59,7 +58,6 @@ const DataTable = () => {
                     >
                         Search
                     </Button>
-                    
                 </Space>
             </div>
         ),
@@ -103,41 +101,19 @@ const DataTable = () => {
             ...getColumnSearchProps("name"),
         },
         {
-            title: "SOCIETE",
-            dataIndex: "societe",
-            key: "societe",
-            ...getColumnSearchProps("societe"),
+            title: "EMAIL",
+            dataIndex: "email",
+            key: "email",
+            ...getColumnSearchProps("email"),
         },
-        {
-            title: "TEL",
-            key: "tel",
-            dataIndex: "tel",
-            ...getColumnSearchProps("tel"),
-        },
-        {
-            title: "GSM",
-            key: "gsm",
-            dataIndex: "gsm",
-            ...getColumnSearchProps("gsm"),
-        },
-        {
-            title: "DATE RDV",
-            key: "date",
-            dataIndex: "date",
-            ...getColumnSearchProps("date"),
-        },
-        {
-            title: "AGENT",
-            key: "agent",
-            dataIndex: "agent",
-            ...getColumnSearchProps("agent"),
-        },
+
         {
             title: "AGENDA",
             key: "agenda",
             dataIndex: "agenda",
             ...getColumnSearchProps("agenda"),
         },
+        
     ];
 
     const data = [
@@ -159,42 +135,7 @@ const DataTable = () => {
                     </Avatar.Group>{" "}
                 </>
             ),
-            societe: (
-                <>
-                    <div className="author-info">
-                        <Title level={5}>BlueTech Solutions</Title>
-                        <p>Organization</p>
-                    </div>
-                </>
-            ),
-            tel: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 123-4567
-                    </Button>
-                </>
-            ),
-            gsm: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 987-6543
-                    </Button>
-                </>
-            ),
-            date: (
-                <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
-                    </div>
-                </>
-            ),
-            agent: (
-                <>
-                    <div className="ant-employed">
-                        <span>Jennifer Smith</span>
-                    </div>
-                </>
-            ),
+            email: "michael@mail.com",
             agenda: (
                 <>
                     <div className="ant-employed">
@@ -224,42 +165,8 @@ const DataTable = () => {
                     </Avatar.Group>{" "}
                 </>
             ),
-            societe: (
-                <>
-                    <div className="author-info">
-                        <Title level={5}>BlueTech Solutions</Title>
-                        <p>Organization</p>
-                    </div>
-                </>
-            ),
-            tel: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 123-4567
-                    </Button>
-                </>
-            ),
-            gsm: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 987-6543
-                    </Button>
-                </>
-            ),
-            date: (
-                <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
-                    </div>
-                </>
-            ),
-            agent: (
-                <>
-                    <div className="ant-employed">
-                        <span>Jennifer Smith</span>
-                    </div>
-                </>
-            ),
+            email: "michael@mail.com",
+
             agenda: (
                 <>
                     <div className="ant-employed">
@@ -289,42 +196,9 @@ const DataTable = () => {
                     </Avatar.Group>{" "}
                 </>
             ),
-            societe: (
-                <>
-                    <div className="author-info">
-                        <Title level={5}>BlueTech Solutions</Title>
-                        <p>Organization</p>
-                    </div>
-                </>
-            ),
-            tel: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 123-4567
-                    </Button>
-                </>
-            ),
-            gsm: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 987-6543
-                    </Button>
-                </>
-            ),
-            date: (
-                <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
-                    </div>
-                </>
-            ),
-            agent: (
-                <>
-                    <div className="ant-employed">
-                        <span>Jennifer Smith</span>
-                    </div>
-                </>
-            ),
+            
+            email: "michael@mail.com",
+
             agenda: (
                 <>
                     <div className="ant-employed">
@@ -354,42 +228,9 @@ const DataTable = () => {
                     </Avatar.Group>{" "}
                 </>
             ),
-            societe: (
-                <>
-                    <div className="author-info">
-                        <Title level={5}>BlueTech Solutions</Title>
-                        <p>Organization</p>
-                    </div>
-                </>
-            ),
-            tel: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 123-4567
-                    </Button>
-                </>
-            ),
-            gsm: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 987-6543
-                    </Button>
-                </>
-            ),
-            date: (
-                <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
-                    </div>
-                </>
-            ),
-            agent: (
-                <>
-                    <div className="ant-employed">
-                        <span>Jennifer Smith</span>
-                    </div>
-                </>
-            ),
+            
+            email: "michael@mail.com",
+
             agenda: (
                 <>
                     <div className="ant-employed">
@@ -419,42 +260,8 @@ const DataTable = () => {
                     </Avatar.Group>{" "}
                 </>
             ),
-            societe: (
-                <>
-                    <div className="author-info">
-                        <Title level={5}>BlueTech Solutions</Title>
-                        <p>Organization</p>
-                    </div>
-                </>
-            ),
-            tel: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 123-4567
-                    </Button>
-                </>
-            ),
-            gsm: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 987-6543
-                    </Button>
-                </>
-            ),
-            date: (
-                <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
-                    </div>
-                </>
-            ),
-            agent: (
-                <>
-                    <div className="ant-employed">
-                        <span>Jennifer Smith</span>
-                    </div>
-                </>
-            ),
+            
+            email: "michael@mail.com",
             agenda: (
                 <>
                     <div className="ant-employed">
@@ -465,6 +272,7 @@ const DataTable = () => {
                     </div>
                 </>
             ),
+
         },
         {
             key: "1",
@@ -484,42 +292,8 @@ const DataTable = () => {
                     </Avatar.Group>{" "}
                 </>
             ),
-            societe: (
-                <>
-                    <div className="author-info">
-                        <Title level={5}>BlueTech Solutions</Title>
-                        <p>Organization</p>
-                    </div>
-                </>
-            ),
-            tel: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 123-4567
-                    </Button>
-                </>
-            ),
-            gsm: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 987-6543
-                    </Button>
-                </>
-            ),
-            date: (
-                <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
-                    </div>
-                </>
-            ),
-            agent: (
-                <>
-                    <div className="ant-employed">
-                        <span>Jennifer Smith</span>
-                    </div>
-                </>
-            ),
+            
+            email: "michael@mail.com",
             agenda: (
                 <>
                     <div className="ant-employed">
@@ -531,12 +305,10 @@ const DataTable = () => {
                 </>
             ),
         },
-        
     ];
 
     return (
         <div>
-            
             <Search
                 id="search-input"
                 placeholder="Search"
@@ -548,4 +320,4 @@ const DataTable = () => {
     );
 };
 
-export default DataTable;
+export default Contacts;
