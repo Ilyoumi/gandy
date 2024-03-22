@@ -52,6 +52,11 @@ body {
   margin: 0;
   padding: 33px 20px;
 }
+.layout-dashboard .ant-layout-sider.sider-primary .brand{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .layout-dashboard .ant-layout-sider.sider-primary .brand img {
   height: 30px;
 }

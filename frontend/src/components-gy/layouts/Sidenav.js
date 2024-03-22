@@ -225,8 +225,8 @@ function Sidenav({ color }) {
                     src={logo}
                     alt=""
                     style={{
-                        width: expanded ? "100px" : "0",
-                        height: expanded ? "40px" : "0",
+                        width: expanded ? "120px" : "0",
+                        height: expanded ? "auto" : "0",
                         
                         overflow: "hidden",
                         transition: "all",
