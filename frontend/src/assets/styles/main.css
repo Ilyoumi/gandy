@@ -23,13 +23,7 @@ body {
   font-family: open sans, Helvetica, Arial, sans-serif;
 }
 
-.centered-container {
-  width:80%;
-  position: absolute;
-  left: 10%;
-  top:30%;
-  
-}
+
 .avatar-uploader .ant-upload {
   width: 200px; /* Adjust width as needed */
   height: 300px; /* Adjust height as needed */

@@ -523,7 +523,8 @@ const History = () => {
                 onChange={(e) => setSearchText(e.target.value)}
                 style={{ width: 200, marginBottom: 16 }}
             />
-            <Table columns={columns} dataSource={data} />
+            <Table columns={columns} dataSource={data} style={{  
+        boxShadow: "0px 20px 27px #0000000d", padding:"10px 1px" }} />
         </div>
     );
 };

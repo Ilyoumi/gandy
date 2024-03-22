@@ -26,8 +26,11 @@ import "./assets/styles/responsive.css";
 import AddUserForm from "./pages-gy/AddUserForm";
 import History from "./pages-gy/History";
 import Contacts from "./pages-gy/Contacts";
+import { SidebarProvider } from './SidebarContext';
+import Agenda from "./pages-gy/Agenda";
 function App() {
   return (
+    <SidebarProvider>
       <div className="App">
         <Switch>
           <Route path="/sign-up" exact component={SignUp} />
@@ -38,6 +41,7 @@ function App() {
             <Route exact path="/rdv" component={Tables} />
             <Route exact path="/history" component={History} />
             <Route exact path="/contact" component={Contacts} />
+            <Route exact path="/agenda" component={Agenda} />
             <Route exact path="/billing" component={Billing} />
             <Route exact path="/rtl" component={Rtl} />
             <Route exact path="/profile" component={Profile} />
@@ -46,6 +50,7 @@ function App() {
           </Main>
         </Switch>
       </div>
+      </SidebarProvider>
   );
 }
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Input, Space, Button, Avatar, Typography, Radio } from "antd";
+import { Table, Input, Space, Button, Avatar, Typography, Radio , Row, Col} from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import face from "../assets/images/face-1.jpg";
 import face2 from "../assets/images/face-2.jpg";
@@ -8,13 +8,19 @@ import face4 from "../assets/images/face-4.jpg";
 import face5 from "../assets/images/face-5.jpeg";
 import face6 from "../assets/images/face-6.jpeg";
 import Highlighter from "react-highlight-words";
-
+import { useHistory } from "react-router-dom";
 import { Link } from "react-router-dom";
 const { Search } = Input;
 const { Title } = Typography;
 const Contacts = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
+    const history = useHistory();
+
+    const handleButtonClick = () => {
+        // Redirect to the desired route
+        history.push("/add-user");
+    };
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -309,13 +315,21 @@ const Contacts = () => {
 
     return (
         <div>
-            <Search
-                id="search-input"
-                placeholder="Search"
-                onChange={(e) => setSearchText(e.target.value)}
-                style={{ width: 200, marginBottom: 16 }}
-            />
-            <Table columns={columns} dataSource={data} />
+            <Input
+            className="header-search mb-2 mt-2"
+            style={{ width:"20%" }}
+            placeholder="Type here..."
+            prefix={<SearchOutlined />}
+          />
+            <Row>
+                    <Col span={24} style={{ textAlign: "right" }}>
+                        <Button type="primary" htmlType="submit" onClick={handleButtonClick}>
+                            Ajouter utilisateur
+                        </Button>
+                    </Col>
+                </Row>
+            <Table columns={columns} dataSource={data} style={{  
+        boxShadow: "0px 20px 27px #0000000d", padding:"10px 1px" }}/>
         </div>
     );
 };

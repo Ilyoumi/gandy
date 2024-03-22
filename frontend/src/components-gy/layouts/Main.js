@@ -22,6 +22,7 @@ const { Header: AntHeader, Content, Sider } = Layout;
 
 function Main({ children }) {
   const [visible, setVisible] = useState(false);
+  
   const [placement, setPlacement] = useState("right");
   const [sidenavColor, setSidenavColor] = useState("#1890ff");
   const [sidenavType, setSidenavType] = useState("transparent");
@@ -75,7 +76,8 @@ function Main({ children }) {
             }`}
             style={{ background: sidenavType }}
           >
-            <Sidenav color={sidenavColor} />
+                
+            <Sidenav color={sidenavColor} onPress={openDrawer}  />
           </Sider>
         </Layout>
       </Drawer>
@@ -93,7 +95,7 @@ function Main({ children }) {
         }`}
         style={{ background: sidenavType }}
       >
-        <Sidenav color={sidenavColor} />
+        <Sidenav color={sidenavColor}  onPress={openDrawer}/>
       </Sider>
       <Layout>
         {fixed ? (
