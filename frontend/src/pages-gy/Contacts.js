@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useRef } from "react";
 import {
     Table,
     Input,
@@ -26,6 +26,7 @@ const Contacts = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
     const history = useHistory();
+    const searchInputRef = useRef(null);
 
     const handleButtonClick = () => {
         // Redirect to the desired route
@@ -89,10 +90,8 @@ const Contacts = () => {
                 .includes(value.toLowerCase()),
         onFilterDropdownVisibleChange: (visible) => {
             if (visible) {
-                setTimeout(
-                    () => document.getElementById("search-input").select(),
-                    100
-                );
+                setTimeout(() => searchInputRef.current && searchInputRef.current.select(), 100);
+
             }
         },
         render: (text) =>
