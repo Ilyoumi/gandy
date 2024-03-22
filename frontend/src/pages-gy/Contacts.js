@@ -430,15 +430,20 @@ const Contacts = () => {
     ];
 
     return (
-        <div>
+        <>
             <Input
                 className="header-search mb-2 mt-2"
                 style={{ width:"20%", padding:"0px 11px", height:"50px", borderRadius:"6px" }}
                 placeholder="Type here..."
                 prefix={<SearchOutlined />}
             />
-            <Row>
-                <Col span={24} style={{ textAlign: "right" }}>
+            <div style={{ backgroundColor:"white", padding:"5px",boxShadow: "0px 20px 27px #0000000d", }}>
+            
+            <Row style={{ margin:"10px 20px" }}>
+            <Col span={12} style={{ textAlign: "left", fontWeight:"bold", fontSize:"20px" }}>
+                    Ajouter Utilisateur
+                </Col>
+                <Col span={12} style={{ textAlign: "right" }}>
                     <Button
                         type="primary"
                         htmlType="submit"
@@ -451,12 +456,11 @@ const Contacts = () => {
             <Table
                 columns={columns}
                 dataSource={data}
-                style={{
-                    boxShadow: "0px 20px 27px #0000000d",
-                    padding: "10px 1px",
-                }}
+                
             />
         </div>
+        </>
+        
     );
 };
 
