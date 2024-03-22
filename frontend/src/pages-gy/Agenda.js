@@ -623,7 +623,7 @@ const Agenda = () => {
         <div>
             <Input
             className="header-search mb-2 mt-2"
-            style={{ width:"20%" }}
+            style={{ width:"20%", padding:"0px 11px", height:"50px", borderRadius:"6px" }}
             placeholder="Type here..."
             prefix={<SearchOutlined />}
           />
