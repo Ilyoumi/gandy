@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useRef} from "react";
 import { Table, Input, Space, Button, Avatar, Typography, Radio } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import face from "../assets/images/face-1.jpg";
@@ -15,6 +15,8 @@ const { Title } = Typography;
 const Agenda = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
+    const searchInputRef = useRef(null);
+
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -73,10 +75,8 @@ const Agenda = () => {
                 .includes(value.toLowerCase()),
         onFilterDropdownVisibleChange: (visible) => {
             if (visible) {
-                setTimeout(
-                    () => document.getElementById("search-input").select(),
-                    100
-                );
+                setTimeout(() => searchInputRef.current && searchInputRef.current.select(), 100);
+
             }
         },
         render: (text) =>

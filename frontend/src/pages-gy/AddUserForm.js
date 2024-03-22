@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useRef } from "react";
 import { Form, Input, Button, Col, Row, Upload, message,Avatar ,Table,Typography,Space} from "antd";
 import {
     UserOutlined,
@@ -53,6 +53,8 @@ const AddUserForm = () => {
     });
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
+    const searchInputRef = useRef(null);
+
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
       confirm();
@@ -106,10 +108,8 @@ const AddUserForm = () => {
             .includes(value.toLowerCase()),
     onFilterDropdownVisibleChange: (visible) => {
         if (visible) {
-            setTimeout(
-                () => document.getElementById("search-input").select(),
-                100
-            );
+            setTimeout(() => searchInputRef.current && searchInputRef.current.select(), 100);
+
         }
     },
     render: (text) =>
