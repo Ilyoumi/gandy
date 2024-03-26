@@ -15,7 +15,7 @@ import face3 from "../../assets/images/face-3.jpg";
 import face4 from "../../assets/images/face-4.jpg";
 import face5 from "../../assets/images/face-5.jpeg";
 import face6 from "../../assets/images/face-6.jpeg";
-
+import UpdateUser from "./UpdateUser"
 const { Dragger } = Upload;
 const { Title } = Typography;
 
@@ -54,6 +54,27 @@ const AddUserForm = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
     const searchInputRef = useRef(null);
+    const [updateModalVisible, setUpdateModalVisible] = useState(false);
+    const [updateData, setUpdateData] = useState({});
+
+    const showUpdateModal = (record) => {
+        setUpdateData(record);
+        setUpdateModalVisible(true);
+    };
+
+    const handleUpdate = (values) => {
+        // Handle update logic here, e.g., call API to update user data
+        console.log("Updated user data:", values);
+        setUpdateModalVisible(false);
+    };
+
+    const updateModalProps = {
+        visible: updateModalVisible,
+        onCancel: () => setUpdateModalVisible(false),
+        onUpdate: handleUpdate,
+        userData: updateData,
+    };
+
 
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -182,11 +203,16 @@ const AddUserForm = () => {
         ...getColumnSearchProps("tel"),
     },
     {
-      title: "ACTION",
-      key: "action",
-      dataIndex: "action",
-      ...getColumnSearchProps("action"),
-  },
+        title: "ACTION",
+        key: "action",
+        render: (text, record) => (
+<div>
+<Button type="link" onClick={() => showUpdateModal(record)}>{pencil}</Button>
+<Button type="link" onClick={() => showUpdateModal(record)}>{deletebtn}</Button>
+
+
+</div>        ),
+    },
 
   ];
 
@@ -557,6 +583,7 @@ const AddUserForm = () => {
 
                 }}
             />
+            <UpdateUser {...updateModalProps} />
         </div>
         </div>
     );

@@ -1,186 +1,91 @@
-import React, { useState } from "react";
-import { Form, Input, Button, Col, Row, Upload, message } from "antd";
-import {
-    UserOutlined,
-    LockOutlined,
-    MailOutlined,
-    VerticalAlignTopOutlined,
-} from "@ant-design/icons";
+import React from "react";
+import { Modal, Form, Input, Select, Upload, Button, message } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 
-const { Dragger } = Upload;
-const props = {
-    name: "file",
-    multiple: true,
-    action: "https://run.mocky.io/v3/435e224c-44fb-4773-9faf-380c5e6a2188",
-    onChange(info) {
-        const { status } = info.file;
-        if (status !== "uploading") {
-            console.log(info.file, info.fileList);
-        }
-        if (status === "done") {
+const { Option } = Select;
+
+const UpdateUserModal = ({ visible, onCancel, onUpdate, userData }) => {
+    const [form] = Form.useForm();
+
+    const handleImageChange = (info) => {
+        if (info.file.status === "done") {
             message.success(`${info.file.name} file uploaded successfully.`);
-        } else if (status === "error") {
+        } else if (info.file.status === "error") {
             message.error(`${info.file.name} file upload failed.`);
         }
-    },
-    onDrop(e) {
-        console.log("Dropped files", e.dataTransfer.files);
-    },
-};
-
-const UpdateUser = () => {
-    const [form] = Form.useForm();
-    const [formData, setFormData] = useState({
-        nom: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        avatar: null,
-    });
-
-    const handleChange = (changedValues) => {
-        setFormData({
-            ...formData,
-            ...changedValues,
-        });
     };
 
     const handleSubmit = () => {
-        console.log(formData);
+        form.validateFields().then((values) => {
+            onUpdate(values);
+            form.resetFields();
+        });
     };
 
     return (
-        <div >
-            <Form
-                form={form}
-                layout="vertical"
-                initialValues={formData}
-                onValuesChange={handleChange}
-                onFinish={handleSubmit}
-                style={{ border: "1px solid #ddd", padding: "80px" , backgroundColor:"white", borderRadius:"10px"}}
-            >
-                <Row gutter={[16, 16]}>
-            
-                    <Col xs={12} sm={8}>
-                        <Form.Item>
-                            <Dragger {...props} style={{ marginTop:"30px", padding:"20px 0px" }}>
-                                <p className="ant-upload-drag-icon">
-                                    <VerticalAlignTopOutlined />
-                                </p>
-                                <p className="ant-upload-text">
-                                    Update profile pictute
-                                </p>
-                                
-                            </Dragger>
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={16}>
-                        <Row gutter={[16, 16]}>
-                            <Col xs={24} sm={12}>
-                                <Form.Item
-                                    name="nom"
-                                    label="Nom"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message:
-                                                "Veuillez entrez le nouveau nom!",
-                                        },
-                                    ]}
-                                >
-                                    <Input
-                                        prefix={<UserOutlined />}
-                                        placeholder="Nom"
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col xs={24} sm={12}>
-                                <Form.Item
-                                    name="email"
-                                    label="Email"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message:
-                                                "Veuillez entrer nouveau email!",
-                                        },
-                                    ]}
-                                >
-                                    <Input
-                                        prefix={<MailOutlined />}
-                                        type="email"
-                                        placeholder="Email"
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col xs={24} sm={12}>
-                                <Form.Item
-                                    name="password"
-                                    label="Mot de passe"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message:
-                                                "Veuillez entrer nouveau mot de passe!",
-                                        },
-                                    ]}
-                                >
-                                    <Input.Password
-                                        prefix={<LockOutlined />}
-                                        placeholder="Mot de passe"
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col xs={24} sm={12}>
-                                <Form.Item
-                                    name="confirmPassword"
-                                    label="Confirmer le mot de passe"
-                                    dependencies={["password"]}
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message:
-                                                "Veuillez confirmer votre mot de passe!",
-                                        },
-                                        ({ getFieldValue }) => ({
-                                            validator(_, value) {
-                                                if (
-                                                    !value ||
-                                                    getFieldValue(
-                                                        "password"
-                                                    ) === value
-                                                ) {
-                                                    return Promise.resolve();
-                                                }
-                                                return Promise.reject(
-                                                    new Error(
-                                                        "Les deux mots de passe ne correspondent pas!"
-                                                    )
-                                                );
-                                            },
-                                        }),
-                                    ]}
-                                >
-                                    <Input.Password
-                                        prefix={<LockOutlined />}
-                                        placeholder="Confirmer le mot de passe"
-                                    />
-                                </Form.Item>
-                                
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-                <Row>
-          <Col span={24} style={{ textAlign: 'right' }}>
-            <Button type="primary" htmlType="submit">
-              Ajouter
-            </Button>
-          </Col>
-        </Row>
+        <Modal
+            visible={visible}
+            title="Modifier Utilisateur"
+            okText="Modifier"
+            onCancel={onCancel}
+            onOk={handleSubmit}
+        >
+            <Form form={form} initialValues={userData} layout="vertical">
+                <Form.Item
+                    name="image"
+                    label="Image"
+                    valuePropName="fileList"
+                    getValueFromEvent={(e) => {
+                        if (Array.isArray(e)) {
+                            return e;
+                        }
+                        return e && e.fileList;
+                    }}
+                    style={{ marginBottom: 20 }}
+                >
+                    <Upload
+                        name="image"
+                        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                        listType="picture"
+                        maxCount={1}
+                        onChange={handleImageChange}
+                        style={{ width: "100%" }}
+                    >
+                        <Button icon={<UploadOutlined />}>Uploader</Button>
+                    </Upload>
+                </Form.Item>
+                <Form.Item
+                    name="nom"
+                    label="Nom"
+                    rules={[{ required: true, message: "Veuillez entrer votre nom!" }]}
+                    style={{ marginBottom: 20 }}
+                >
+                    <Input placeholder="Nom" />
+                </Form.Item>
+                <Form.Item
+                    name="email"
+                    label="Email"
+                    rules={[{ required: true, message: "Veuillez entrer votre email!" }]}
+                    style={{ marginBottom: 20 }}
+                >
+                    <Input type="email" placeholder="Email" />
+                </Form.Item>
+                <Form.Item
+                    name="role"
+                    label="Rôle"
+                    rules={[{ required: true, message: "Veuillez sélectionner un rôle!" }]}
+                    style={{ marginBottom: 20 }}
+                >
+                    <Select placeholder="Sélectionner un rôle" style={{ width: "100%" }}>
+                        <Option value="Admin">Admin</Option>
+                        <Option value="Agent">Agent</Option>
+                        <Option value="Superviseur">Superviseur</Option>
+                        <Option value="Agent Commercial">Agent Commercial</Option>
+                    </Select>
+                </Form.Item>
             </Form>
-        </div>
+        </Modal>
     );
 };
 
-export default UpdateUser;
+export default UpdateUserModal;

@@ -1,5 +1,5 @@
 import React, { useState ,useRef} from "react";
-import { Table, Input, Space, Button, Avatar, Typography, Radio } from "antd";
+import { Table, Input, Space, Button, Avatar, Typography, Form, Modal,Select  } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import face from "../../assets/images/face-1.jpg";
 import face2 from "../../assets/images/face-2.jpg";
@@ -9,12 +9,13 @@ import face5 from "../../assets/images/face-5.jpeg";
 import face6 from "../../assets/images/face-6.jpeg";
 import Highlighter from "react-highlight-words";
 
-import { Link } from "react-router-dom";
-const { Search } = Input;
 const { Title } = Typography;
+const { Option } = Select;
 const Agenda = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [selectedRowData, setSelectedRowData] = useState(null);
     const searchInputRef = useRef(null);
 
 
@@ -24,10 +25,15 @@ const Agenda = () => {
         setSearchedColumn(dataIndex);
     };
 
-    const handleReset = (clearFilters) => {
-        clearFilters();
-        setSearchText("");
+    const handleUpdate = (record) => {
+        setSelectedRowData(record);
+        setIsModalVisible(true);
     };
+
+    const handleModalCancel = () => {
+        setIsModalVisible(false);
+    };
+
 
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({
@@ -149,8 +155,16 @@ const Agenda = () => {
         {
             title: "ACTION",
             key: "action",
-            dataIndex: "action",
-            ...getColumnSearchProps("action"),
+            render: (text, record) => (
+                <Space size="middle">
+                    <Button type="link" danger>
+                        {deletebtn}
+                    </Button>
+                    <Button type="link" className="darkbtn" onClick={() => handleUpdate(record)}>
+                        {pencil}
+                    </Button>
+                </Space>
+            ),
         },
     ];
 
@@ -635,8 +649,52 @@ const Agenda = () => {
                     padding: "10px 1px",
                 }}
             />
+            <Modal
+                title="Update Record"
+                visible={isModalVisible}
+                onCancel={handleModalCancel}
+                footer={null}
+            >
+                <UpdateForm initialValues={selectedRowData} onSubmit={(values) => console.log(values)} />
+            </Modal>
         </div>
     );
 };
 
+
+
 export default Agenda;
+const UpdateForm = ({ initialValues, onSubmit }) => {
+    const [form] = Form.useForm();
+
+    const handleSubmit = async () => {
+        try {
+            const values = await form.validateFields();
+            onSubmit(values);
+        } catch (errorInfo) {
+            console.log("Failed:", errorInfo);
+        }
+    };
+
+    return (
+        <Form form={form} layout="vertical" onFinish={handleSubmit} initialValues={initialValues}>
+            <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please input the name!" }]}>
+                <Input />
+            </Form.Item>
+            <Form.Item label="Agent" name="agent" rules={[{ required: true, message: "Please select an agent!" }]}>
+                <Select>
+                    <Option value="agent1">Agent 1</Option>
+                    <Option value="agent2">Agent 2</Option>
+                    <Option value="agent3">Agent 3</Option>
+                    {/* Add more options as needed */}
+                </Select>
+            </Form.Item>
+            <Form.Item>
+                <Button type="primary" htmlType="submit">
+                Mettre à jour
+                </Button>
+            </Form.Item>
+        </Form>
+    );
+};
+
