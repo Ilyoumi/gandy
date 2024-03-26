@@ -19,7 +19,7 @@ body {
   font-size: 14px;
   line-height: 1.6;
   font-weight: 400;
-  
+
   font-family: open sans, Helvetica, Arial, sans-serif;
 }
 
@@ -2040,7 +2040,7 @@ body {
   box-shadow: 0 20px 27px rgb(0 0 0 / 5%);
   flex-direction: row;
   padding: 0 50px;
-  height: 64px;
+  height: 84px;
   line-height: 64px;
 }
 .fill-muted {
@@ -2163,6 +2163,7 @@ body {
 }
 .sign-img img {
   width: 100%;
+  max-width: 500px;
   display: block;
 }
 .layout-signin {
@@ -2216,9 +2217,7 @@ body {
 }
 
 /* end sign up */
-.signin{
-  margin-top: 120px !important;
-}
+
 .rightside-top .signin {
   display: inline-flex;
 }

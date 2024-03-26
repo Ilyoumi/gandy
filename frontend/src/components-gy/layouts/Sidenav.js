@@ -15,7 +15,7 @@
 import { Menu } from "antd";
 
 import { NavLink, useLocation } from "react-router-dom";
-import logo from "../../assets/images/loogo.png";
+import logo from "../../assets/images/gy-noir.png";
 import React, { useState } from "react";
 function Sidenav({ color }) {
     const { pathname } = useLocation();
@@ -225,11 +225,12 @@ function Sidenav({ color }) {
                     src={logo}
                     alt=""
                     style={{
-                        width: expanded ? "120px" : "0",
+                        width: expanded ? "70px" : "0",
                         height: expanded ? "auto" : "0",
-                        
+
                         overflow: "hidden",
                         transition: "all",
+                        marginTop:"-10px"
                     }}
                 />
             </div>
@@ -240,8 +241,11 @@ function Sidenav({ color }) {
                 style={{
                     marginTop: "28px",
                     width: expanded ? "200px" : "50px",
+                    marginTop:"8px"
+
+
                 }}
-                className="sidenav"
+                className=""
             >
                 <Menu.Item
                     key="1"
@@ -295,7 +299,7 @@ function Sidenav({ color }) {
                         </span>
                     </NavLink>
                 </Menu.Item>
-                
+
                 {expanded && (
                     <Menu.Item
                         className="menu-item-header"
@@ -335,8 +339,8 @@ function Sidenav({ color }) {
                     </NavLink>
                 </Menu.Item>
 
-                
-                
+
+
                 <Menu.Item
                     key="4"
                     style={{ width: expanded ? "200px" : "10px" }}
@@ -364,7 +368,7 @@ function Sidenav({ color }) {
                         </span>
                     </NavLink>
                 </Menu.Item>
-                
+
                 {expanded && (
                     <Menu.Item
                         className="menu-item-header"
@@ -377,7 +381,7 @@ function Sidenav({ color }) {
                     </Menu.Item>
                 )}
 
-                
+
                 <Menu.Item
                     key="7"
                     style={{ width: expanded ? "200px" : "10px" }}
@@ -425,7 +429,7 @@ function Sidenav({ color }) {
                         </span>
                     </NavLink>
                 </Menu.Item>
-                
+
             </Menu>
         </div>
     );
