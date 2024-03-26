@@ -11,23 +11,23 @@
 */
 import { Switch, Route, Redirect } from "react-router-dom";
 import Home from "./pages-gy/Home";
-import Tables from "./pages-gy/Tables";
+import Tables from "./pages-gy/rdv/Tables";
 import Billing from "./pages-gy/Billing";
 import Rtl from "./pages-gy/Rtl";
-import Profile from "./pages-gy/Profile";
-import SignUp from "./pages-gy/SignUp";
-import SignIn from "./pages-gy/SignIn";
+import Profile from "./pages-gy/user/Profile";
+import SignUp from "./pages-gy/user/SignUp";
+import SignIn from "./pages-gy/user/SignIn";
 import Main from "./components-gy/layouts/Main";
-import MyCalendar from './pages-gy/MyCalendar'
+import MyCalendar from './pages-gy/caledrier/MyCalendar'
 // import "antd/dist/antd.css";
 import 'antd/dist/antd.min.css'
 import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
-import AddUserForm from "./pages-gy/AddUserForm";
-import History from "./pages-gy/History";
-import Contacts from "./pages-gy/Contacts";
+import AddUserForm from "./pages-gy/user/AddUserForm";
+import History from "./pages-gy/rdv/History";
+import Contacts from "./pages-gy/user/Contacts";
 import { SidebarProvider } from './SidebarContext';
-import Agenda from "./pages-gy/Agenda";
+import Agenda from "./pages-gy/caledrier/Agenda";
 import Card from "./pages-gy/card/Card";
 function App() {
   return (

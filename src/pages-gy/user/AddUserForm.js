@@ -9,12 +9,12 @@ import {
 } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 
-import face from "../assets/images/face-1.jpg";
-import face2 from "../assets/images/face-2.jpg";
-import face3 from "../assets/images/face-3.jpg";
-import face4 from "../assets/images/face-4.jpg";
-import face5 from "../assets/images/face-5.jpeg";
-import face6 from "../assets/images/face-6.jpeg";
+import face from "../../assets/images/face-1.jpg";
+import face2 from "../../assets/images/face-2.jpg";
+import face3 from "../../assets/images/face-3.jpg";
+import face4 from "../../assets/images/face-4.jpg";
+import face5 from "../../assets/images/face-5.jpeg";
+import face6 from "../../assets/images/face-6.jpeg";
 
 const { Dragger } = Upload;
 const { Title } = Typography;
@@ -187,9 +187,9 @@ const AddUserForm = () => {
       dataIndex: "action",
       ...getColumnSearchProps("action"),
   },
-    
+
   ];
-  
+
   const data = [
     {
         key: "1",
@@ -231,7 +231,7 @@ const AddUserForm = () => {
                             {deletebtn}
                         </Button>
                         <Button type="link" className="darkbtn">
-                            {pencil} 
+                            {pencil}
                         </Button>
                     </div>
                 </div>
@@ -270,8 +270,8 @@ const AddUserForm = () => {
                 </Button>
             </>
         ),
-        
-        
+
+
         action: (
             <>
                 <div className="ant-employed">
@@ -280,7 +280,7 @@ const AddUserForm = () => {
                             {deletebtn}
                         </Button>
                         <Button type="link" className="darkbtn">
-                            {pencil} 
+                            {pencil}
                         </Button>
                     </div>
                 </div>
@@ -319,8 +319,8 @@ const AddUserForm = () => {
                 </Button>
             </>
         ),
-        
-        
+
+
         action: (
             <>
                 <div className="ant-employed">
@@ -329,7 +329,7 @@ const AddUserForm = () => {
                             {deletebtn}
                         </Button>
                         <Button type="link" className="darkbtn">
-                            {pencil} 
+                            {pencil}
                         </Button>
                     </div>
                 </div>
@@ -361,7 +361,7 @@ const AddUserForm = () => {
               </div>
           </>
       ),
-        
+
       role: (
         <>
             <Button className="tag-primary" style={{ backgroundColor:"#7BD3EA", border:"none" , width:"150px", color:"white" }}>
@@ -377,14 +377,14 @@ const AddUserForm = () => {
                             {deletebtn}
                         </Button>
                         <Button type="link" className="darkbtn">
-                            {pencil} 
+                            {pencil}
                         </Button>
                     </div>
                 </div>
             </>
         ),
     },
-    
+
   ];
 
     const handleChange = (changedValues) => {
@@ -529,7 +529,7 @@ const AddUserForm = () => {
                     </Col>
                 </Row>
                 <Row>
-                
+
                     <Col span={24} style={{ textAlign: "right" }}>
                         <Button type="primary" htmlType="submit">
                             Ajouter
@@ -538,7 +538,7 @@ const AddUserForm = () => {
                 </Row>
             </Form>
             <div style={{
-                    
+
                     marginTop:"20px",
                     marginBottom:"20px"
                 }}>
@@ -554,7 +554,7 @@ const AddUserForm = () => {
                 style={{
                     boxShadow: "0px 20px 27px #0000000d",
                     padding: "10px 1px",
-                    
+
                 }}
             />
         </div>

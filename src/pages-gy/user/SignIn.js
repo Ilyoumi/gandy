@@ -11,8 +11,8 @@ import {
   Switch,
   Menu
 } from "antd";
-import signinbg from "../assets/images/login.png";
-import logo from "../assets/images/gy.png";
+import signinbg from "../../assets/images/login.png";
+import logo from "../../assets/images/gy.png";
 
 
 const { Title } = Typography;

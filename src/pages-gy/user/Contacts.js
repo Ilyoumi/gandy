@@ -11,12 +11,12 @@ import {
     Col,
 } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import face from "../assets/images/face-1.jpg";
-import face2 from "../assets/images/face-2.jpg";
-import face3 from "../assets/images/face-3.jpg";
-import face4 from "../assets/images/face-4.jpg";
-import face5 from "../assets/images/face-5.jpeg";
-import face6 from "../assets/images/face-6.jpeg";
+import face from "../../assets/images/face-1.jpg";
+import face2 from "../../assets/images/face-2.jpg";
+import face3 from "../../assets/images/face-3.jpg";
+import face4 from "../../assets/images/face-4.jpg";
+import face5 from "../../assets/images/face-5.jpeg";
+import face6 from "../../assets/images/face-6.jpeg";
 import Highlighter from "react-highlight-words";
 import { useHistory } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -438,7 +438,7 @@ const Contacts = () => {
                 prefix={<SearchOutlined />}
             />
             <div style={{ backgroundColor:"white", padding:"5px",boxShadow: "0px 20px 27px #0000000d", }}>
-            
+
             <Row style={{ margin:"10px 20px" }}>
             <Col span={12} style={{ textAlign: "left", fontWeight:"bold", fontSize:"20px" }}>
                     Ajouter Utilisateur
@@ -456,11 +456,11 @@ const Contacts = () => {
             <Table
                 columns={columns}
                 dataSource={data}
-                
+
             />
         </div>
         </>
-        
+
     );
 };
 
