@@ -11,9 +11,11 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+ 
     public function index()
     {
-        //
+        $users = User::with('role')->get();
+        return response()->json($users);
     }
 
     /**
