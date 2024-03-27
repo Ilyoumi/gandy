@@ -13,7 +13,7 @@ import {
     Radio,
     message,
     Row,
-    Col,
+    Col,Card ,
 } from "antd";
 import { ClockCircleOutlined } from '@ant-design/icons';
 const { Option } = Select;
@@ -92,17 +92,23 @@ const CalendarComponent = () => {
                 
             >
                 <Form layout="vertical" onFinish={handleFormSubmit} >
-                    <Row
+                <Card style={{     padding: "0 !important", marginBottom: "10px"}} >
+                    <Row gutter={[16, 16]}
                         style={{
-                            border: "1px solid rgb(0 0 0 / 8%)",
-                            boxShadow: "0 20px 27px rgb(0 0 0 / 8%)",
-                            borderRadius: "8px",
-                            height:"48px",
-                            padding:"3px 0",
-                            backgroundColor:"white", 
-                            boxShadow:"0 20px 27px rgb(0 0 0 / 5%)",
+                            // padding: "9px 16px"
+                            // border: "1px solid rgb(0 0 0 / 8%)",
+                            // boxShadow: "0 20px 27px rgb(0 0 0 / 8%)",
+                            // borderRadius: "8px",
+                            // height:"48px",
+                            // padding:"3px 0",
+                            // backgroundColor:"white", 
+                            // boxShadow:"0 20px 27px rgb(0 0 0 / 5%)",
                         }}
                     >
+                        {/* <Col span={1} >
+                            <ClockCircleOutlined style={{color:"#D9D9D9", marginRight:"10px"}} />
+                        
+                        </Col> */}
                         <Col span={6} >
                             <Form.Item
                                 name="startTime"
@@ -114,11 +120,9 @@ const CalendarComponent = () => {
                                     },
                                 ]}
                             >
-                            <ClockCircleOutlined style={{color:"#D9D9D9", marginRight:"10px"}} />
-
-                                <DatePicker showTime style={{ borderRadius:"6px", fontWeight:"600px", height:"40px"
-  }} />
+                            <DatePicker showTime style={{ borderRadius:"6px", fontWeight:"600px", height:"40px"}} />
                             </Form.Item>
+
                         </Col>
                         <Col span={6} >
                         <Form.Item
@@ -131,17 +135,22 @@ const CalendarComponent = () => {
                                 },
                             ]}
                         >
-                        <ClockCircleOutlined style={{color:"#D9D9D9", marginRight:"10px"}}/>
-
-                            <DatePicker showTime style={{ borderRadius:"6px", fontWeight:"600px", height:"40px", 
-  }} />
+                        <DatePicker showTime style={{ borderRadius:"6px", fontWeight:"600px", height:"40px",}} />
                         </Form.Item>
                     </Col>
+                    <Col span={12}>
+                            <Form.Item style={{position: "absolute", right: "20px"}}>
+                                <Button  htmlType="submit" style={{backgroundColor:"#00CC6A"}}>
+                                    Ajouter un rendez-vous
+                                </Button>
+                            </Form.Item>
+                        </Col>
                     </Row>
-                    <Row gutter={[16, 16]} style={{ marginTop: "20px",backgroundColor:"white", 
-                            borderRadius: "8px",
-                            boxShadow:"0 20px 27px rgb(0 0 0 / 5%)" }}>
+                </Card>
+                <Card>
+                    <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} lg={8}>
+
                             <Form.Item
                                 label="Titre"
                                 name="title"
@@ -368,14 +377,16 @@ const CalendarComponent = () => {
                                 <Input.TextArea rows={2} />
                             </Form.Item>
                         </Col>
-                        <Col xs={24}>
+                        {/* <Col xs={24}>
                             <Form.Item>
                                 <Button  htmlType="submit" style={{backgroundColor:"#00CC6A"}}>
                                     Ajouter un rendez-vous
                                 </Button>
                             </Form.Item>
-                        </Col>
+                        </Col> */}
+
                     </Row>
+                </Card>
                 </Form>
             </Modal>
         </div>
