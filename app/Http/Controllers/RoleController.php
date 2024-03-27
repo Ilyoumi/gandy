@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\Role;
 class RoleController extends Controller
 {
     /**
@@ -24,7 +24,18 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validate request data
+        $request->validate([
+            'name' => 'required|string|unique:roles,name',
+        ]);
+
+        // Create a new role
+        $role = Role::create([
+            'name' => $request->input('name'),
+        ]);
+
+        // Return a response indicating success
+        return response()->json(['message' => 'Role created successfully', 'role' => $role], 201);
     }
 
     /**
