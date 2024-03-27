@@ -6,11 +6,15 @@ import {
     Button,
     Avatar,
     Typography,
-    Radio,
+    Modal,
+    Select,
     Row,
     Col,
+    Form,
+    Upload,
+    message
 } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined,UploadOutlined } from "@ant-design/icons";
 import face from "../../assets/images/face-1.jpg";
 import face2 from "../../assets/images/face-2.jpg";
 import face3 from "../../assets/images/face-3.jpg";
@@ -19,14 +23,30 @@ import face5 from "../../assets/images/face-5.jpeg";
 import face6 from "../../assets/images/face-6.jpeg";
 import Highlighter from "react-highlight-words";
 import { useHistory } from "react-router-dom";
-import { Link } from "react-router-dom";
-const { Search } = Input;
+
+const { Option } = Select;
 const { Title } = Typography;
+
 const Contacts = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
+    const [visible, setVisible] = useState(false);
+    const [selectedAgenda, setSelectedAgenda] = useState("");
     const history = useHistory();
     const searchInputRef = useRef(null);
+
+    const showUpdateModal = () => {
+        setVisible(true);
+    };
+
+    const handleAgendaChange = (value) => {
+        setSelectedAgenda(value);
+    };
+
+    const handleUpdate = () => {
+        // Logic to update the agenda
+        setVisible(false);
+    };
 
     const handleButtonClick = () => {
         // Redirect to the desired route
@@ -169,7 +189,16 @@ const Contacts = () => {
             title: "ACTION",
             key: "action",
             dataIndex: "action",
-            ...getColumnSearchProps("action"),
+            render: () => (
+                <Space size="middle">
+                    <Button type="link" className="darkbtn" onClick={showUpdateModal}>
+                        {pencil}
+                    </Button>
+                    <Button type="link" className="darkbtn" onClick={showUpdateModal}>
+                        {deletebtn}
+                    </Button>
+                </Space>
+            ),
         },
     ];
 
@@ -458,6 +487,12 @@ const Contacts = () => {
                 dataSource={data}
 
             />
+            <UpdateUserModal
+                visible={visible}
+                onCancel={() => setVisible(false)}
+                onUpdate={handleUpdate}
+            />
+
         </div>
         </>
 
@@ -465,3 +500,99 @@ const Contacts = () => {
 };
 
 export default Contacts;
+const UpdateUserModal = ({ visible, onCancel, onUpdate, userData }) => {
+    const [form] = Form.useForm();
+    const [agenda, setAgenda] = useState(userData ? userData.agenda : undefined);
+
+    const handleAgendaChange = (value) => {
+        setAgenda(value);
+    };
+    const handleImageChange = (info) => {
+        if (info.file.status === "done") {
+            message.success(`${info.file.name} file uploaded successfully.`);
+        } else if (info.file.status === "error") {
+            message.error(`${info.file.name} file upload failed.`);
+        }
+    };
+
+    const handleSubmit = () => {
+        form
+            .validateFields()
+            .then((values) => {
+                form.resetFields();
+                onUpdate({ ...values, agenda });
+            })
+            .catch((info) => {
+                console.log("Validate Failed:", info);
+            });
+    };
+
+    return (
+        <Modal
+            visible={visible}
+            title="Modifier Utilisateur"
+            okText="Modifier"
+            onCancel={onCancel}
+            onOk={handleSubmit}
+        >
+            <Form
+                form={form}
+                initialValues={{
+                    name: userData ? userData.name : "",
+                    email: userData ? userData.email : "",
+                    agenda: userData ? userData.agenda : undefined,
+                }}
+            >
+                <Form.Item
+                    name="image"
+                    label="Image"
+                    valuePropName="fileList"
+                    getValueFromEvent={(e) => {
+                        if (Array.isArray(e)) {
+                            return e;
+                        }
+                        return e && e.fileList;
+                    }}
+                    style={{ marginBottom: 20 }}
+                >
+                    <Upload
+                        name="image"
+                        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                        listType="picture"
+                        maxCount={1}
+                        onChange={handleImageChange}
+                        style={{ width: "100%" }}
+                    >
+                        <Button icon={<UploadOutlined />}>Uploader</Button>
+                    </Upload>
+                </Form.Item>
+                <Form.Item
+                    name="name"
+                    label="Nom"
+                    rules={[{ required: true, message: "Veuillez entrer le nom!" }]}
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item
+                    name="email"
+                    label="Email"
+                    rules={[{ required: true, message: "Veuillez entrer l'email!" }]}
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    name="agenda"
+                    label="Agenda"
+                    rules={[{ required: true, message: "Veuillez sélectionner l'agenda!" }]}
+                >
+                    <Select onChange={handleAgendaChange}>
+                        <Option value="agenda1">Agenda 1</Option>
+                        <Option value="agenda2">Agenda 2</Option>
+                        <Option value="agenda3">Agenda 3</Option>
+                    </Select>
+                </Form.Item>
+            </Form>
+        </Modal>
+    );
+};
