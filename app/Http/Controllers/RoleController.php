@@ -13,8 +13,10 @@ class RoleController extends Controller
      */
     public function index()
     {
-        //
+        $roles = Role::all();
+        return response()->json($roles);
     }
+
 
     /**
      * Store a newly created resource in storage.
