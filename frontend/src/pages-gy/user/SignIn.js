@@ -11,7 +11,7 @@ import {
   Switch,
   Menu
 } from "antd";
-import signinbg from "../../assets/images/login.png";
+import signinbg from "../../assets/images/loginbg.png";
 import logo from "../../assets/images/gy.png";
 
 
@@ -30,33 +30,31 @@ export default class SignIn extends Component {
     return (
       <>
         <Layout className="layout-default layout-signin">
-          <Header>
-            <div className="header-col header-brand">
-              <img src={logo} alt="" style={{ width: "80px", marginTop:"8px" }} />
-            </div>
-            <div className="header-col header-nav">
-              <Menu mode="horizontal" defaultSelectedKeys={["1"]}>
-                <Menu.Item key="1">
-                  <Link to="/dashboard">
-
-                    <span> Dashboard</span>
-                  </Link>
-                </Menu.Item>
-
-              </Menu>
-            </div>
-
-          </Header>
           <Content className="signin">
             <Row
-              gutter={[24, 0]}
+             gutter={[24, 0]}
+             justify="space-around"
+             align="left"
+             style={{ }}
+            >
+              <Col
+              xs={{ span: 24, offset: 0 }}
+              lg={{ span: 20, offset: 4 }}
+              md={{ span: 24 }}
+              >
+              <img src={logo} alt="" style={{ width: "100px" }} />
+        
+              </Col>
+            </Row>
+            <Row
+              gutter={[0, 0]}
               justify="space-around"
               align="middle"
-              style={{ height: "100%" }}
+              style={{ height: "70%" }}
             >
               <Col
                 xs={{ span: 24, offset: 0 }}
-                lg={{ span: 6, offset: 2 }}
+                lg={{ span: 8, offset: 4 }}
                 md={{ span: 12 }}
               >
                 <Title className="mb-15">Sign In</Title>
@@ -115,32 +113,31 @@ export default class SignIn extends Component {
                       SIGN IN
                     </Button>
                   </Form.Item>
-                  <p className="font-semibold text-muted">
-                    Don't have an account?{" "}
-                    <Link to="/sign-up" className="text-dark font-bold">
-                      Sign Up
-                    </Link>
-                  </p>
                 </Form>
               </Col>
               <Col
+                xs={{ span: 24, offset: 0 }}
+                lg={{ span: 2, offset: 0 }}
+                md={{ span: 12 }}
+              ></Col>
+              <Col
                 className="sign-img"
-                style={{ padding: 12 }}
+                // style={{ padding: 12 }}
                 xs={{ span: 24 }}
-                lg={{ span: 12 }}
+                lg={{ span: 10  }}
                 md={{ span: 12 }}
               >
                 <img src={signinbg} alt="" />
               </Col>
             </Row>
           </Content>
-          <Footer>
+          {/* <Footer>
             <p className="copyright">
               {" "}
               Copyright © 2024 GANDY Inc. All rights reserved
 .{" "}
             </p>
-          </Footer>
+          </Footer> */}
         </Layout>
       </>
     );
