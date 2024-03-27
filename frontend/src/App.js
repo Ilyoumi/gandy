@@ -12,8 +12,6 @@
 import { Switch, Route, Redirect } from "react-router-dom";
 import Home from "./pages-gy/Home";
 import Tables from "./pages-gy/rdv/Tables";
-import Billing from "./pages-gy/Billing";
-import Rtl from "./pages-gy/Rtl";
 import Profile from "./pages-gy/user/Profile";
 import SignUp from "./pages-gy/user/SignUp";
 import SignIn from "./pages-gy/user/SignIn";
@@ -44,8 +42,6 @@ function App() {
             <Route exact path="/history" component={History} />
             <Route exact path="/contact" component={Contacts} />
             <Route exact path="/agenda" component={Agenda} />
-            <Route exact path="/billing" component={Billing} />
-            <Route exact path="/rtl" component={Rtl} />
             <Route exact path="/profile" component={Profile} />
             <Route exact path="/add-user" component={AddUserForm} />
             <Redirect from="*" to="/dashboard" />
