@@ -2,11 +2,7 @@ import React, { useState ,useRef} from "react";
 import { Table, Input, Space, Button, Avatar, Typography, Form, Modal,Select  } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import face from "../../assets/images/face-1.jpg";
-import face2 from "../../assets/images/face-2.jpg";
-import face3 from "../../assets/images/face-3.jpg";
-import face4 from "../../assets/images/face-4.jpg";
-import face5 from "../../assets/images/face-5.jpeg";
-import face6 from "../../assets/images/face-6.jpeg";
+
 import Highlighter from "react-highlight-words";
 
 const { Title } = Typography;
@@ -255,7 +251,7 @@ const Agenda = () => {
                             className="shape-avatar"
                             shape="square"
                             size={40}
-                            src={face6}
+                            src={face}
                         ></Avatar>
                         <div className="avatar-info">
                             <Title level={5}>Michael John</Title>
@@ -332,7 +328,7 @@ const Agenda = () => {
                             className="shape-avatar"
                             shape="square"
                             size={40}
-                            src={face3}
+                            src={face}
                         ></Avatar>
                         <div className="avatar-info">
                             <Title level={5}>Michael John</Title>
@@ -409,7 +405,7 @@ const Agenda = () => {
                             className="shape-avatar"
                             shape="square"
                             size={40}
-                            src={face2}
+                            src={face}
                         ></Avatar>
                         <div className="avatar-info">
                             <Title level={5}>Michael John</Title>
@@ -486,7 +482,7 @@ const Agenda = () => {
                             className="shape-avatar"
                             shape="square"
                             size={40}
-                            src={face4}
+                            src={face}
                         ></Avatar>
                         <div className="avatar-info">
                             <Title level={5}>Michael John</Title>
@@ -564,7 +560,7 @@ const Agenda = () => {
                             className="shape-avatar"
                             shape="square"
                             size={40}
-                            src={face5}
+                            src={face}
                         ></Avatar>
                         <div className="avatar-info">
                             <Title level={5}>Michael John</Title>
