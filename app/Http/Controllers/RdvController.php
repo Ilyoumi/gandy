@@ -4,76 +4,58 @@ namespace App\Http\Controllers;
 
 use App\Models\rdv;
 use Illuminate\Http\Request;
+use App\Models\Agenda;
+use App\Models\User; 
 
 class RdvController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        return Rdv::all();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nom' => 'required|string',
+            'prenom' => 'required|string',
+            'nom_ste' => 'required|string',
+            'tva' => 'required|string',
+            'tel' => 'required|string',
+            'gsm' => 'required|string',
+            'fournisseur' => 'required|boolean',
+            'tarification' => 'required|string',
+            'nbr_comp_elect' => 'required|integer',
+            'nbr_comp_gaz' => 'required|integer',
+            'tarif' => 'required|boolean',
+            'haute_tension' => 'required|boolean',
+            'id_agent' => 'required|exists:users,id',
+            'id_agenda' => 'required|exists:agendas,id',
+        ]);
+
+        return Rdv::create($request->all());
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\rdv  $rdv
-     * @return \Illuminate\Http\Response
-     */
-    public function show(rdv $rdv)
+    public function show($id)
     {
-        //
+        return Rdv::findOrFail($id);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\rdv  $rdv
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, rdv $rdv)
+    public function update(Request $request, $id)
     {
-        //
+        $rdv = Rdv::findOrFail($id);
+        $rdv->update($request->all());
+
+        return $rdv;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\rdv  $rdv
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(rdv $rdv)
+    public function destroy($id)
     {
-        //
+        $rdv = Rdv::findOrFail($id);
+        $rdv->delete();
+
+        return 204; // No content
     }
-
-    //  /**
-    //  * Display a listing of the resource.
-    //  *
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function index()
-    // {
-    //     // Récupérer tous les RDVs avec les relations user et agenda
-    //     $rdvs = Rdv::with(['user', 'agenda'])->get();
-    //     return response()->json($rdvs);
-    // }
-
     // /**
     //  * Store a newly created resource in storage.
     //  *

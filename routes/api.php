@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
     // Routes pour les utilisateurs
     Route::apiResource('users', 'UserController');
 
@@ -12,4 +12,4 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Routes pour les rendez-vous (RDVs)
     Route::apiResource('rdvs', 'RdvController');
-});
+// });

@@ -20,12 +20,19 @@ class agenda extends Model
     /**
      * Get the user that owns the agenda item.
      */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    // public function user()
+    // {
+    //     return $this->belongsTo(User::class);
+    // }
     public function rdvs()
     {
         return $this->hasMany(Rdv::class, 'id_agenda');
+    }
+
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'contact_id');
     }
 }
