@@ -38,7 +38,6 @@ import {
 
 import { NavLink, Link } from "react-router-dom";
 import styled from "styled-components";
-import avtar from "../../assets/images/team-2.jpg";
 
 const ButtonContainer = styled.div`
   .ant-btn-primary {
@@ -152,7 +151,7 @@ const data = [
     title: "New message from Sophie",
     description: <>{clockicon} 2 days ago</>,
 
-    avatar: avtar,
+    avatar: <Avatar shape="square">{wifi}</Avatar>
   },
   {
     title: "New album by Travis Scott",
@@ -398,7 +397,7 @@ function Header({
                   <Title level={5}>Navbar Fixed </Title>
                   <Switch onChange={(e) => handleFixedNavbar(e)} />
                 </div>
-                
+
                 <div className="viewstar">
                   <a href="#pablo">{<StarOutlined />} Star</a>
                   <a href="#pablo"> 190</a>

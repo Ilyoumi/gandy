@@ -34,17 +34,7 @@ import Paragraph from "antd/lib/typography/Paragraph";
 import Echart from "../components/chart/EChart";
 import LineChart from "../components/chart/LineChart";
 
-import ava1 from "../assets/images/logo-shopify.svg";
-import ava2 from "../assets/images/logo-atlassian.svg";
-import ava3 from "../assets/images/logo-slack.svg";
-import ava4 from "../assets/images/logo-spotify.svg";
-import ava5 from "../assets/images/logo-jira.svg";
-import ava6 from "../assets/images/logo-invision.svg";
-import team1 from "../assets/images/team-1.jpg";
-import team2 from "../assets/images/team-2.jpg";
-import team3 from "../assets/images/team-3.jpg";
-import team4 from "../assets/images/team-4.jpg";
-import card from "../assets/images/info-card-1.jpg";
+import face from "../assets/images/face-1.jpg";
 import History from "./rdv/History";
 
 function Home() {
@@ -173,23 +163,23 @@ function Home() {
 
   const list = [
     {
-      img: ava1,
+      img: face,
       Title: "Soft UI Shopify Version",
       bud: "$14,000",
       progress: <Progress percent={60} size="small" />,
       member: (
         <div className="avatar-group mt-2">
           <Tooltip placement="bottom" title="Ryan Tompson">
-            <img className="tootip-img" src={team1} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
           <Tooltip placement="bottom" title="Romina Hadid">
-            <img className="tootip-img" src={team2} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
           <Tooltip placement="bottom" title="Alexander Smith">
-            <img className="tootip-img" src={team3} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
           <Tooltip placement="bottom" title="Jessica Doe">
-            <img className="tootip-img" src={team4} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
         </div>
       ),
@@ -202,74 +192,74 @@ function Home() {
       member: (
         <div className="avatar-group mt-2">
           <Tooltip placement="bottom" title="Ryan Tompson">
-            <img className="tootip-img" src={team1} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
           <Tooltip placement="bottom" title="Romina Hadid">
-            <img className="tootip-img" src={team2} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
         </div>
       ),
     },
     {
-      img: ava3,
+      img: face,
       Title: "Fix Platform Errors",
       bud: "Not Set",
       progress: <Progress percent={100} size="small" status="active" />,
       member: (
         <div className="avatar-group mt-2">
           <Tooltip placement="bottom" title="Ryan Tompson">
-            <img className="tootip-img" src={team1} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
           <Tooltip placement="bottom" title="Romina Hadid">
-            <img className="tootip-img" src={team1} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
           <Tooltip placement="bottom" title="Alexander Smith">
-            <img className="tootip-img" src={team3} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
         </div>
       ),
     },
     {
-      img: ava4,
+      img: face,
       Title: "Launch new Mobile App",
       bud: "$20,600",
       progress: <Progress percent={100} size="small" status="active" />,
       member: (
         <div className="avatar-group mt-2">
           <Tooltip placement="bottom" title="Ryan Tompson">
-            <img className="tootip-img" src={team1} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
           <Tooltip placement="bottom" title="Romina Hadid">
-            <img className="tootip-img" src={team2} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
         </div>
       ),
     },
     {
-      img: ava5,
+      img: face,
       Title: "Add the New Landing Page",
       bud: "$4,000",
       progress: <Progress percent={80} size="small" />,
       member: (
         <div className="avatar-group mt-2">
           <Tooltip placement="bottom" title="Ryan Tompson">
-            <img className="tootip-img" src={team1} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
           <Tooltip placement="bottom" title="Romina Hadid">
-            <img className="tootip-img" src={team2} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
           <Tooltip placement="bottom" title="Alexander Smith">
-            <img className="tootip-img" src={team3} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
           <Tooltip placement="bottom" title="Jessica Doe">
-            <img className="tootip-img" src={team4} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
         </div>
       ),
     },
 
     {
-      img: ava6,
+      img: face,
       Title: "Redesign Online Store",
       bud: "$2,000",
       progress: (
@@ -283,10 +273,10 @@ function Home() {
       member: (
         <div className="avatar-group mt-2">
           <Tooltip placement="bottom" title="Ryan Tompson">
-            <img className="tootip-img" src={team1} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
           <Tooltip placement="bottom" title="Romina Hadid">
-            <img className="tootip-img" src={team2} alt="" />
+            <img className="tootip-img" src={face} alt="" />
           </Tooltip>
         </div>
       ),

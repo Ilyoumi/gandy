@@ -54,10 +54,6 @@
   "devDependencies": {
     "@vitejs/plugin-react-swc": "^3.5.0",
     "file-loader": "^6.2.0",
-<<<<<<< HEAD
-
-=======
->>>>>>> add-animated-cards-landing-page
     "tailwindcss": "^3.4.1",
     "vite": "^5.1.6",
     "webpack": "^5.90.3",
