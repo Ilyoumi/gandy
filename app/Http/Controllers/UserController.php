@@ -12,12 +12,10 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function index()
     {
-        // Fetch all users with their associated roles
-        $users = User::with('role')->get();
-
-        // Return JSON response with users data
+        $users = User::all();
         return response()->json($users);
     }
 
