@@ -23,6 +23,22 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
+     * Handle an incoming login request.
+     */
+    public function login(LoginRequest $request): Response
+    {
+        // Attempt to authenticate the user
+        if (Auth::attempt($request->only('email', 'password'))) {
+            // Authentication was successful
+            $request->session()->regenerate();
+            return response()->noContent();
+        }
+
+        // Authentication failed
+        return response()->json(['message' => 'Invalid credentials'], 401);
+    }
+
+    /**
      * Destroy an authenticated session.
      */
     public function destroy(Request $request): Response
