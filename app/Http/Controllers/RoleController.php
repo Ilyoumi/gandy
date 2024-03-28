@@ -6,13 +6,18 @@ use Illuminate\Http\Request;
 use App\Models\Role;
 class RoleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+   
+
     public function index()
     {
+<<<<<<< HEAD
+        return Role::all();
+    }
+
+    public function store(Request $request)
+    {
+        return Role::create($request->all());
+=======
         $roles = Role::all();
         return response()->json($roles);
     }
@@ -38,39 +43,27 @@ class RoleController extends Controller
 
         // Return a response indicating success
         return response()->json(['message' => 'Role created successfully', 'role' => $role], 201);
+>>>>>>> 42791fdd748d45cdaee891b44bfe793058c661be
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        //
+        return Role::findOrFail($id);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        //
+        $role = Role::findOrFail($id);
+        $role->update($request->all());
+
+        return $role;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        //
+        $role = Role::findOrFail($id);
+        $role->delete();
+
+        return 204; // No content
     }
 }

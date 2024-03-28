@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
 
-Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
     // Routes pour les utilisateurs
     Route::apiResource('users', 'UserController');
 
@@ -13,6 +13,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Routes pour les rendez-vous (RDVs)
     Route::apiResource('rdvs', 'RdvController');
+<<<<<<< HEAD
+// });
+=======
 
     Route::apiResource('roles', RoleController::class);
 
@@ -32,3 +35,4 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 });
+>>>>>>> 42791fdd748d45cdaee891b44bfe793058c661be
