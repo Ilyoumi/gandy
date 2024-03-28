@@ -1,8 +1,20 @@
-import React, { useState ,useRef} from "react";
-import { Table, Input, Space, Button, Avatar, Typography, Form, Modal,Select  } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import React, { useState, useRef } from "react";
+import {
+    Table,
+    Input,
+    Space,
+    Button,
+    Avatar,
+    Typography,
+    Form,
+    Modal,
+    Select,
+    Col,
+    Row
+} from "antd";
+import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import face from "../../assets/images/face-1.jpg";
-
+import AddAgendaModal from "./AddAgenda";
 import Highlighter from "react-highlight-words";
 
 const { Title } = Typography;
@@ -10,10 +22,10 @@ const { Option } = Select;
 const Agenda = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+    const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
     const [selectedRowData, setSelectedRowData] = useState(null);
     const searchInputRef = useRef(null);
-
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -23,13 +35,16 @@ const Agenda = () => {
 
     const handleUpdate = (record) => {
         setSelectedRowData(record);
-        setIsModalVisible(true);
+        setIsUpdateModalVisible(true);
     };
 
     const handleModalCancel = () => {
-        setIsModalVisible(false);
+        setIsUpdateModalVisible(false);
     };
 
+    const handleAddModalCancel = () => {
+    setIsAddModalVisible(false);
+  };
 
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({
@@ -77,8 +92,12 @@ const Agenda = () => {
                 .includes(value.toLowerCase()),
         onFilterDropdownVisibleChange: (visible) => {
             if (visible) {
-                setTimeout(() => searchInputRef.current && searchInputRef.current.select(), 100);
-
+                setTimeout(
+                    () =>
+                        searchInputRef.current &&
+                        searchInputRef.current.select(),
+                    100
+                );
             }
         },
         render: (text) =>
@@ -140,7 +159,6 @@ const Agenda = () => {
             ...getColumnSearchProps("name"),
         },
 
-
         {
             title: "AGENT",
             key: "agent",
@@ -156,7 +174,11 @@ const Agenda = () => {
                     <Button type="link" danger>
                         {deletebtn}
                     </Button>
-                    <Button type="link" className="darkbtn" onClick={() => handleUpdate(record)}>
+                    <Button
+                        type="link"
+                        className="darkbtn"
+                        onClick={() => handleUpdate(record)}
+                    >
                         {pencil}
                     </Button>
                 </Space>
@@ -223,7 +245,6 @@ const Agenda = () => {
                 <>
                     <div className="ant-employed">
                         <span>23/04/18</span>
-
                     </div>
                 </>
             ),
@@ -300,7 +321,6 @@ const Agenda = () => {
                 <>
                     <div className="ant-employed">
                         <span>23/04/18</span>
-
                     </div>
                 </>
             ),
@@ -377,7 +397,6 @@ const Agenda = () => {
                 <>
                     <div className="ant-employed">
                         <span>23/04/18</span>
-
                     </div>
                 </>
             ),
@@ -454,7 +473,6 @@ const Agenda = () => {
                 <>
                     <div className="ant-employed">
                         <span>23/04/18</span>
-
                     </div>
                 </>
             ),
@@ -531,7 +549,6 @@ const Agenda = () => {
                 <>
                     <div className="ant-employed">
                         <span>23/04/18</span>
-
                     </div>
                 </>
             ),
@@ -549,7 +566,6 @@ const Agenda = () => {
                     </div>
                 </>
             ),
-
         },
         {
             key: "1",
@@ -632,12 +648,46 @@ const Agenda = () => {
     return (
         <div>
             <Input
-            className="header-search mb-2 mt-2"
-            style={{ width:"20%", padding:"0px 11px", borderRadius:"6px" }}
-            placeholder="Type here..."
-            prefix={<SearchOutlined />}
-          />
-            <Table
+                className="header-search mb-2 mt-2"
+                style={{
+                    width: "20%",
+                    padding: "0px 11px",
+                    borderRadius: "6px",
+                }}
+                placeholder="Type here..."
+                prefix={<SearchOutlined />}
+            />
+            <div
+                style={{
+                    backgroundColor: "white",
+                    padding: "5px",
+                    boxShadow: "0px 20px 27px #0000000d",
+                }}
+            >
+                <Row style={{ margin: "10px 20px" }}>
+                    <Col
+                        span={12}
+                        style={{
+                            textAlign: "left",
+                            fontWeight: "bold",
+                            fontSize: "20px",
+                        }}
+                    >
+                        Ajouter Agenda
+                    </Col>
+                    <Col span={12} style={{ textAlign: "right" }}>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsAddModalVisible(true)}
+
+                        >
+                            Ajouter Agenda
+                        </Button>
+                    </Col>
+                </Row>
+                <Table
                 columns={columns}
                 dataSource={data}
                 style={{
@@ -645,19 +695,31 @@ const Agenda = () => {
                     padding: "10px 1px",
                 }}
             />
+            <AddAgendaModal
+                visible={isAddModalVisible}
+                onCancel={handleAddModalCancel}
+                onSubmit={(values) => {
+                    console.log("Submitted:", values);
+                    setIsAddModalVisible(false);
+                }}
+            />
             <Modal
                 title="Update Record"
-                visible={isModalVisible}
+                visible={isUpdateModalVisible}
                 onCancel={handleModalCancel}
                 footer={null}
             >
-                <UpdateForm initialValues={selectedRowData} onSubmit={(values) => console.log(values)} />
+                <UpdateForm
+                    initialValues={selectedRowData}
+                    onSubmit={(values) => console.log(values)}
+                />
             </Modal>
+            </div>
+
+
         </div>
     );
 };
-
-
 
 export default Agenda;
 const UpdateForm = ({ initialValues, onSubmit }) => {
@@ -673,11 +735,24 @@ const UpdateForm = ({ initialValues, onSubmit }) => {
     };
 
     return (
-        <Form form={form} layout="vertical" onFinish={handleSubmit} initialValues={initialValues}>
-            <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please input the name!" }]}>
+        <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSubmit}
+            initialValues={initialValues}
+        >
+            <Form.Item
+                label="Name"
+                name="name"
+                rules={[{ required: true, message: "Please input the name!" }]}
+            >
                 <Input />
             </Form.Item>
-            <Form.Item label="Agent" name="agent" rules={[{ required: true, message: "Please select an agent!" }]}>
+            <Form.Item
+                label="Agent"
+                name="agent"
+                rules={[{ required: true, message: "Please select an agent!" }]}
+            >
                 <Select>
                     <Option value="agent1">Agent 1</Option>
                     <Option value="agent2">Agent 2</Option>
@@ -687,10 +762,9 @@ const UpdateForm = ({ initialValues, onSubmit }) => {
             </Form.Item>
             <Form.Item>
                 <Button type="primary" htmlType="submit">
-                Mettre à jour
+                    Mettre à jour
                 </Button>
             </Form.Item>
         </Form>
     );
 };
-

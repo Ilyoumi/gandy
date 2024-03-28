@@ -1,4 +1,4 @@
-import React, { useState,useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
     Table,
     Input,
@@ -12,9 +12,9 @@ import {
     Col,
     Form,
     Upload,
-    message
+    message,
 } from "antd";
-import { SearchOutlined,UploadOutlined } from "@ant-design/icons";
+import { SearchOutlined, UploadOutlined,PlusOutlined } from "@ant-design/icons";
 import face from "../../../assets/images/face-1.jpg";
 
 import Highlighter from "react-highlight-words";
@@ -106,8 +106,12 @@ const Contacts = () => {
                 .includes(value.toLowerCase()),
         onFilterDropdownVisibleChange: (visible) => {
             if (visible) {
-                setTimeout(() => searchInputRef.current && searchInputRef.current.select(), 100);
-
+                setTimeout(
+                    () =>
+                        searchInputRef.current &&
+                        searchInputRef.current.select(),
+                    100
+                );
             }
         },
         render: (text) =>
@@ -187,10 +191,18 @@ const Contacts = () => {
             dataIndex: "action",
             render: () => (
                 <Space size="middle">
-                    <Button type="link" className="darkbtn" onClick={showUpdateModal}>
+                    <Button
+                        type="link"
+                        className="darkbtn"
+                        onClick={showUpdateModal}
+                    >
                         {pencil}
                     </Button>
-                    <Button type="link" className="darkbtn" onClick={showUpdateModal}>
+                    <Button
+                        type="link"
+                        className="darkbtn"
+                        onClick={showUpdateModal}
+                    >
                         {deletebtn}
                     </Button>
                 </Space>
@@ -458,47 +470,61 @@ const Contacts = () => {
         <>
             <Input
                 className="header-search mb-2 mt-2"
-                style={{ width:"20%", padding:"0px 11px", borderRadius:"6px" }}
+                style={{
+                    width: "20%",
+                    padding: "0px 11px",
+                    borderRadius: "6px",
+                }}
                 placeholder="Type here..."
                 prefix={<SearchOutlined />}
             />
-            <div style={{ backgroundColor:"white", padding:"5px",boxShadow: "0px 20px 27px #0000000d", }}>
-
-            <Row style={{ margin:"10px 20px" }}>
-            <Col span={12} style={{ textAlign: "left", fontWeight:"bold", fontSize:"20px" }}>
-                    Ajouter Utilisateur
-                </Col>
-                <Col span={12} style={{ textAlign: "right" }}>
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        onClick={handleButtonClick}
+            <div
+                style={{
+                    backgroundColor: "white",
+                    padding: "5px",
+                    boxShadow: "0px 20px 27px #0000000d",
+                }}
+            >
+                <Row style={{ margin: "10px 20px" }}>
+                    <Col
+                        span={12}
+                        style={{
+                            textAlign: "left",
+                            fontWeight: "bold",
+                            fontSize: "20px",
+                        }}
                     >
-                        Ajouter utilisateur
-                    </Button>
-                </Col>
-            </Row>
-            <Table
-                columns={columns}
-                dataSource={data}
+                        Ajouter Utilisateur
+                    </Col>
+                    <Col span={12} style={{ textAlign: "right" }}>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            icon={<PlusOutlined />}
 
-            />
-            <UpdateUserModal
-                visible={visible}
-                onCancel={() => setVisible(false)}
-                onUpdate={handleUpdate}
-            />
-
-        </div>
+                            onClick={handleButtonClick}
+                        >
+                            Ajouter utilisateur
+                        </Button>
+                    </Col>
+                </Row>
+                <Table columns={columns} dataSource={data} />
+                <UpdateUserModal
+                    visible={visible}
+                    onCancel={() => setVisible(false)}
+                    onUpdate={handleUpdate}
+                />
+            </div>
         </>
-
     );
 };
 
 export default Contacts;
 const UpdateUserModal = ({ visible, onCancel, onUpdate, userData }) => {
     const [form] = Form.useForm();
-    const [agenda, setAgenda] = useState(userData ? userData.agenda : undefined);
+    const [agenda, setAgenda] = useState(
+        userData ? userData.agenda : undefined
+    );
 
     const handleAgendaChange = (value) => {
         setAgenda(value);
@@ -512,8 +538,7 @@ const UpdateUserModal = ({ visible, onCancel, onUpdate, userData }) => {
     };
 
     const handleSubmit = () => {
-        form
-            .validateFields()
+        form.validateFields()
             .then((values) => {
                 form.resetFields();
                 onUpdate({ ...values, agenda });
@@ -565,7 +590,9 @@ const UpdateUserModal = ({ visible, onCancel, onUpdate, userData }) => {
                 <Form.Item
                     name="name"
                     label="Nom"
-                    rules={[{ required: true, message: "Veuillez entrer le nom!" }]}
+                    rules={[
+                        { required: true, message: "Veuillez entrer le nom!" },
+                    ]}
                 >
                     <Input />
                 </Form.Item>
@@ -573,14 +600,21 @@ const UpdateUserModal = ({ visible, onCancel, onUpdate, userData }) => {
                 <Form.Item
                     name="email"
                     label="Email"
-                    rules={[{ required: true, message: "Veuillez entrer l'email!" }]}
+                    rules={[
+                        { required: true, message: "Veuillez entrer l'email!" },
+                    ]}
                 >
                     <Input />
                 </Form.Item>
                 <Form.Item
                     name="agenda"
                     label="Agenda"
-                    rules={[{ required: true, message: "Veuillez sélectionner l'agenda!" }]}
+                    rules={[
+                        {
+                            required: true,
+                            message: "Veuillez sélectionner l'agenda!",
+                        },
+                    ]}
                 >
                     <Select onChange={handleAgendaChange}>
                         <Option value="agenda1">Agenda 1</Option>
