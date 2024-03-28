@@ -26,6 +26,7 @@ body {
 .ant-modal-body{
     background-color: #FAFAFA;
 }
+
 .avatar-uploader .ant-upload {
   width: 200px; /* Adjust width as needed */
   height: 300px; /* Adjust height as needed */
