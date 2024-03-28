@@ -12,7 +12,7 @@ import Highlighter from "react-highlight-words";
 import face from "../../../assets/images/face-1.jpg";
 
 import UpdateUser from "./UpdateUser"
-import fetchUsers from "../../../apis/user/usersApi"
+import fetchUsers from "../services/apis/usersApi"
 const { Dragger } = Upload;
 
 const props = {
