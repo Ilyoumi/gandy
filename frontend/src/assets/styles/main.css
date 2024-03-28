@@ -9,6 +9,8 @@
 =========================================================
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
+
+
 body {
   padding: 0 0 30px 0;
   background-color: #fafafa;
@@ -17,7 +19,16 @@ body {
   font-size: 14px;
   line-height: 1.6;
   font-weight: 400;
+
   font-family: open sans, Helvetica, Arial, sans-serif;
+}
+
+.ant-modal-body{
+    background-color: #FAFAFA;
+}
+.avatar-uploader .ant-upload {
+  width: 200px; /* Adjust width as needed */
+  height: 300px; /* Adjust height as needed */
 }
 .ant-layout.ant-layout-has-sider {
   flex-direction: row;
@@ -42,6 +53,11 @@ body {
   overflow: auto;
   margin: 0;
   padding: 33px 20px;
+}
+.layout-dashboard .ant-layout-sider.sider-primary .brand{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .layout-dashboard .ant-layout-sider.sider-primary .brand img {
   height: 30px;
@@ -2026,7 +2042,7 @@ body {
   box-shadow: 0 20px 27px rgb(0 0 0 / 5%);
   flex-direction: row;
   padding: 0 50px;
-  height: 64px;
+  height: 84px;
   line-height: 64px;
 }
 .fill-muted {
@@ -2149,9 +2165,12 @@ body {
 }
 .sign-img img {
   width: 100%;
+  max-width: 500px;
   display: block;
 }
 .layout-signin {
+  width: 100vw;
+  height: 100vh;
   background: #fff;
 }
 .layout-signin footer.ant-layout-footer svg {
@@ -2200,9 +2219,7 @@ body {
 }
 
 /* end sign up */
-.signin{
-  margin-top: 120px !important;
-}
+
 .rightside-top .signin {
   display: inline-flex;
 }

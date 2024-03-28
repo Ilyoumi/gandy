@@ -3,19 +3,47 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\Role;
 class RoleController extends Controller
 {
    
 
     public function index()
     {
+<<<<<<< HEAD
         return Role::all();
     }
 
     public function store(Request $request)
     {
         return Role::create($request->all());
+=======
+        $roles = Role::all();
+        return response()->json($roles);
+    }
+
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        // Validate request data
+        $request->validate([
+            'name' => 'required|string|unique:roles,name',
+        ]);
+
+        // Create a new role
+        $role = Role::create([
+            'name' => $request->input('name'),
+        ]);
+
+        // Return a response indicating success
+        return response()->json(['message' => 'Role created successfully', 'role' => $role], 201);
+>>>>>>> 42791fdd748d45cdaee891b44bfe793058c661be
     }
 
     public function show($id)
