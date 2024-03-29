@@ -1,34 +1,35 @@
-import React, { useState, useRef, useEffect } from "react";
-import {
-    Table,
-    Input,
-    Space,
-    Button,
-    Avatar,
-    Typography,
-    Modal,
-    Form,
-    Select, DatePicker
-} from "antd";
+import React, { useState ,useRef} from "react";
+import { Table, Input, Space, Button, Avatar, Typography, Form, Modal,Select  } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import face from "../../assets/images/face-1.jpg";
+import face from "../../../assets/images/face-1.jpg";
+
 import Highlighter from "react-highlight-words";
-import moment from "moment";
+
 const { Title } = Typography;
 const { Option } = Select;
-const DataTable = () => {
+const Agenda = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
-    const [updateModalVisible, setUpdateModalVisible] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedRowData, setSelectedRowData] = useState(null);
-    const [tableData, setTableData] = useState([]);
     const searchInputRef = useRef(null);
+
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
         setSearchText(selectedKeys[0]);
         setSearchedColumn(dataIndex);
     };
+
+    const handleUpdate = (record) => {
+        setSelectedRowData(record);
+        setIsModalVisible(true);
+    };
+
+    const handleModalCancel = () => {
+        setIsModalVisible(false);
+    };
+
 
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({
@@ -76,12 +77,8 @@ const DataTable = () => {
                 .includes(value.toLowerCase()),
         onFilterDropdownVisibleChange: (visible) => {
             if (visible) {
-                setTimeout(
-                    () =>
-                        searchInputRef.current &&
-                        searchInputRef.current.select(),
-                    100
-                );
+                setTimeout(() => searchInputRef.current && searchInputRef.current.select(), 100);
+
             }
         },
         render: (text) =>
@@ -96,25 +93,6 @@ const DataTable = () => {
                 text
             ),
     });
-    const handleUpdateClick = (record) => {
-        setSelectedRowData(record);
-        setUpdateModalVisible(true);
-    };
-    const handleUpdateFormSubmit = (updatedData) => {
-        // Implement logic to update the table data
-        const updatedTableData = tableData.map(item => {
-            if (item.key === selectedRowData.key) {
-                return {
-                    ...item,
-                    ...updatedData
-                };
-            }
-            return item;
-        });
-        setTableData(updatedTableData); // Update the table data
-        setUpdateModalVisible(false); // Close the update modal
-    };
-
     const deletebtn = [
         <svg
             width="16"
@@ -161,61 +139,27 @@ const DataTable = () => {
             width: "32%",
             ...getColumnSearchProps("name"),
         },
-        {
-            title: "SOCIETE",
-            dataIndex: "societe",
-            key: "societe",
-            ...getColumnSearchProps("societe"),
-        },
-        {
-            title: "TEL",
-            key: "tel",
-            dataIndex: "tel",
-            ...getColumnSearchProps("tel"),
-        },
-        {
-            title: "GSM",
-            key: "gsm",
-            dataIndex: "gsm",
-            ...getColumnSearchProps("gsm"),
-        },
-        {
-            title: "DATE RDV",
-            key: "date",
-            dataIndex: "date",
-            ...getColumnSearchProps("date"),
-        },
+
+
         {
             title: "AGENT",
             key: "agent",
             dataIndex: "agent",
             ...getColumnSearchProps("agent"),
         },
-        {
-            title: "AGENDA",
-            key: "agenda",
-            dataIndex: "agenda",
-            ...getColumnSearchProps("agenda"),
-        },
+
         {
             title: "ACTION",
             key: "action",
-            dataIndex: "action",
-            render: (_, record) => (
-                <div>
-                    <Button
-                        type="link"
-                        onClick={() => handleUpdateClick(record)}
-                    >
-                        {pencil}
-                    </Button>
-                    <Button
-                        type="link"
-                        onClick={() => handleUpdateClick(record)}
-                    >
+            render: (text, record) => (
+                <Space size="middle">
+                    <Button type="link" danger>
                         {deletebtn}
                     </Button>
-                </div>
+                    <Button type="link" className="darkbtn" onClick={() => handleUpdate(record)}>
+                        {pencil}
+                    </Button>
+                </Space>
             ),
         },
     ];
@@ -223,7 +167,7 @@ const DataTable = () => {
     const data = [
         {
             key: "1",
-            name: (
+            agent: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -268,7 +212,7 @@ const DataTable = () => {
                     </div>
                 </>
             ),
-            agent: (
+            name: (
                 <>
                     <div className="ant-employed">
                         <span>Jennifer Smith</span>
@@ -279,6 +223,7 @@ const DataTable = () => {
                 <>
                     <div className="ant-employed">
                         <span>23/04/18</span>
+
                     </div>
                 </>
             ),
@@ -299,7 +244,7 @@ const DataTable = () => {
         },
         {
             key: "1",
-            name: (
+            agent: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -344,7 +289,7 @@ const DataTable = () => {
                     </div>
                 </>
             ),
-            agent: (
+            name: (
                 <>
                     <div className="ant-employed">
                         <span>Jennifer Smith</span>
@@ -355,6 +300,7 @@ const DataTable = () => {
                 <>
                     <div className="ant-employed">
                         <span>23/04/18</span>
+
                     </div>
                 </>
             ),
@@ -375,7 +321,7 @@ const DataTable = () => {
         },
         {
             key: "1",
-            name: (
+            agent: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -420,7 +366,7 @@ const DataTable = () => {
                     </div>
                 </>
             ),
-            agent: (
+            name: (
                 <>
                     <div className="ant-employed">
                         <span>Jennifer Smith</span>
@@ -431,6 +377,7 @@ const DataTable = () => {
                 <>
                     <div className="ant-employed">
                         <span>23/04/18</span>
+
                     </div>
                 </>
             ),
@@ -451,7 +398,7 @@ const DataTable = () => {
         },
         {
             key: "1",
-            name: (
+            agent: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -496,7 +443,7 @@ const DataTable = () => {
                     </div>
                 </>
             ),
-            agent: (
+            name: (
                 <>
                     <div className="ant-employed">
                         <span>Jennifer Smith</span>
@@ -507,6 +454,7 @@ const DataTable = () => {
                 <>
                     <div className="ant-employed">
                         <span>23/04/18</span>
+
                     </div>
                 </>
             ),
@@ -527,7 +475,7 @@ const DataTable = () => {
         },
         {
             key: "1",
-            name: (
+            agent: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -572,7 +520,7 @@ const DataTable = () => {
                     </div>
                 </>
             ),
-            agent: (
+            name: (
                 <>
                     <div className="ant-employed">
                         <span>Jennifer Smith</span>
@@ -583,6 +531,7 @@ const DataTable = () => {
                 <>
                     <div className="ant-employed">
                         <span>23/04/18</span>
+
                     </div>
                 </>
             ),
@@ -600,10 +549,11 @@ const DataTable = () => {
                     </div>
                 </>
             ),
+
         },
         {
             key: "1",
-            name: (
+            agent: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -648,7 +598,7 @@ const DataTable = () => {
                     </div>
                 </>
             ),
-            agent: (
+            name: (
                 <>
                     <div className="ant-employed">
                         <span>Jennifer Smith</span>
@@ -682,57 +632,37 @@ const DataTable = () => {
     return (
         <div>
             <Input
-                className="header-search mb-2 mt-2"
-                style={{
-                    width: "20%",
-                    padding: "0px 11px",
-                    borderRadius: "6px",
-                }}
-                placeholder="Type here..."
-                prefix={<SearchOutlined />}
-            />
+            className="header-search mb-2 mt-2"
+            style={{ width:"20%", padding:"0px 11px", borderRadius:"6px" }}
+            placeholder="Type here..."
+            prefix={<SearchOutlined />}
+          />
             <Table
                 columns={columns}
                 dataSource={data}
-                scroll={{ x: "max-content" }}
                 style={{
                     boxShadow: "0px 20px 27px #0000000d",
                     padding: "10px 1px",
-                    overflowX: "auto",
-                }}
-                responsive={{
-                    xs: 1, // 1 column for extra small screens (mobile)
-                    sm: 3, // 3 columns for small screens (tablet)
                 }}
             />
             <Modal
-                title="Update Data"
-                visible={updateModalVisible}
-                onCancel={() => setUpdateModalVisible(false)}
+                title="Update Record"
+                visible={isModalVisible}
+                onCancel={handleModalCancel}
                 footer={null}
-                style={{ marginTop: '-50px' }}
             >
-                <UpdateForm
-                    initialValues={selectedRowData}
-                    onSubmit={handleUpdateFormSubmit}
-                />
+                <UpdateForm initialValues={selectedRowData} onSubmit={(values) => console.log(values)} />
             </Modal>
         </div>
     );
 };
 
-export default DataTable;
+
+
+export default Agenda;
 const UpdateForm = ({ initialValues, onSubmit }) => {
     const [form] = Form.useForm();
 
-    useEffect(() => {
-        // Convert date string to moment object
-        const formattedInitialValues = {
-            ...initialValues,
-            date: moment(initialValues.date),
-        };
-        form.setFieldsValue(formattedInitialValues);
-    }, [initialValues, form]);
     const handleSubmit = async () => {
         try {
             const values = await form.validateFields();
@@ -743,60 +673,11 @@ const UpdateForm = ({ initialValues, onSubmit }) => {
     };
 
     return (
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
-            <Form.Item
-                label="Nom"
-                name="name"
-                rules={[{ required: true, message: "Veuillez entrer le nom" }]}
-            >
+        <Form form={form} layout="vertical" onFinish={handleSubmit} initialValues={initialValues}>
+            <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please input the name!" }]}>
                 <Input />
             </Form.Item>
-            <Form.Item
-                label="Société"
-                name="societe"
-                rules={[{ required: true, message: "Veuillez entrer la société" }]}
-            >
-                <Input />
-            </Form.Item>
-            <Form.Item
-                label="Tél"
-                name="tel"
-                rules={[{ required: true, message: "Veuillez entrer le téléphone" }]}
-            >
-                <Input />
-            </Form.Item>
-            <Form.Item
-                label="Gsm"
-                name="gsm"
-                rules={[{ required: true, message: "Veuillez entrer le portable" }]}
-            >
-                <Input />
-            </Form.Item>
-            <Form.Item
-                label="Heure de début - Heure de fin"
-                style={{ marginBottom: 0 }}
-            >
-                <Form.Item
-                    style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
-                    name="startTime"
-                    rules={[{ required: true, message: 'Veuillez sélectionner l\'heure de début !' }]}
-                >
-                    <DatePicker showTime />
-                </Form.Item>
-                <span style={{ display: 'inline-block', width: '16px', textAlign: 'center' }}>-</span>
-                <Form.Item
-                    style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
-                    name="endTime"
-                    rules={[{ required: true, message: 'Veuillez sélectionner l\'heure de fin !' }]}
-                >
-                    <DatePicker showTime />
-                </Form.Item>
-            </Form.Item>
-            <Form.Item
-                label="Agent"
-                name="agent"
-                rules={[{ required: true, message: "Veuillez sélectionner l'agent" }]}
-            >
+            <Form.Item label="Agent" name="agent" rules={[{ required: true, message: "Please select an agent!" }]}>
                 <Select>
                     <Option value="agent1">Agent 1</Option>
                     <Option value="agent2">Agent 2</Option>
@@ -804,21 +685,9 @@ const UpdateForm = ({ initialValues, onSubmit }) => {
                     {/* Add more options as needed */}
                 </Select>
             </Form.Item>
-            <Form.Item
-                label="Agenda"
-                name="agenda"
-                rules={[{ required: true, message: "Veuillez sélectionner l'agenda" }]}
-            >
-                <Select>
-                    <Option value="agenda1">Agenda 1</Option>
-                    <Option value="agenda2">Agenda 2</Option>
-                    <Option value="agenda3">Agenda 3</Option>
-                    {/* Add more options as needed */}
-                </Select>
-            </Form.Item>
             <Form.Item>
                 <Button type="primary" htmlType="submit">
-                    Mettre à jour
+                Mettre à jour
                 </Button>
             </Form.Item>
         </Form>

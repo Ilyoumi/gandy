@@ -17,7 +17,7 @@ Route::post('/login', [AuthenticatedSessionController::class, 'login']);
 
 // Route::middleware('auth:sanctum')->group(function () {
     // Routes pour les utilisateurs
-    Route::apiResource('users', 'UserController');
+    // Route::apiResource('users', 'UserController');
 
 
     // Routes pour les agendas
