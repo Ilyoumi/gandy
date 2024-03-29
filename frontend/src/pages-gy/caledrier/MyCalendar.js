@@ -15,7 +15,6 @@ import {
     Row,
     Col,Card ,
 } from "antd";
-import { ClockCircleOutlined } from '@ant-design/icons';
 const { Option } = Select;
 
 const CalendarComponent = () => {

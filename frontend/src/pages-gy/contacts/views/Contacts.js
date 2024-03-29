@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState,useRef } from "react";
 import {
     Table,
     Input,
@@ -6,28 +6,23 @@ import {
     Button,
     Avatar,
     Typography,
-    Modal,
     Select,
     Row,
     Col,
-    Form,
-    Upload,
-    message,
 } from "antd";
-import { SearchOutlined, UploadOutlined,PlusOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import face from "../../../assets/images/face-1.jpg";
 
 import Highlighter from "react-highlight-words";
 import { useHistory } from "react-router-dom";
+import UpdateContactModal from "./UpdateContact";
 
-const { Option } = Select;
 const { Title } = Typography;
 
 const Contacts = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
     const [visible, setVisible] = useState(false);
-    const [selectedAgenda, setSelectedAgenda] = useState("");
     const history = useHistory();
     const searchInputRef = useRef(null);
 
@@ -35,9 +30,7 @@ const Contacts = () => {
         setVisible(true);
     };
 
-    const handleAgendaChange = (value) => {
-        setSelectedAgenda(value);
-    };
+    
 
     const handleUpdate = () => {
         // Logic to update the agenda
@@ -55,10 +48,6 @@ const Contacts = () => {
         setSearchedColumn(dataIndex);
     };
 
-    const handleReset = (clearFilters) => {
-        clearFilters();
-        setSearchText("");
-    };
 
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({
@@ -106,12 +95,8 @@ const Contacts = () => {
                 .includes(value.toLowerCase()),
         onFilterDropdownVisibleChange: (visible) => {
             if (visible) {
-                setTimeout(
-                    () =>
-                        searchInputRef.current &&
-                        searchInputRef.current.select(),
-                    100
-                );
+                setTimeout(() => searchInputRef.current && searchInputRef.current.select(), 100);
+
             }
         },
         render: (text) =>
@@ -191,18 +176,10 @@ const Contacts = () => {
             dataIndex: "action",
             render: () => (
                 <Space size="middle">
-                    <Button
-                        type="link"
-                        className="darkbtn"
-                        onClick={showUpdateModal}
-                    >
+                    <Button type="link" className="darkbtn" onClick={showUpdateModal}>
                         {pencil}
                     </Button>
-                    <Button
-                        type="link"
-                        className="darkbtn"
-                        onClick={showUpdateModal}
-                    >
+                    <Button type="link" className="darkbtn" onClick={showUpdateModal}>
                         {deletebtn}
                     </Button>
                 </Space>
@@ -470,159 +447,42 @@ const Contacts = () => {
         <>
             <Input
                 className="header-search mb-2 mt-2"
-                style={{
-                    width: "20%",
-                    padding: "0px 11px",
-                    borderRadius: "6px",
-                }}
+                style={{ width:"20%", padding:"0px 11px", borderRadius:"6px" }}
                 placeholder="Type here..."
                 prefix={<SearchOutlined />}
             />
-            <div
-                style={{
-                    backgroundColor: "white",
-                    padding: "5px",
-                    boxShadow: "0px 20px 27px #0000000d",
-                }}
-            >
-                <Row style={{ margin: "10px 20px" }}>
-                    <Col
-                        span={12}
-                        style={{
-                            textAlign: "left",
-                            fontWeight: "bold",
-                            fontSize: "20px",
-                        }}
-                    >
-                        Ajouter Utilisateur
-                    </Col>
-                    <Col span={12} style={{ textAlign: "right" }}>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            icon={<PlusOutlined />}
+            <div style={{ backgroundColor:"white", padding:"5px",boxShadow: "0px 20px 27px #0000000d", }}>
 
-                            onClick={handleButtonClick}
-                        >
-                            Ajouter utilisateur
-                        </Button>
-                    </Col>
-                </Row>
-                <Table columns={columns} dataSource={data} />
-                <UpdateUserModal
-                    visible={visible}
-                    onCancel={() => setVisible(false)}
-                    onUpdate={handleUpdate}
-                />
-            </div>
+            <Row style={{ margin:"10px 20px" }}>
+            <Col span={12} style={{ textAlign: "left", fontWeight:"bold", fontSize:"20px" }}>
+                    Ajouter Utilisateur
+                </Col>
+                <Col span={12} style={{ textAlign: "right" }}>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        onClick={handleButtonClick}
+                    >
+                        Ajouter utilisateur
+                    </Button>
+                </Col>
+            </Row>
+            <Table
+                columns={columns}
+                dataSource={data}
+
+            />
+            <UpdateContactModal
+                visible={visible}
+                onCancel={() => setVisible(false)}
+                onUpdate={handleUpdate}
+            />
+
+        </div>
         </>
+
     );
 };
 
 export default Contacts;
-const UpdateUserModal = ({ visible, onCancel, onUpdate, userData }) => {
-    const [form] = Form.useForm();
-    const [agenda, setAgenda] = useState(
-        userData ? userData.agenda : undefined
-    );
 
-    const handleAgendaChange = (value) => {
-        setAgenda(value);
-    };
-    const handleImageChange = (info) => {
-        if (info.file.status === "done") {
-            message.success(`${info.file.name} file uploaded successfully.`);
-        } else if (info.file.status === "error") {
-            message.error(`${info.file.name} file upload failed.`);
-        }
-    };
-
-    const handleSubmit = () => {
-        form.validateFields()
-            .then((values) => {
-                form.resetFields();
-                onUpdate({ ...values, agenda });
-            })
-            .catch((info) => {
-                console.log("Validate Failed:", info);
-            });
-    };
-
-    return (
-        <Modal
-            visible={visible}
-            title="Modifier Utilisateur"
-            okText="Modifier"
-            onCancel={onCancel}
-            onOk={handleSubmit}
-        >
-            <Form
-                form={form}
-                initialValues={{
-                    name: userData ? userData.name : "",
-                    email: userData ? userData.email : "",
-                    agenda: userData ? userData.agenda : undefined,
-                }}
-            >
-                <Form.Item
-                    name="image"
-                    label="Image"
-                    valuePropName="fileList"
-                    getValueFromEvent={(e) => {
-                        if (Array.isArray(e)) {
-                            return e;
-                        }
-                        return e && e.fileList;
-                    }}
-                    style={{ marginBottom: 20 }}
-                >
-                    <Upload
-                        name="image"
-                        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                        listType="picture"
-                        maxCount={1}
-                        onChange={handleImageChange}
-                        style={{ width: "100%" }}
-                    >
-                        <Button icon={<UploadOutlined />}>Uploader</Button>
-                    </Upload>
-                </Form.Item>
-                <Form.Item
-                    name="name"
-                    label="Nom"
-                    rules={[
-                        { required: true, message: "Veuillez entrer le nom!" },
-                    ]}
-                >
-                    <Input />
-                </Form.Item>
-
-                <Form.Item
-                    name="email"
-                    label="Email"
-                    rules={[
-                        { required: true, message: "Veuillez entrer l'email!" },
-                    ]}
-                >
-                    <Input />
-                </Form.Item>
-                <Form.Item
-                    name="agenda"
-                    label="Agenda"
-                    rules={[
-                        {
-                            required: true,
-                            message: "Veuillez sélectionner l'agenda!",
-                        },
-                    ]}
-                >
-                    <Select onChange={handleAgendaChange}>
-                        <Option value="agenda1">Agenda 1</Option>
-                        <Option value="agenda2">Agenda 2</Option>
-                        <Option value="agenda3">Agenda 3</Option>
-                    </Select>
-                </Form.Item>
-            </Form>
-        </Modal>
-    );
-};
