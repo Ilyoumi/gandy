@@ -25,17 +25,24 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming login request.
      */
-    public function login(LoginRequest $request): Response
+    public function login(Request $request)
     {
-        // Attempt to authenticate the user
-        if (Auth::attempt($request->only('email', 'password'))) {
-            // Authentication was successful
-            $request->session()->regenerate();
-            return response()->noContent();
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+            // Authentication passed...
+            $user = Auth::user();
+            return response()->json([
+                'success' => true,
+                'user' => $user,
+                'message' => 'Login successful',
+            ], 200);
         }
 
-        // Authentication failed
-        return response()->json(['message' => 'Invalid credentials'], 401);
+        return response()->json([
+            'success' => false,
+            'message' => 'Login failed',
+        ], 401);
     }
 
     /**

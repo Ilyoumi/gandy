@@ -1,14 +1,5 @@
 import React, { useState } from "react";
-import {
-    Form,
-    Input,
-    Button,
-    Col,
-    Row,
-    Upload,
-    message,
-    Select
-} from "antd";
+import { Form, Input, Button, Col, Row, Upload, message, Select } from "antd";
 import {
     UserOutlined,
     LockOutlined,
@@ -16,7 +7,6 @@ import {
     VerticalAlignTopOutlined,
 } from "@ant-design/icons";
 import DisplayUsers from "./DisplayUsers";
-
 
 const { Dragger } = Upload;
 const { Option } = Select;
@@ -51,7 +41,6 @@ const AddUserForm = () => {
         confirmPassword: "",
         avatar: null,
     });
-    
 
     const handleChange = (changedValues) => {
         setFormData({
@@ -156,24 +145,29 @@ const AddUserForm = () => {
                                 </Form.Item>
                             </Col>
                             <Col xs={24} sm={12}>
-                        <Form.Item
-                            name="role"
-                            label="Role"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Veuillez choisir un rôle!",
-                                },
-                            ]}
-                        >
-                            <Select placeholder="Sélectionner un rôle">
-                                <Option value="admin">Admin</Option>
-                                <Option value="agent">Agent</Option>
-                                <Option value="superviseur">Superviseur</Option>
-                                <Option value="agent_commercial">Agent Commercial</Option>
-                            </Select>
-                        </Form.Item>
-                    </Col>
+                                <Form.Item
+                                    name="role"
+                                    label="Role"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                "Veuillez choisir un rôle!",
+                                        },
+                                    ]}
+                                >
+                                    <Select placeholder="Sélectionner un rôle">
+                                        <Option value="admin">Admin</Option>
+                                        <Option value="agent">Agent</Option>
+                                        <Option value="superviseur">
+                                            Superviseur
+                                        </Option>
+                                        <Option value="agent_commercial">
+                                            Agent Commercial
+                                        </Option>
+                                    </Select>
+                                </Form.Item>
+                            </Col>
                             <Col xs={24} sm={12}>
                                 <Form.Item
                                     name="password"
@@ -240,7 +234,6 @@ const AddUserForm = () => {
                 </Row>
             </Form>
             <DisplayUsers />
-            
         </div>
     );
 };
