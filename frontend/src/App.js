@@ -14,7 +14,7 @@ import Home from "./pages-gy/Home";
 import Tables from "./pages-gy/rdv/views/Tables";
 import SignIn from "./pages-gy/user/views/SignIn";
 import Main from "./components-gy/layouts/Main";
-import MyCalendar from './pages-gy/caledrier/MyCalendar'
+import MyCalendar from './pages-gy/caledrier/views/MyCalendar'
 // import "antd/dist/antd.css";
 import 'antd/dist/antd.min.css'
 import "./assets/styles/main.css";
@@ -23,7 +23,7 @@ import AddUserForm from "./pages-gy/user/views/AddUserForm";
 import History from "./pages-gy/rdv/views/History";
 import Contacts from "./pages-gy/contacts/views/Contacts";
 import { SidebarProvider } from './SidebarContext';
-import Agenda from "./pages-gy/caledrier/Agenda";
+import Agenda from "./pages-gy/caledrier/views/Agenda";
 import Card from "./pages-gy/card/Card";
 function App() {
   return (
