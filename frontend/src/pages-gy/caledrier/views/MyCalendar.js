@@ -64,7 +64,7 @@ const CalendarComponent = () => {
         setAppointments([...appointments, newAppointment]);
         message.success("Rendez-vous ajouté avec succès !");
         handleCloseModal();
-    };
+    }; 
 
     return (
         <div>
@@ -88,7 +88,7 @@ const CalendarComponent = () => {
                 onCancel={handleCloseModal}
                 footer={null}
                 width={1000}
-                
+
             >
                 <Form layout="vertical" onFinish={handleFormSubmit} >
                 <Card style={{     padding: "0 !important", marginBottom: "10px"}} >
@@ -100,13 +100,13 @@ const CalendarComponent = () => {
                             // borderRadius: "8px",
                             // height:"48px",
                             // padding:"3px 0",
-                            // backgroundColor:"white", 
+                            // backgroundColor:"white",
                             // boxShadow:"0 20px 27px rgb(0 0 0 / 5%)",
                         }}
                     >
                         {/* <Col span={1} >
                             <ClockCircleOutlined style={{color:"#D9D9D9", marginRight:"10px"}} />
-                        
+
                         </Col> */}
                         <Col span={6} >
                             <Form.Item
