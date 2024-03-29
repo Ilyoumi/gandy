@@ -6,19 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\Role;
 class RoleController extends Controller
 {
-   
+
 
     public function index()
     {
         return Role::all();
     }
 
-    // public function store(Request $request)
-    // {
-    //     return Role::create($request->all());
-    //     $roles = Role::all();
-    //     return response()->json($roles);
-    // }
+    
 
 
     /**
