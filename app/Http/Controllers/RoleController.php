@@ -6,21 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\Role;
 class RoleController extends Controller
 {
-   
+
 
     public function index()
     {
-<<<<<<< HEAD
         return Role::all();
     }
 
-    public function store(Request $request)
-    {
-        return Role::create($request->all());
-=======
-        $roles = Role::all();
-        return response()->json($roles);
-    }
+    
 
 
     /**
@@ -43,7 +36,6 @@ class RoleController extends Controller
 
         // Return a response indicating success
         return response()->json(['message' => 'Role created successfully', 'role' => $role], 201);
->>>>>>> 42791fdd748d45cdaee891b44bfe793058c661be
     }
 
     public function show($id)
