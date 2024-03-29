@@ -1,7 +1,7 @@
 import React, { useState ,useRef} from "react";
 import { Table, Input, Space, Button, Avatar, Typography, Form, Modal,Select  } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import face from "../../assets/images/face-1.jpg";
+import face from "../../../assets/images/face-1.jpg";
 
 import Highlighter from "react-highlight-words";
 
