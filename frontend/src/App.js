@@ -39,7 +39,7 @@ function App() {
             <Route exact path="/history" component={History} />
             <Route exact path="/contact" component={Contacts} />
             <Route exact path="/agenda" component={Agenda} />
-            <Route exact path="/add-user" component={AddUserForm} />
+            <Route exact path="/creer-utilisateur" component={AddUserForm} />
             <Redirect from="*" to="/dashboard" />
           </Main>
         </Switch>

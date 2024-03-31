@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Col, Row, Upload, message, Select } from "antd";
+import { Form, Input, Button, Col, Row, Upload, message, Select , Card} from "antd";
 import {
     UserOutlined,
     LockOutlined,
@@ -55,7 +55,16 @@ const AddUserForm = () => {
 
     return (
         <div>
-            <Form
+        <Card style={{ marginBottom:"10px" }}>
+        <Row>
+        <Col span={12} style={{ textAlign: "left", fontWeight:"bold", fontSize:"20px" }}>
+        Créer Utilisateur
+                </Col>
+        </Row>
+
+        </Card>
+        <Card>
+        <Form
                 form={form}
                 layout="vertical"
                 initialValues={formData}
@@ -63,9 +72,7 @@ const AddUserForm = () => {
                 onFinish={handleSubmit}
                 style={{
                     padding: "30px 80px",
-                    backgroundColor: "white",
-                    borderRadius: "12px",
-                    boxShadow: "0px 20px 27px #0000000d",
+                    
                 }}
             >
                 <Row gutter={[16, 16]}>
@@ -228,11 +235,14 @@ const AddUserForm = () => {
                 <Row>
                     <Col span={24} style={{ textAlign: "right" }}>
                         <Button type="primary" htmlType="submit">
-                            Ajouter
+                        Créer
                         </Button>
                     </Col>
                 </Row>
             </Form>
+
+        </Card>
+            
             <DisplayUsers />
         </div>
     );
