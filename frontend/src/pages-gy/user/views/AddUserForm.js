@@ -243,7 +243,6 @@ const AddUserForm = () => {
 
         </Card>
             
-            <DisplayUsers />
         </div>
     );
 };

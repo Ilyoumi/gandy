@@ -25,6 +25,7 @@ import Contacts from "./pages-gy/contacts/views/Contacts";
 import { SidebarProvider } from './SidebarContext';
 import Agenda from "./pages-gy/caledrier/views/Agenda";
 import Card from "./pages-gy/card/Card";
+import DisplayUsers from "./pages-gy/user/views/DisplayUsers";
 function App() {
   return (
     <SidebarProvider>
@@ -40,6 +41,7 @@ function App() {
             <Route exact path="/contact" component={Contacts} />
             <Route exact path="/agenda" component={Agenda} />
             <Route exact path="/creer-utilisateur" component={AddUserForm} />
+            <Route exact path="/utilisateurs" component={DisplayUsers} />
             <Redirect from="*" to="/dashboard" />
           </Main>
         </Switch>

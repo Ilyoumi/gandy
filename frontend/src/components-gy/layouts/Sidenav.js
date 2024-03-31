@@ -429,6 +429,33 @@ function Sidenav({ color }) {
                         </span>
                     </NavLink>
                 </Menu.Item>
+                <Menu.Item
+                    key="4"
+                    style={{ width: expanded ? "200px" : "10px" }}
+                >
+                    <NavLink
+                        to="/utilisateurs"
+                        className={` overflow-hidden transition-all ${
+                            expanded ? "w-48" : "w-16"
+                        }`}
+                    >
+                        <span
+                            className="icon"
+                            style={{
+                                background: page === "rtl" ? color : "",
+                            }}
+                        >
+                            {contact}
+                        </span>
+                        <span
+                            className={`label overflow-hidden transition-all ${
+                                expanded ? "w-32" : "w-0"
+                            }`}
+                        >
+                            Liste des utilisateurs
+                        </span>
+                    </NavLink>
+                </Menu.Item>
 
             </Menu>
         </div>
