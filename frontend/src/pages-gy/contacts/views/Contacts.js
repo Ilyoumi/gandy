@@ -39,7 +39,7 @@ const Contacts = () => {
 
     const handleButtonClick = () => {
         // Redirect to the desired route
-        history.push("/add-user");
+        history.push("/creer-utilisateur");
     };
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -445,12 +445,7 @@ const Contacts = () => {
 
     return (
         <>
-            <Input
-                className="header-search mb-2 mt-2"
-                style={{ width:"20%", padding:"0px 11px", borderRadius:"6px" }}
-                placeholder="Type here..."
-                prefix={<SearchOutlined />}
-            />
+            
             <div style={{ backgroundColor:"white", padding:"5px",boxShadow: "0px 20px 27px #0000000d", }}>
 
             <Row style={{ margin:"10px 20px" }}>

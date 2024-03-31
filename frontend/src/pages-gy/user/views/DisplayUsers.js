@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Input, Avatar, Space, Table, Button } from "antd";
+import { Input, Avatar, Space, Table, Button , Row, Col, Card} from "antd";
 import UpdateUser from "./UpdateUser";
 import fetchUsers from "../services/apis/usersApi";
 import { SearchOutlined } from "@ant-design/icons";
@@ -210,25 +210,24 @@ const DisplayUsers = () => {
                 marginBottom: "20px",
             }}
         >
-            <Input
-                className="header-search mb-2 mt-2"
-                style={{
-                    width: "20%",
-                    padding: "0px 11px",
-                    borderRadius: "6px",
-                }}
-                placeholder="Type here..."
-                prefix={<SearchOutlined />}
-            />
+            <Card style={{ marginBottom:"10px" }}>
+        <Row>
+        <Col span={12} style={{ textAlign: "left", fontWeight:"bold", fontSize:"20px" }}>
+        Liste des Utilisateurs
+                </Col>
+        </Row>
+
+        </Card>
+            <Card>
             <Table
                 columns={columns}
                 dataSource={users}
                 pagination={false}
                 style={{
-                    boxShadow: "0px 20px 27px #0000000d",
                     padding: "10px 1px",
                 }}
             />
+            </Card>
             <UpdateUser {...updateModalProps} />
         </div>
     );
