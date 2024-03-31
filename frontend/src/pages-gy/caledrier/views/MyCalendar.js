@@ -3,6 +3,9 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 import {
     Modal,
     Form,
@@ -65,11 +68,13 @@ const CalendarComponent = () => {
         message.success("Rendez-vous ajouté avec succès !");
         handleCloseModal();
     }; 
+    
 
     return (
         <div>
+        
             <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, bootstrap5Plugin]}
                 initialView="timeGridWeek"
                 weekends={true}
                 editable={true}
@@ -81,6 +86,13 @@ const CalendarComponent = () => {
                 eventDisplay="block" // Display events as blocks
                 eventBackgroundColor="#52c41a" // Custom color for added appointments
                 eventBorderColor="#87d068" // Custom border color for added appointments
+                locale="fr" // Set the calendar language to French
+                themeSystem= 'bootstrap5'
+                headerToolbar={{
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                }}
             />
             <Modal
                 visible={showModal}
@@ -376,13 +388,7 @@ const CalendarComponent = () => {
                                 <Input.TextArea rows={2} />
                             </Form.Item>
                         </Col>
-                        {/* <Col xs={24}>
-                            <Form.Item>
-                                <Button  htmlType="submit" style={{backgroundColor:"#00CC6A"}}>
-                                    Ajouter un rendez-vous
-                                </Button>
-                            </Form.Item>
-                        </Col> */}
+                        
 
                     </Row>
                 </Card>
