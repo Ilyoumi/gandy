@@ -387,7 +387,7 @@ function Sidenav({ color }) {
                     style={{ width: expanded ? "200px" : "10px" }}
                 >
                     <NavLink
-                        to="/add-user"
+                        to="/creer-utilisateur"
                         className={` overflow-hidden transition-all ${
                             expanded ? "w-48" : "w-16"
                         }`}
