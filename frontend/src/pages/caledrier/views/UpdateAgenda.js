@@ -10,6 +10,7 @@ const UpdateAgenda = ({ initialValues, onSubmit }) => {
         try {
             const values = await form.validateFields();
             onSubmit(values);
+            form.resetFields(); // Reset form fields after submission
         } catch (errorInfo) {
             console.log("Failed:", errorInfo);
         }
@@ -20,26 +21,34 @@ const UpdateAgenda = ({ initialValues, onSubmit }) => {
             form={form}
             layout="vertical"
             onFinish={handleSubmit}
-            initialValues={initialValues}
+            initialValues={initialValues} // Set initial form values
         >
             <Form.Item
-                label="Name"
-                name="name"
-                rules={[{ required: true, message: "Please input the name!" }]}
+                label="Titre"
+                name="title"
+                rules={[{ required: true, message: "Please input the titre!" }]}
             >
                 <Input />
             </Form.Item>
             <Form.Item
-                label="Agent"
-                name="agent"
-                rules={[{ required: true, message: "Please select an agent!" }]}
+                label="Contact"
+                name="contact"
+                rules={[{ required: true, message: "Please select a contact!" }]}
             >
-                <Select>
-                    <Option value="agent1">Agent 1</Option>
-                    <Option value="agent2">Agent 2</Option>
-                    <Option value="agent3">Agent 3</Option>
-                    {/* Add more options as needed */}
+                <Select placeholder="Sélectionner un contact">
+                    <Option value="contact1">Contact 1</Option>
+                    <Option value="contact2">Contact 2</Option>
+                    <Option value="contact3">Contact 3</Option>
+                    <Option value="contact4">Contact 4</Option>
+                    <Option value="contact5">Contact 5</Option>
                 </Select>
+            </Form.Item>
+            <Form.Item
+                label="Description"
+                name="description"
+                rules={[{ required: true, message: "Please input the description!" }]}
+            >
+                <Input.TextArea rows={4} />
             </Form.Item>
             <Form.Item>
                 <Button type="primary" htmlType="submit">
