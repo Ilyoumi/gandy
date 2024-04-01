@@ -1,18 +1,24 @@
 import React, { useState } from "react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
+
 import 'bootstrap/dist/css/bootstrap.css'; // Import Bootstrap CSS locally
 import 'bootstrap-icons/font/bootstrap-icons.css'; // Import Bootstrap Icons CSS locally
-import bootstrap5Plugin from '@fullcalendar/bootstrap5';
-import { Modal } from "antd";
-import AddAppointment from "./AddAppoitment";
+
+import { Button, Col, Row } from "antd";
+import AddAgendaModal from "./AddAgenda";
+import CalendarComponent from "./CalendarComponent";
+
 
 const DisplayCalendar = () => {
     const [showModal, setShowModal] = useState(false);
     const [appointments, setAppointments] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
+    const [calendars, setCalendars] = useState([]);
+
+    const [addAgendaModalVisible, setAddAgendaModalVisible] = useState(false);
+
+    const handleCreateCalendar = (newCalendar) => {
+        setCalendars([...calendars, { title: newCalendar.title, contact: newCalendar.contact }]);
+    };
 
     const handleDateClick = (arg) => {
         setSelectedDate(arg.date);
@@ -27,42 +33,50 @@ const DisplayCalendar = () => {
         setAppointments([...appointments, newAppointment]);
         handleCloseModal();
     };
+    const handleOpenAddAgendaModal = () => {
+        setAddAgendaModalVisible(true);
+    };
 
     return (
         <div>
-            <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, bootstrap5Plugin]}
-                initialView="timeGridWeek"
-                weekends={true}
-                editable={true}
-                selectable={true}
-                selectMirror={true}
-                dayMaxEvents={true}
-                dateClick={handleDateClick}
-                events={appointments} // Display appointments on the calendar
-                eventDisplay="block" // Display events as blocks
-                eventBackgroundColor="#52c41a" // Custom color for added appointments
-                eventBorderColor="#87d068" // Custom border color for added appointments
-                locale="fr" // Set the calendar language to French
-                themeSystem='bootstrap5'
-                headerToolbar={{
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                }}
+        <Row style={{ margin: "10px 20px" }}>
+                <Col
+                    span={12}
+                    style={{
+                        textAlign: "left",
+                        fontWeight: "bold",
+                        fontSize: "20px",
+                    }}
+                >
+                    Ajouter Agenda
+                </Col>
+                <Col span={12} style={{ textAlign: "right" }}>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        onClick={handleOpenAddAgendaModal}
+                    >
+                        Ajouter Agenda
+                    </Button>
+                </Col>
+            </Row>
+        
+            <AddAgendaModal
+            onCreate={handleCreateCalendar}
+                visible={addAgendaModalVisible}
+                onCancel={() => setAddAgendaModalVisible(false)}
             />
-            <Modal
-                visible={showModal}
-                title="Ajouter un rendez-vous"
-                onCancel={handleCloseModal}
-                footer={null}
-                width={1000}
-            >
-                <AddAppointment
-                    selectedDate={selectedDate}
-                    onFormSubmit={handleFormSubmit}
-                />
-            </Modal>
+            <div >
+                {calendars.map((calendar, index) => (
+                    <CalendarComponent
+                        key={index}
+                        title={calendar.title}
+                        contact={calendar.contact}
+                        appointments={appointments} // Pass appointments to CalendarComponent
+
+                    />
+                ))}
+            </div>
         </div>
     );
 };
