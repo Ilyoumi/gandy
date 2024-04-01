@@ -1,26 +1,29 @@
 // AddAgendaModal.js
-import React from "react";
-import { Modal, Form, Input, Button, Card, Row, Col } from "antd";
-import SearchSelect from "../../../constants/SearchSelect";
+
+import React, { useState } from "react";
+import { Modal, Form, Input, Button, Card, Row, Col, Select } from "antd";
+
+const { Option } = Select;
 
 const options = [
-    { value: 'contact1', label: 'Contact 1' },
-    { value: 'contact2', label: 'Contact 2' },
-    { value: 'contact3', label: 'Contact 3' },
-    { value: 'contact4', label: 'Contact 4' },
-    { value: 'contact5', label: 'Contact 5' },
+    { value: "contact1", label: "Contact 1" },
+    { value: "contact2", label: "Contact 2" },
+    { value: "contact3", label: "Contact 3" },
+    { value: "contact4", label: "Contact 4" },
+    { value: "contact5", label: "Contact 5" },
 ];
 
-const AddAgendaModal = ({ visible, onCancel, onSubmit }) => {
+const AddAgendaModal = ({ visible, onCancel, onCreate }) => {
     const [form] = Form.useForm();
 
-    const handleSubmit = async () => {
-        try {
-            const values = await form.validateFields();
-            onSubmit(values);
-            form.resetFields();
-        } catch (errorInfo) {
-            console.log("Failed:", errorInfo);
+    const handleSubmit = (values) => {
+        try{
+            onCreate(values); // Pass form values to the parent component to create a new calendar
+        onCancel(); // Close the modal after submitting
+        form.resetFields(); // Reset form fields
+        console.log("All is well")
+        }catch(error){
+            console.log("ERROR", error)
         }
     };
 
@@ -31,45 +34,16 @@ const AddAgendaModal = ({ visible, onCancel, onSubmit }) => {
             onCancel={onCancel}
             footer={null}
         >
-            <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                <Card style={{ padding: "0 !important", marginBottom: "10px", height: "75px" }}>
-                    <Row gutter={[16, 16]}>
-                        <Col span={7}>
-                            <Form.Item>
-                                <Button
-                                    type="primary"
-                                    htmlType="submit"
-                                    style={{
-                                        textAlign: "center",
-                                        backgroundColor: "#00CC6A",
-                                        border: "none",
-                                    }}
-                                >
-                                    Sauvegarder
-                                </Button>
-                            </Form.Item>
-                        </Col>
-                        <Col span={6}>
-                            <Form.Item>
-                                <Button
-                                    type="primary"
-                                    htmlType="submit"
-                                    style={{
-                                        textAlign: "center",
-                                        backgroundColor: "#40A2D8",
-                                        border: "none",
-                                    }}
-                                >
-                                    Sauvegarder et Nouveau
-                                </Button>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                </Card>
-                <Card >
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleSubmit} // Handle form submission
+                initialValues={{ contact: options[0].value }} // Set initial value for contact
+            >
+                <Card>
                     <Form.Item
                         label="Titre"
-                        name="titre"
+                        name="title"
                         rules={[
                             {
                                 required: true,
@@ -89,11 +63,13 @@ const AddAgendaModal = ({ visible, onCancel, onSubmit }) => {
                             },
                         ]}
                     >
-                        <SearchSelect
-                            placeholder="Sélectionner un contact"
-                            options={options}
-                            onChange={(value) => form.setFieldsValue({ contact: value })}
-                        />
+                        <Select placeholder="Sélectionner un contact">
+                            {options.map((option) => (
+                                <Option key={option.value} value={option.value}>
+                                    {option.label}
+                                </Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                     <Form.Item
                         label="Description"
@@ -106,6 +82,16 @@ const AddAgendaModal = ({ visible, onCancel, onSubmit }) => {
                         ]}
                     >
                         <Input.TextArea rows={4} />
+                    </Form.Item>
+                    <Form.Item>
+                        <Row gutter={[16, 16]}>
+                            <Col span={7}>
+                                <Button type="primary" htmlType="submit" style={{ backgroundColor: "#00CC6A" }}>Sauvegarder</Button>
+                            </Col>
+                            <Col span={6}>
+                                <Button type="primary" htmlType="submit" style={{ backgroundColor: "#40A2D8" }}>Sauvegarder et Nouveau</Button>
+                            </Col>
+                        </Row>
                     </Form.Item>
                 </Card>
             </Form>

@@ -11,21 +11,7 @@ const DisplayAgenda = () => {
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [addAgendaModalVisible, setAddAgendaModalVisible] = useState(false);
     const { getColumnSearchProps } = useColumnSearch();
-    const [calendarEvents, setCalendarEvents] = useState([]);
-
-    const handleAddAgendaSubmit = (values) => {
-        // Add submitted data to calendar events state
-        setCalendarEvents([
-            ...calendarEvents,
-            {
-                title: values.titre,
-                start: new Date(), // or specify your start date
-                end: new Date(), // or specify your end date
-                owner: values.contact,
-            }
-        ]);
-        setAddAgendaModalVisible(false); // Close modal after submission
-    };
+    
 
     const handleOpenAddAgendaModal = () => {
         setAddAgendaModalVisible(true);
