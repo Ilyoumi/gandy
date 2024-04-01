@@ -61,14 +61,7 @@ const AddUserForm = () => {
 
     return (
         <div>
-        <Card style={{ marginBottom:"10px" }}>
-        <Row>
-        <Col span={12} style={{ textAlign: "left", fontWeight:"bold", fontSize:"20px" }}>
-        Créer Utilisateur
-                </Col>
-        </Row>
-
-        </Card>
+        
         <Card>
         <Form
                 form={form}
@@ -77,7 +70,7 @@ const AddUserForm = () => {
                 onValuesChange={handleChange}
                 onFinish={handleSubmit}
                 style={{
-                    padding: "30px 80px",
+                    padding: "30px",
                     
                 }}
             >
@@ -232,7 +225,7 @@ const AddUserForm = () => {
                 <Row>
                     <Col span={24} style={{ textAlign: "right" }}>
                         <Button type="primary" htmlType="submit">
-                        Créer
+                        Enregistrer
                         </Button>
                     </Col>
                 </Row>

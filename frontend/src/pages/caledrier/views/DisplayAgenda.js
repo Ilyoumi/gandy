@@ -11,6 +11,7 @@ const DisplayAgenda = () => {
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [addAgendaModalVisible, setAddAgendaModalVisible] = useState(false);
     const { getColumnSearchProps } = useColumnSearch();
+    
 
     const handleOpenAddAgendaModal = () => {
         setAddAgendaModalVisible(true);

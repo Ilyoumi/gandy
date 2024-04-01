@@ -3,6 +3,7 @@ import { Avatar, Space, Table, Button , Row, Col, Card} from "antd";
 import UpdateUser from "./UpdateUser";
 import fetchUsers from "../services/apis/usersApi";
 import { pencil, deletebtn } from "../../../constants/icons";
+import { useHistory } from "react-router-dom";
 
 import useColumnSearch from "../../../constants/tableSearchLogin";
 const DisplayUsers = () => {
@@ -11,6 +12,13 @@ const DisplayUsers = () => {
     const [updateModalVisible, setUpdateModalVisible] = useState(false);
     const [updateData, setUpdateData] = useState({});
     const { getColumnSearchProps } = useColumnSearch();
+    const history = useHistory();
+
+
+    const handleButtonClick = () => {
+        // Redirect to the desired route
+        history.push("/creer-utilisateur");
+    };
 
     useEffect(() => {
         // Fetch users data when component mounts
@@ -101,11 +109,20 @@ const DisplayUsers = () => {
             }}
         >
             <Card style={{ marginBottom:"10px" }}>
-        <Row>
-        <Col span={12} style={{ textAlign: "left", fontWeight:"bold", fontSize:"20px" }}>
-        Liste des Utilisateurs
-                </Col>
-        </Row>
+            <Row style={{ margin:"10px 20px" }}>
+                    <Col span={12} style={{ textAlign: "left", fontWeight:"bold", fontSize:"20px" }}>
+                        Liste des Utilisateurs
+                    </Col>
+                    <Col span={12} style={{ textAlign: "right" }}>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            onClick={handleButtonClick}
+                        >
+                            Nouveau utilisateur
+                        </Button>
+                    </Col>
+                </Row>
 
         </Card>
             <Card>

@@ -6,9 +6,12 @@ import frFR from "antd/lib/locale/fr_FR";
 import SaveButton from '../../../constants/SaveButton';
 
 const { RangePicker } = DatePicker;
+
 const AddAppointment = ({ selectedDate, onFormSubmit }) => {
     const [showAdditionalInput, setShowAdditionalInput] = useState(false);
     const [ppvValue, setPpvValue] = useState("");
+    const [value, setValue] = useState(""); // Define value state
+    const [error, setError] = useState(null);
 
     const [loading, setLoading] = useState(false);
 
@@ -23,8 +26,16 @@ const AddAppointment = ({ selectedDate, onFormSubmit }) => {
         setPpvValue(value);
         setShowAdditionalInput(value === "oui");
     };
+    const handleSelectChange = (value) => {
+        setValue(value);
+        setError(null); // Clear error when selecting an option
+    };
 
     const handleFormSubmit = (values) => {
+        if (!value) {
+            setError("Please select an option"); // Set error if no option selected
+            return;
+        }
         onFormSubmit({
             ...values,
             start: values.startTime.toDate(),
@@ -137,6 +148,8 @@ const AddAppointment = ({ selectedDate, onFormSubmit }) => {
                             ]}
                         >
                             <DynamicSelect
+                                value={value} // Ensure value and onChange are passed
+                                onChange={handleSelectChange}
                                 placeholder="Sélectionner un fournisseur"
                                 options={[
                                     {
@@ -168,6 +181,8 @@ const AddAppointment = ({ selectedDate, onFormSubmit }) => {
                             ]}
                         >
                             <DynamicSelect
+                            value={value} // Ensure value and onChange are passed
+                                onChange={handleSelectChange}
                                 placeholder="Sélectionner le nombre de compteurs électriques"
                                 options={[
                                     { value: "1", label: "1" },
@@ -192,6 +207,8 @@ const AddAppointment = ({ selectedDate, onFormSubmit }) => {
                             ]}
                         >
                             <DynamicSelect
+                            value={value} // Ensure value and onChange are passed
+                                onChange={handleSelectChange}
                                 placeholder="Sélectionner le nombre de compteurs gaz"
                                 options={[
                                     { value: "1", label: "1" },
