@@ -1,9 +1,23 @@
 import React, { useState } from "react";
-import { Form, Input, Button, DatePicker, Radio, Row, Col, Card } from "antd";
+import { Form, Input, Button, DatePicker, Radio, Row, Col, Card, Space,ConfigProvider } from "antd";
 import DynamicSelect from "../../../constants/SearchSelect";
+import moment from "moment";
+import frFR from "antd/lib/locale/fr_FR";
+import SaveButton from '../../../constants/SaveButton';
+
+const { RangePicker } = DatePicker;
 const AddAppointment = ({ selectedDate, onFormSubmit }) => {
     const [showAdditionalInput, setShowAdditionalInput] = useState(false);
     const [ppvValue, setPpvValue] = useState("");
+
+    const [loading, setLoading] = useState(false);
+
+    const handleClick = () => {
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+    };
 
     const handlePpvChange = (value) => {
         setPpvValue(value);
@@ -20,61 +34,18 @@ const AddAppointment = ({ selectedDate, onFormSubmit }) => {
 
     return (
         <Form layout="vertical" onFinish={handleFormSubmit}>
-            <Card style={{ padding: "0 !important", marginBottom: "10px" }}>
+            <Card style={{  marginBottom: "10px" }}>
                 <Row gutter={[16, 16]}>
-                    <Col span={6}>
-                        <Form.Item
-                            name="startTime"
-                            rules={[
-                                {
-                                    required: true,
-                                    message:
-                                        "Veuillez sélectionner l'heure de début !",
-                                },
-                            ]}
-                        >
-                            <DatePicker
-                                showTime
-                                style={{
-                                    borderRadius: "6px",
-                                    fontWeight: "600px",
-                                    height: "40px",
-                                }}
+                    <Col span={12}>
+                        <ConfigProvider locale={frFR}>
+                            <DatePicker.RangePicker
+                            showTime={true}
+                                defaultValue={moment("2015-01-01", "YYYY-MM-DD")}
                             />
-                        </Form.Item>
-                    </Col>
-                    <Col span={6}>
-                        <Form.Item
-                            name="endTime"
-                            rules={[
-                                {
-                                    required: true,
-                                    message:
-                                        "Veuillez sélectionner l'heure de fin !",
-                                },
-                            ]}
-                        >
-                            <DatePicker
-                                showTime
-                                style={{
-                                    borderRadius: "6px",
-                                    fontWeight: "600px",
-                                    height: "40px",
-                                }}
-                            />
-                        </Form.Item>
+                        </ConfigProvider>
                     </Col>
                     <Col span={12}>
-                        <Form.Item
-                            style={{ position: "absolute", right: "20px" }}
-                        >
-                            <Button
-                                htmlType="submit"
-                                style={{ backgroundColor: "#00CC6A" }}
-                            >
-                                Ajouter un rendez-vous
-                            </Button>
-                        </Form.Item>
+                        <SaveButton onClick={handleClick} loading={loading} />
                     </Col>
                 </Row>
             </Card>
