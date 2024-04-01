@@ -30,6 +30,7 @@ const DisplayCalendar = () => {
 
     return (
         <div>
+        <FullCalendar plugins={[dayGridPlugin]} initialView="dayGridMonth" events={events} />;
             <FullCalendar
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, bootstrap5Plugin]}
                 initialView="timeGridWeek"

@@ -1,13 +1,15 @@
+// AddAgendaModal.js
 import React from "react";
 import { Modal, Form, Input, Button, Card, Row, Col } from "antd";
-import SearchSelect from "../../../constants/SearchSelect"
+import SearchSelect from "../../../constants/SearchSelect";
+
 const options = [
     { value: 'contact1', label: 'Contact 1' },
     { value: 'contact2', label: 'Contact 2' },
     { value: 'contact3', label: 'Contact 3' },
     { value: 'contact4', label: 'Contact 4' },
     { value: 'contact5', label: 'Contact 5' },
-  ];
+];
 
 const AddAgendaModal = ({ visible, onCancel, onSubmit }) => {
     const [form] = Form.useForm();
@@ -30,7 +32,7 @@ const AddAgendaModal = ({ visible, onCancel, onSubmit }) => {
             footer={null}
         >
             <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                <Card style={{ padding: "0 !important",marginBottom: "10px", height:"75px" }}>
+                <Card style={{ padding: "0 !important", marginBottom: "10px", height: "75px" }}>
                     <Row gutter={[16, 16]}>
                         <Col span={7}>
                             <Form.Item>
@@ -87,8 +89,11 @@ const AddAgendaModal = ({ visible, onCancel, onSubmit }) => {
                             },
                         ]}
                     >
-                                    <SearchSelect placeholder="Sélectionner un contact" options={options} />
-                        
+                        <SearchSelect
+                            placeholder="Sélectionner un contact"
+                            options={options}
+                            onChange={(value) => form.setFieldsValue({ contact: value })}
+                        />
                     </Form.Item>
                     <Form.Item
                         label="Description"
