@@ -10,22 +10,22 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 import { Switch, Route, Redirect } from "react-router-dom";
-import Home from "./pages-gy/Home";
-import Tables from "./pages-gy/rdv/views/Tables";
-import SignIn from "./pages-gy/user/views/SignIn";
-import Main from "./components-gy/layouts/Main";
-import MyCalendar from './pages-gy/caledrier/views/MyCalendar'
+import Home from "./pages/Home";
+import Tables from "./pages/rdv/views/Tables";
+import SignIn from "./pages/user/views/Login";
+import Main from "./components/layouts/Main";
 // import "antd/dist/antd.css";
 import 'antd/dist/antd.min.css'
 import "./assets/styles/main.css";
 import "./assets/styles/responsive.css";
-import AddUserForm from "./pages-gy/user/views/AddUserForm";
-import History from "./pages-gy/rdv/views/History";
-import Contacts from "./pages-gy/contacts/views/Contacts";
+import AddUserForm from "./pages/user/views/AddUserForm";
+import History from "./pages/rdv/views/History";
+import Contacts from "./pages/contacts/views/Contacts";
 import { SidebarProvider } from './SidebarContext';
-import Agenda from "./pages-gy/caledrier/views/Agenda";
-import Card from "./pages-gy/card/Card";
-import DisplayUsers from "./pages-gy/user/views/DisplayUsers";
+import Agenda from "./pages/caledrier/views/DisplayAgenda";
+import Card from "./pages/card/Card";
+import DisplayUsers from "./pages/user/views/DisplayUsers";
+import DisplayCalendar from "./pages/caledrier/views/DisplayCalendar";
 function App() {
   return (
     <SidebarProvider>
@@ -35,7 +35,7 @@ function App() {
           <Route path="/" exact component={Card} />
           <Main>
             <Route exact path="/dashboard" component={Home} />
-            <Route exact path="/calendar" component={MyCalendar} />
+            <Route exact path="/calendrier" component={DisplayCalendar} />
             <Route exact path="/rdv" component={Tables} />
             <Route exact path="/history" component={History} />
             <Route exact path="/contact" component={Contacts} />
