@@ -4,7 +4,6 @@ import dayGridPlugin from '@fullcalendar/daygrid'; // import the DayGrid plugin
 import timeGridPlugin from '@fullcalendar/timegrid'; // import the TimeGrid plugin
 import interactionPlugin from '@fullcalendar/interaction'; // import the interaction plugin
 import frLocale from '@fullcalendar/core/locales/fr'; // import French locale
-import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 import { Select } from "antd";
 
 const { Option } = Select;
@@ -21,7 +20,7 @@ function MyCalendar() {
     return (
         <div style={{ marginBottom:"30px" }}>
             <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, bootstrap5Plugin]}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView="dayGridMonth"
                 locale={frLocale}
                 events={[

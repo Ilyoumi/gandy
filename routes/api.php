@@ -10,10 +10,13 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 Route::post('/register', [RegisteredUserController::class, 'store']);
 // Route for user login
 Route::post('/login', [AuthenticatedSessionController::class, 'login']);
-
+Route::post('/users', [UserController::class, 'store']);
 // Route::middleware('auth:sanctum')->group(function () {
      // Route for fetching all users
      Route::get('users', [UserController::class, 'index']);
+     Route::get('/csrf-token', function() {
+        return response()->json(['csrfToken' => csrf_token()]);
+    });
 
 // Route::middleware('auth:sanctum')->group(function () {
     // Routes pour les utilisateurs

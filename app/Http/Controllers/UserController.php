@@ -26,26 +26,38 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        // Validate request data
-        $request->validate([
-            'name' => 'required|string',
+{
+    try {
+        // Validate incoming request
+        $validatedData = $request->validate([
+            'nom' => 'required|string|max:255', 
+            'prenom' => 'required|string|max:255', // Assuming 'name' includes both first name and last name
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string',
             'role_id' => 'required|exists:roles,id',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        // Create a new user
+        // Since 'name' includes both first name and last name, no need to split it
+
+        // Create the user
         $user = User::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => bcrypt($request->input('password')),
-            'role_id' => $request->input('role_id'),
+            'name' => $validatedData['nom'] . ' ' . $validatedData['prenom'],
+            'email' => $validatedData['email'],
+            'role_id' => $validatedData['role_id'],
+            'password' => bcrypt($validatedData['password']),
         ]);
 
-        // Return a response indicating success
+        // Return a JSON response indicating success
         return response()->json(['message' => 'User created successfully', 'user' => $user], 201);
+    } catch (\Exception $e) {
+        // Return a JSON response with error message if an exception occurs
+        return response()->json(['message' => 'Failed to create user: ' . $e->getMessage()], 500);
     }
+}
+
+
+
+
 
     /**
      * Display the specified resource.
