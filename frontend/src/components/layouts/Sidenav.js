@@ -277,7 +277,7 @@ function Sidenav({ color }) {
                     style={{ width: expanded ? "200px" : "10px" }}
                 >
                     <NavLink
-                        to="/calendrier"
+                        to="/mycl"
                         className={` overflow-hidden transition-all ${
                             expanded ? "w-48" : "w-16"
                         }`}

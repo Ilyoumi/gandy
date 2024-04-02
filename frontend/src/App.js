@@ -26,6 +26,7 @@ import Agenda from "./pages/caledrier/views/DisplayAgenda";
 import Card from "./pages/card/Card";
 import DisplayUsers from "./pages/user/views/DisplayUsers";
 import DisplayCalendar from "./pages/caledrier/views/DisplayCalendar";
+import MyCalendar from "./pages/caledrier/views/MyCalendar";
 function App() {
   return (
     <SidebarProvider>
@@ -36,6 +37,7 @@ function App() {
           <Main>
             <Route exact path="/dashboard" component={Home} />
             <Route exact path="/calendrier" component={DisplayCalendar} />
+            <Route exact path="/mycl" component={MyCalendar} />
             <Route exact path="/rdv" component={Tables} />
             <Route exact path="/history" component={History} />
             <Route exact path="/contact" component={Contacts} />

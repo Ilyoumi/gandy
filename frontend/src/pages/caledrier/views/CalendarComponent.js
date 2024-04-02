@@ -3,11 +3,27 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from "@fullcalendar/timegrid";
-import { Modal } from "antd";
+import { Modal, Col, Row } from "antd";
 import AddAppointment from "./AddAppoitment";
 import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 
+
+import dayjs from 'dayjs';
+import { Alert, Calendar } from 'antd';
+
+
 const CalendarComponent = ({ title, contact }) => {
+  const [value, setValue] = useState(() => dayjs('2017-01-25'));
+  const [selectedValue, setSelectedValue] = useState(() => dayjs('2017-01-25'));
+  const onSelect = (newValue) => {
+    setValue(newValue);
+    setSelectedValue(newValue);
+  };
+  const onPanelChange = (newValue) => {
+    setValue(newValue);
+  };
+
+  
   const [showModal, setShowModal] = useState(false);
     const [appointments, setAppointments] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
@@ -43,6 +59,12 @@ const handleFormSubmit = (newAppointment) => {
 
   return (
     <div style={{ marginBottom:"30px" }}>
+      <Row>
+        <Col>
+          {/* <Alert message={`You selected date: ${selectedValue?.format('YYYY-MM-DD')}`} /> */}
+          <Calendar value={value}  />
+        </Col>
+      </Row>
         
             <FullCalendar
             ref={calendarRef}
