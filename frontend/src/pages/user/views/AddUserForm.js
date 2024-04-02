@@ -7,7 +7,7 @@ import {
     MailOutlined,
     VerticalAlignTopOutlined,
 } from "@ant-design/icons";
-
+import addUser from "../services/apis/crud/addUser";
 const { Dragger } = Upload;
 const props = {
     name: "file",
@@ -29,6 +29,9 @@ const props = {
     },
 };
 
+
+
+
 const roleOptions = [
     { value: 'admin', label: 'Admin' },
     { value: 'agent', label: 'Agent' },
@@ -48,6 +51,18 @@ const AddUserForm = () => {
         avatar: null,
     });
 
+    const handleSubmit = async () => {
+        try {
+            await addUser(formData); // Pass formData to the addUser function
+            // If addUser function doesn't throw an error, handle success
+            console.log("User added successfully");
+        } catch (error) {
+            console.error('Error adding user:', error);
+            // Handle error, show error message
+            message.error("Failed to add user");
+        }
+    };
+
     const handleChange = (changedValues) => {
         setFormData({
             ...formData,
@@ -55,9 +70,6 @@ const AddUserForm = () => {
         });
     };
 
-    const handleSubmit = () => {
-        console.log(formData);
-    };
 
     return (
         <div>
