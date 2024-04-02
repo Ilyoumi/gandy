@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 
-import 'bootstrap/dist/css/bootstrap.css'; // Import Bootstrap CSS locally
-import 'bootstrap-icons/font/bootstrap-icons.css'; // Import Bootstrap Icons CSS locally
-
 import { Button, Col, Row } from "antd";
 import AddAgendaModal from "./AddAgenda";
 import CalendarComponent from "./CalendarComponent";
