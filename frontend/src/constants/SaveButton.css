@@ -1,0 +1,16 @@
+/* SaveButton.css */
+.save-button {
+    background-color: #1A252F; /* Custom background color */
+    border-color: #1A252F; /* Custom border color */
+    color: #fff; /* Text color */
+    width: 150px;position: absolute; right: 20px
+  }
+  
+  .save-button:hover,
+  .save-button:focus {
+    background-color: #2C3E50; /* Custom hover color */
+    border-color: #2C3E50; /* Custom hover border color */
+    color: #fff; /* Text color */
+
+  }
+  
