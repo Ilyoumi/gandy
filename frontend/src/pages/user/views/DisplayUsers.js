@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Avatar, Space, Table, Button , Row, Col, Card} from "antd";
+import { Avatar, Space, Table, Button , Row, Col, Card, message} from "antd";
 import UpdateUser from "./UpdateUser";
-import fetchUsers from "../services/apis/usersApi";
+import {fetchUsers, deleteUser} from "../services/apis/usersApi";
 import { pencil, deletebtn } from "../../../constants/icons";
 import { useHistory } from "react-router-dom";
 
@@ -88,10 +88,7 @@ const DisplayUsers = () => {
         setUpdateModalVisible(true);
     };
 
-    const handleUpdate = (values) => {
-        console.log("Updated user data:", values);
-        setUpdateModalVisible(false);
-    };
+    
 
     const updateModalProps = {
         visible: updateModalVisible,
@@ -140,7 +137,7 @@ const DisplayUsers = () => {
                     </Button>
                     <Button
                         type="link"
-                        onClick={() => console.log("Delete user:", record.id)}
+                        onClick={() => handleDelete()}
                     >
                         {deletebtn}
                     </Button>

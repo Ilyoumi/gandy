@@ -169,4 +169,3 @@ public function update(Request $request, $id)
         return response()->json(['message' => 'User deleted successfully']);
     }
     }
-} 
