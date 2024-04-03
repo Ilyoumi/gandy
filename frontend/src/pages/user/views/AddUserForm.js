@@ -73,8 +73,6 @@ const AddUserForm = () => {
         try {
             if (formData.password !== formData.confirmPassword) {
                 throw new Error("The password confirmation does not match.");
-            } else{
-                console.log("The two passwords are matching", formData.confirmPassword, formData.password)
             }
             console.log('Sending data:', formData);
             const response = await axios.post(
