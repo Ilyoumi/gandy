@@ -1,30 +1,4 @@
-import React, { useState } from "react";
 
-
-import { Button, Col, Row } from "antd";
-import AddAgendaModal from "./AddAgenda";
-import CalendarComponent from "./CalendarComponent";
-
-
-const DisplayCalendar = () => {
-    const [showModal, setShowModal] = useState(false);
-    const [appointments, setAppointments] = useState([]);
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [calendars, setCalendars] = useState([]);
-
-    const [addAgendaModalVisible, setAddAgendaModalVisible] = useState(false);
-
-    const handleCreateCalendar = (newCalendar) => {
-        setCalendars([...calendars, { title: newCalendar.title, contact: newCalendar.contact }]);
-    };
-
-    const handleDateClick = (arg) => {
-        setSelectedDate(arg.date);
-        setShowModal(true);
-    };
-
-    const handleCloseModal = () => {
-        setShowModal(false);
 import React, { useState } from "react";
 
 
@@ -62,13 +36,7 @@ const DisplayCalendar = () => {
     const handleOpenAddAgendaModal = () => {
         setAddAgendaModalVisible(true);
     };
-    const handleFormSubmit = (newAppointment) => {
-        setAppointments([...appointments, newAppointment]);
-        handleCloseModal();
-    };
-    const handleOpenAddAgendaModal = () => {
-        setAddAgendaModalVisible(true);
-    };
+    
 
     return (
         <div>
@@ -150,8 +118,8 @@ const DisplayCalendar = () => {
                 ))}
             </div>
         </div>
+        </div>
     );
 };
 
-export default DisplayCalendar;
 export default DisplayCalendar;
