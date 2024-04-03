@@ -20,6 +20,12 @@ Route::post('/users', [UserController::class, 'store']);
      Route::get('/csrf-token', function () {
         return response()->json(['csrfToken' => csrf_token()]);
     });
+    Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+        return $request->user();
+    });
+    
+
+
     
 
 // Route::middleware('auth:sanctum')->group(function () {

@@ -30,11 +30,12 @@ import {
 } from "antd";
 
 import {
-  SearchOutlined,
+  UserOutlined,
   StarOutlined,
   TwitterOutlined,
   FacebookFilled,
 } from "@ant-design/icons";
+import { useAuth } from "../../AuthContext";
 
 import { NavLink, Link } from "react-router-dom";
 import styled from "styled-components";
@@ -263,11 +264,15 @@ function Header({
 
   const [visible, setVisible] = useState(false);
   const [sidenavType, setSidenavType] = useState("transparent");
+  const { isLoggedIn, username } = useAuth();
 
   useEffect(() => window.scrollTo(0, 0));
 
   const showDrawer = () => setVisible(true);
   const hideDrawer = () => setVisible(false);
+
+  // Function to handle successful login
+  
 
   return (
     <>
@@ -415,10 +420,17 @@ function Header({
               </div>
             </div>
           </Drawer>
-          <Link to="/sign-in" className="btn-sign-in">
-            {profile}
-            <span>Sign in</span>
-          </Link>
+          {isLoggedIn ? ( // Display username if logged in
+                    <div className="username-display">
+                        {profile}
+                        
+                        <span>Bienvenue, {username}</span>
+                    </div>
+                ) : (
+                    <Link to="/sign-in" className="btn-sign-in">
+                        <span>Sign in</span>
+                    </Link>
+                )}
           
         </Col>
       </Row>

@@ -13,20 +13,80 @@ import signinbg from "../../../assets/images/loginbg.png";
 import logo from "../../../assets/images/gy.png";
 import { useHistory } from "react-router-dom";
 import { axiosClient } from "../../../api/axios";
-
+import { useAuth } from "../../../AuthContext";
 const { Title } = Typography;
 const { Content } = Layout;
 
 const Login = () => {
     const [remember, setRemember] = useState(true);
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const { handleLoginSuccess } = useAuth();
+    
+    const [form] = Form.useForm();
     const history = useHistory();
-
     const onFinish = async (values) => {
-        const axios = axiosClient.defaults
-        console.log(values, axios)
+        try {
+            // Make a request to fetch the CSRF cookie
+            await axiosClient.get("/sanctum/csrf-cookie");
+    
+            // Make a request to login
+            const response = await axiosClient.post("/login", values);
+    
+            // Check if login is successful
+            if (response.status === 204) {
+                console.log("Login successful!");
+                handleLoginSuccess()
+                history.push("/dashboard");
+                
+                // Fetch user info after successful login
+                // try {
+                //     const userInfoResponse = await axiosClient.get("/api/user");
+                //     const userInfo = userInfoResponse.data.user;
+                //     console.log("user data", userInfo);
+                
+                //     // Pass user info to the handleLoginSuccess function
+                //     handleLoginSuccess(userInfo);
+                
+                //     // Redirect to dashboard
+                // } catch (userInfoError) {
+                //     console.error("Error fetching user info:", userInfoError);
+                    
+                //     // Log more details from the error response if available
+                //     if (userInfoError.response && userInfoError.response.data) {
+                //         console.error("Error response data:", userInfoError.response.data);
+                //     }
+                    
+                //     // Handle error fetching user info
+                // }
+                
+            } else {
+                console.log("Login failed:", response.data.message);
+                // Set form validation error
+                form.setFields([
+                    {
+                        name: "email",
+                        errors: ["Identifiants incorrects. Veuillez réessayer."],
+                    },
+                    {
+                        name: "password",
+                        errors: ["Identifiants incorrects. Veuillez réessayer."],
+                    },
+                ]);
+            }
+        } catch (error) {
+            console.error("Error occurred:", error);
+            // Display the error message from the server response
+            if (error.response && error.response.data && error.response.data.message) {
+                console.error("Server error message:", error.response.data.message);
+                // Log the exact error message received from the server
+            } else {
+                console.error("Unexpected error occurred:", error.message);
+            }
+        }
     };
+    
+    
+    
+    
 
     const onFinishFailed = (errorInfo) => {
         console.log("Failed:", errorInfo);
@@ -74,6 +134,7 @@ const Login = () => {
                                 vous connecter
                             </Title>
                             <Form
+                            form={form}
                                 onFinish={onFinish}
                                 onFinishFailed={onFinishFailed}
                                 layout="vertical"
@@ -83,8 +144,9 @@ const Login = () => {
                                     className="username"
                                     label="Email"
                                     name="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    validateStatus={form.getFieldError('email') ? 'error' : ''}
+    help={form.getFieldError('email')?.[0]}
+                                    
                                     rules={[
                                         {
                                             required: true,
@@ -100,10 +162,9 @@ const Login = () => {
                                     className="username"
                                     label="Password"
                                     name="password"
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
+                                    validateStatus={form.getFieldError('password') ? 'error' : ''}
+    help={form.getFieldError('password')?.[0]}
+                                    
                                     rules={[
                                         {
                                             required: true,
@@ -113,6 +174,7 @@ const Login = () => {
                                     ]}
                                 >
                                     <Input placeholder="Password" />
+                                    
                                 </Form.Item>
 
                                 <Form.Item
