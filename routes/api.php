@@ -10,6 +10,8 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 Route::post('/register', [RegisteredUserController::class, 'store']);
 // Route for user login
 Route::post('/login', [AuthenticatedSessionController::class, 'login']);
+Route::get('/login', [AuthenticatedSessionController::class, 'getUser']);
+Route::post('/logout', [AuthenticatedSessionController::class, 'logout']);
 Route::post('/users', [UserController::class, 'store']);
 // Route::middleware('auth:sanctum')->group(function () {
      // Route for fetching all users

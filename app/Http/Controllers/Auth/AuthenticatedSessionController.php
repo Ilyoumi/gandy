@@ -9,6 +9,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use App\Models\User;
 class AuthenticatedSessionController extends Controller
 {
     /**
@@ -49,35 +51,62 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming login request.
      */
-    public function login(Request $request)
-{
-    $email = $request->input('email');
-    $plainPassword = $request->input('password');
-    
-    // Hash the plain password
-    $hashedPassword = Hash::make($plainPassword);
-    
-    // Attempt authentication with the hashed password
-    $credentials = [
-        'email' => $email,
-        'password' => $hashedPassword,
-    ];
-
-    if (Auth::attempt($credentials)) {
-        // Authentication passed...
-        $user = Auth::user();
+    public function login (Request $request){
+        $validator = Validator::make($request->all(), [
+        'email' => 'required|email:191',
+        'password' => 'required',
+        ]);
+        
+        if($validator->fails())
+        {
         return response()->json([
-            'success' => true,
-            'user' => $user,
-            'message' => 'Login successful',
-        ], 200);
-    }
+        'validation_errors' =>$validator->messages(),
+        ]);
+        }
+        else
+        {
+        $user = User::where('email', $request->email)->first();
+        
+        if(!$user || !Hash::check($request->password,$user->password))
+        {
+        return response()->json([
+        'status'=>401,
+        'message'=>'Invalid Credentials',
+        ]);
+        }
+        else
+        {
+        if($user->role_as == 1) //1 = admin
+        {
+        $role = 'admin';
+        $token = $user->createToken($user->email.'_AdminToken',['server:admin'])->plainTextToken;
+        }
+        else
+        {
+        $role = '';
+        $token = $user->createToken($user->email.'_Token', [''])->plainTextToken;
+        }
+        return response()->json([
+        'status' =>200,
+        'username' =>$user->name,
+        'token' =>$token,
+        'message' =>'Logged In Successfully',
+        'role'=>$role,
+        ]);
+        }
+        }
+        }
 
-    return response()->json([
-        'success' => false,
-        'message' => 'Login failed',
-    ], 401); 
-}
+        public function logout()
+        {
+            try {
+                return Auth::logout();
+            } catch (\Exception $e) {
+                // Handle any exceptions that may occur during the logout process
+                return response()->json(['error' => 'Logout failed: ' . $e->getMessage()], 500);
+            }
+        }
+        
 
     /**
      * Destroy an authenticated session.

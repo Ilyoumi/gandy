@@ -21,68 +21,86 @@ const Login = () => {
     const [remember, setRemember] = useState(true);
     const { handleLoginSuccess } = useAuth();
     
+    
     const [form] = Form.useForm();
     const history = useHistory();
-    const onFinish = async (values) => {
-        try {
-            // Make a request to fetch the CSRF cookie
-            await axiosClient.get("/sanctum/csrf-cookie");
+    const onFinish = () => {
+        form.validateFields().then((values) => { // validateFields is used to get form values
+            const data = {
+                email: values.email,
+                password: values.password,
+            };
     
-            // Make a request to login
-            const response = await axiosClient.post("/login", values);
+            axiosClient.get("/sanctum/csrf-cookie")
+                .then((response) => {
+                    axiosClient.post(`api/login`, data)
+                        .then((res) => {
+                            if (res.data.status === 200) {
+                                localStorage.setItem("auth_token", res.data.token);
+                                localStorage.setItem("auth_name", res.data.username);
+                                handleLoginSuccess(res.data.username);
+                                fetchAndUpdateRole(res.data.token);
+                                console.log("res:",res.data)
+                                console.log(localStorage)
     
-            // Check if login is successful
-            if (response.status === 204) {
-                console.log("Login successful!");
-                handleLoginSuccess()
-                history.push("/dashboard");
-                
-                // Fetch user info after successful login
-                // try {
-                //     const userInfoResponse = await axiosClient.get("/api/user");
-                //     const userInfo = userInfoResponse.data.user;
-                //     console.log("user data", userInfo);
-                
-                //     // Pass user info to the handleLoginSuccess function
-                //     handleLoginSuccess(userInfo);
-                
-                //     // Redirect to dashboard
-                // } catch (userInfoError) {
-                //     console.error("Error fetching user info:", userInfoError);
-                    
-                //     // Log more details from the error response if available
-                //     if (userInfoError.response && userInfoError.response.data) {
-                //         console.error("Error response data:", userInfoError.response.data);
-                //     }
-                    
-                //     // Handle error fetching user info
-                // }
-                
-            } else {
-                console.log("Login failed:", response.data.message);
-                // Set form validation error
-                form.setFields([
-                    {
-                        name: "email",
-                        errors: ["Identifiants incorrects. Veuillez réessayer."],
-                    },
-                    {
-                        name: "password",
-                        errors: ["Identifiants incorrects. Veuillez réessayer."],
-                    },
-                ]);
-            }
-        } catch (error) {
-            console.error("Error occurred:", error);
-            // Display the error message from the server response
-            if (error.response && error.response.data && error.response.data.message) {
-                console.error("Server error message:", error.response.data.message);
-                // Log the exact error message received from the server
-            } else {
-                console.error("Unexpected error occurred:", error.message);
-            }
-        }
+                                if (res.data.role === "admin") {
+                                    history.push("/admin/dashboard");
+                                } else {
+                                    history.push("/dashboard");
+                                }
+                            } else if (res.data.status === 401) {
+                                // Handle 401 Unauthorized error if needed
+                            } else {
+                                // Handle other status codes or validation errors
+                                console.error("Login failed:", res.data.message);
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("An error occurred during login:", error);
+                            // Log the error
+                            // You can also handle the error or display an error message to the user if needed
+                        });
+                })
+                .catch((error) => {
+                    console.error("An error occurred while fetching CSRF token:", error);
+                    // Log the error
+                    // You can also handle the error or display an error message to the user if needed
+                });
+        }).catch((error) => {
+            console.error("Form validation failed:", error);
+            // Log the validation error
+            // You can also handle the validation error or display an error message to the user if needed
+        });
     };
+
+    const fetchAndUpdateRole = (token) => {
+        axiosClient.get("/api/user", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+            .then((response) => {
+                const { role } = response.data;
+                if (role) {
+                    localStorage.setItem("user_role", role); // Update user role in localStorage
+                    handleLoginSuccess(response.data.name);
+                    console.log("role",localStorage )
+                    if (role === "admin") {
+                        history.push("/admin/dashboard");
+                    } else {
+                        history.push("/dashboard");
+                    }
+                } else {
+                    console.error("User role not found in response data");
+                }
+            })
+            .catch((error) => {
+                console.error("An error occurred while fetching user data:", error);
+            });
+    };
+    
+    
+    
     
     
     
