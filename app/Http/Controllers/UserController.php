@@ -121,6 +121,14 @@ public function update(Request $request, $id)
             return response()->json(['message' => 'User not found'], 404);
         }
 
+        // Map role name to role ID
+        $roleIds = [
+            'Admin' => 1,
+            'Agent' => 2,
+            'Superviseur' => 3,
+            'Agent Commercial' => 4,
+        ];
+
         // Validate request data
         $validatedData = $request->validate([
             'name' => 'required|string',
