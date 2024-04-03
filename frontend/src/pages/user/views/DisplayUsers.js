@@ -35,15 +35,13 @@ const DisplayUsers = () => {
                 // Hide the modal
                 setUpdateModalVisible(false);
                 message.success("User updated successfully");
-                fetchUsersData();
+                fetchUsers()
             } else {
                 // Handle errors
-                const errorMessage = await response.text();
-                console.error('Error:', errorMessage);
-                message.error("Failed to update user: " + errorMessage);
+                message.error("Failed to update user");
             }
         } catch (error) {
-            console.error('Error:', error.message);
+            console.error("Error updating user:", error);
             message.error("Failed to update user");
         }
     };

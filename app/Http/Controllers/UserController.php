@@ -51,12 +51,15 @@ class UserController extends Controller
         ];
 
         // Create the user
-        $user = new User();
-        $user->name = $validatedData['nom'] . ' ' . $validatedData['prenom'];
-        $user->email = $validatedData['email'];
-        $user->password = Hash::make($validatedData['password']);
-        $user->role_id = $roleIds[$validatedData['role_name']]; // Assign role ID based on role name
-        $user->save();
+        // Create the user
+$user = new User();
+$user->name = $validatedData['nom'] . ' ' . $validatedData['prenom'];
+$user->email = $validatedData['email'];
+$user->password = Hash::make($validatedData['password']);
+$user->role_id = $roleIds[$validatedData['role_name']]; // Assign role ID based on role name
+$user->role = $validatedData['role_name']; // Assign role name
+$user->save();
+
 
         // Return a response indicating success
         return response()->json(['message' => 'User created successfully', 'user' => $user], 201);
@@ -67,7 +70,7 @@ class UserController extends Controller
         // Return a response with error message if an exception occurs
         return response()->json([
             'message' => 'Failed to create user: ' . $e->getMessage(),
-            
+            'formData' => $request->all() // Include form data in the response
         ], 500);
     }
 }
@@ -130,15 +133,13 @@ public function update(Request $request, $id)
         $validatedData = $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email,'.$id,
-            'role_name' => 'required|string|in:Admin,Agent,Superviseur,Agent Commercial',
-
+            'role_id' => 'required|exists:roles,id',
         ]);
 
         // Update user data
         $user->name = $validatedData['name'];
         $user->email = $validatedData['email'];
-        $user->role_id = $roleIds[$validatedData['role_name']]; // Assign role ID based on role name
-
+        $user->role_id = $validatedData['role_id'];
         $user->save();
 
         // Return a response indicating success
@@ -175,4 +176,4 @@ public function update(Request $request, $id)
         // Return a response indicating success
         return response()->json(['message' => 'User deleted successfully']);
     }
-}
+    }
