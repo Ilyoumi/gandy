@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Avatar, Space, Table, Button , Row, Col, Card, message} from "antd";
+import { Avatar, Space, Table, Button , Row, Col, Card, message, Tag} from "antd";
 import UpdateUser from "./UpdateUser";
 import {fetchUsers, deleteUser} from "../services/apis/usersApi";
 import { pencil, deletebtn } from "../../../constants/icons";
@@ -76,7 +76,11 @@ const DisplayUsers = () => {
     const fetchUsersData = async () => {
         try {
             const userData = await fetchUsers();
-            setUsers(userData);
+            console.log('Type of users:', typeof userData.users);
+            console.log('Users data:', userData.users)
+            console.log('Response data:', userData);
+
+            setUsers(userData.users);
         } catch (error) {
             console.error("Error fetching users:", error);
         }
@@ -95,6 +99,21 @@ const DisplayUsers = () => {
         onCancel: () => setUpdateModalVisible(false),
         onUpdate: handleUpdate,
         userData: updateData,
+    };
+
+    const roleNames = {
+        1: 'Admin',
+        2: 'Agent',
+        3: 'Superviseur',
+        4: 'Agent Commercial',
+    };
+
+    const roleColors = {
+        1: 'success', // Admin
+        2: 'processing', // Agent
+        3: 'error', // Superviseur
+        4: 'warning', // Agent Commercial
+        // Add more colors as needed
     };
 
     
@@ -120,11 +139,13 @@ const DisplayUsers = () => {
         },
         {
             title: "ROLE",
-            dataIndex: "role",
-            key: "role",
-            ...getColumnSearchProps("role"),
+            dataIndex: "role_id",
+            key: "role_id",
+            ...getColumnSearchProps("role_id"),
             render: (text, record) => (
-                <span>{record.role ? record.role.name : ""}</span>
+                <Tag color={roleColors[text]}>
+                    {roleNames[text]}
+                </Tag>
             ),
         },
         {
@@ -137,7 +158,7 @@ const DisplayUsers = () => {
                     </Button>
                     <Button
                         type="link"
-                        onClick={() => handleDelete()}
+                        onConfirm={() => handleDelete(record.id)}
                     >
                         {deletebtn}
                     </Button>
@@ -175,7 +196,6 @@ const DisplayUsers = () => {
                 columns={columns}
                 dataSource={users}
                 pagination={{ pageSize: 5}}
-                scroll={{ x: "max-content" }}
                 responsive={{
                     xs: 1, // 1 column for extra small screens (mobile)
                     sm: 3, // 3 columns for small screens (tablet)
@@ -185,7 +205,7 @@ const DisplayUsers = () => {
                 }}
             />
             </Card>
-            <UpdateUser {...updateModalProps} />
+            <UpdateUser {...updateModalProps} onUpdate={handleUpdate} />
         </div>
     );
 };
