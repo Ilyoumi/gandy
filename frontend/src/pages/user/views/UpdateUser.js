@@ -73,17 +73,17 @@ const UpdateUserModal = ({ visible, onCancel, onUpdate, userData }) => {
                     <Input type="email" placeholder="Email" />
                 </Form.Item>
                 <Form.Item
-                    name="role_id"
+                    name="role_name"
                     label="Rôle"
                     rules={[{ required: true, message: "Veuillez sélectionner un rôle!" }]}
                     style={{ marginBottom: 20 }}
                 >
                     <Select placeholder="Sélectionner un rôle" style={{ width: "100%" }}>
-        <Option value={1}>Admin</Option>
-        <Option value={2}>Agent</Option>
-        <Option value={3}>Superviseur</Option>
-        <Option value={4}>Agent Commercial</Option>
-    </Select>
+                        <Option value="Admin">Admin</Option>
+                        <Option value="Agent">Agent</Option>
+                        <Option value="Superviseur">Superviseur</Option>
+                        <Option value="Agent Commercial">Agent Commercial</Option>
+                    </Select>
                 </Form.Item>
             </Form>
         </Modal>
