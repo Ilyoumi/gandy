@@ -14,6 +14,54 @@ const DisplayUsers = () => {
     const { getColumnSearchProps } = useColumnSearch();
     const history = useHistory();
 
+    const handleUpdate = async (values) => {
+        try {
+            // Send a PUT request to update user data
+            const response = await fetch(`http://localhost:8000/api/users/${updateData.id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(values),
+            });
+            if (response.ok) {
+                // If the request is successful, update the user in the frontend
+                const updatedUser = await response.json();
+                // Update the user in the users state
+                const updatedUsers = users.map((user) =>
+                    user.id === updatedUser.id ? updatedUser : user
+                );
+                setUsers(updatedUsers);
+                // Hide the modal
+                setUpdateModalVisible(false);
+                message.success("User updated successfully");
+                fetchUsers()
+            } else {
+                // Handle errors
+                message.error("Failed to update user");
+            }
+        } catch (error) {
+            console.error("Error updating user:", error);
+            message.error("Failed to update user");
+        }
+    };
+    const handleDelete = async (userId) => {
+        try {
+            const response = await deleteUser(userId);
+            if (response.ok) {
+                message.success("User deleted successfully");
+                fetchUsersData(); // Refetch user data after delete
+            } else {
+                message.error("Failed to delete user");
+            }
+        } catch (error) {
+            console.error('Error:', error.response);
+            message.error("Failed to delete user");
+        }
+    };
+    
+
+
 
     const handleButtonClick = () => {
         // Redirect to the desired route
