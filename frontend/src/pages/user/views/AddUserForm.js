@@ -8,6 +8,7 @@ import {
     MailOutlined,
     VerticalAlignTopOutlined,
 } from "@ant-design/icons";
+import addUser from "../services/apis/crud/addUser";
 const { Dragger } = Upload;
 const props = {
     name: "file",
@@ -30,13 +31,14 @@ const props = {
 };
 
 
-const roleOptions = [
-    { value: 'Admin', label: 'Admin' },
-    { value: 'Agent', label: 'Agent' },
-    { value: 'Superviseur', label: 'Superviseur' },
-    { value: 'Agent Commercial', label: 'Agent Commercial' },
-];
 
+
+const roleOptions = [
+    { value: 'admin', label: 'Admin' },
+    { value: 'agent', label: 'Agent' },
+    { value: 'superviseur', label: 'Superviseur' },
+    { value: 'agent_commercial', label: 'Agent Commercial' },
+  ];
 
 // Import statements remain unchanged...
 
@@ -46,13 +48,11 @@ const AddUserForm = () => {
         nom: "",
         prenom: "",
         email: "",
-        role_name: "", 
+        role: "",
         password: "",
         confirmPassword: "",
         avatar: null,
     });
-
-    
 
     const handleChange = (changedValues) => {
         setFormData({
@@ -88,16 +88,21 @@ const AddUserForm = () => {
             message.success(response.data.message);
             // Optionally, clear the form fields if needed
             form.resetFields();
+            setFormData({
+                nom: "",
+                prenom: "",
+                email: "",
+                role: "",
+                password: "",
+                confirmPassword: "",
+                avatar: null,
+            });
         } catch (error) {
     
             // Display an error message to the user
             console.error('Error:', error.response);
         }
     };
-    
-    
-
-    
 
     return (
         <div>
@@ -114,8 +119,6 @@ const AddUserForm = () => {
                 >
                     <Row gutter={[16, 16]}>
                         <Col xs={12} sm={8}>
-                        
-
                             <Form.Item>
                                 <Dragger
                                     {...props}
@@ -201,7 +204,7 @@ const AddUserForm = () => {
                                 </Col>
                                 <Col xs={24} sm={12}>
                                     <Form.Item
-                                        name="role_name"
+                                        name="role"
                                         label="Role"
                                         rules={[
                                             {
