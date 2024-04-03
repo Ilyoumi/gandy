@@ -35,16 +35,21 @@ const DisplayUsers = () => {
                 // Hide the modal
                 setUpdateModalVisible(false);
                 message.success("User updated successfully");
-                fetchUsers()
+                fetchUsersData();
             } else {
                 // Handle errors
-                message.error("Failed to update user");
+                const errorMessage = await response.text();
+                console.error('Error:', errorMessage);
+                message.error("Failed to update user: " + errorMessage);
             }
         } catch (error) {
-            console.error("Error updating user:", error);
+            console.error('Error:', error.message);
             message.error("Failed to update user");
         }
     };
+    
+    
+    
     const handleDelete = async (userId) => {
         try {
             const response = await deleteUser(userId);
@@ -139,13 +144,13 @@ const DisplayUsers = () => {
         },
         {
             title: "ROLE",
-            dataIndex: "role_id",
-            key: "role_id",
-            ...getColumnSearchProps("role_id"),
+            dataIndex: "role",
+            key: "role",
+            ...getColumnSearchProps("role"),
             render: (text, record) => (
-                <Tag color={roleColors[text]}>
-                    {roleNames[text]}
-                </Tag>
+                <Tag color={roleColors[record.role_id]}>
+            {text}
+        </Tag>
             ),
         },
         {

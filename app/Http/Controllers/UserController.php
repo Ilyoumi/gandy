@@ -28,52 +28,60 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-{
-    try {
-        // Log the incoming request data
-        Log::info('Incoming request data:', $request->all());
+    {
+        try {
+            // Log the incoming request data
+            Log::info('Incoming request data:', $request->all());
 
-        // Validate incoming request
-        $validatedData = $request->validate([
-            'nom' => 'required|string|max:255',
-            'prenom' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'role_name' => 'required|string|in:Admin,Agent,Superviseur,Agent Commercial',
-            'password' => 'required|string|min:8',
-        ]);
+            // Validate incoming request
+            $validatedData = $request->validate([
+                'nom' => 'required|string|max:255',
+                'prenom' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'role_name' => 'required|string|in:Admin,Agent,Superviseur,Agent Commercial',
+                'password' => 'required|string|min:8',
+            ]);
 
-        // Map role name to role ID
-        $roleIds = [
-            'Admin' => 1,
-            'Agent' => 2,
-            'Superviseur' => 3,
-            'Agent Commercial' => 4,
-        ];
+            // Map role name to role ID
+            $roleIds = [
+                'Admin' => 1,
+                'Agent' => 2,
+                'Superviseur' => 3,
+                'Agent Commercial' => 4,
+            ];
 
-        // Create the user
-        // Create the user
-$user = new User();
-$user->name = $validatedData['nom'] . ' ' . $validatedData['prenom'];
-$user->email = $validatedData['email'];
-$user->password = Hash::make($validatedData['password']);
-$user->role_id = $roleIds[$validatedData['role_name']]; // Assign role ID based on role name
-$user->role = $validatedData['role_name']; // Assign role name
-$user->save();
+            // Get role ID based on role name
+            $roleId = $roleIds[$validatedData['role_name']];
 
+            // Create the user
+            $user = new User();
+            $user->name = $validatedData['nom'] . ' ' . $validatedData['prenom'];
+            $user->email = $validatedData['email'];
+            $user->password = Hash::make($validatedData['password']);
+            $user->role = $validatedData['role_name']; // Assign role name directly
+            $user->save();
 
-        // Return a response indicating success
-        return response()->json(['message' => 'User created successfully', 'user' => $user], 201);
-    } catch (\Exception $e) {
-        // Log the error message
-        Log::error('Failed to create user: ' . $e->getMessage());
+            // Return a response indicating success
+            return response()->json([
+                'message' => 'User created successfully',
+                'user' => $user,
+                'received_data' => $validatedData // Include received data in the response
+            ], 201);
+        } catch (\Exception $e) {
+            // Log the error message
+            Log::error('Failed to create user: ' . $e->getMessage());
 
-        // Return a response with error message if an exception occurs
-        return response()->json([
-            'message' => 'Failed to create user: ' . $e->getMessage(),
-            'formData' => $request->all() // Include form data in the response
-        ], 500);
+            // Return a response with error message if an exception occurs
+            return response()->json([
+                'message' => 'Failed to create user: ' . $e->getMessage(),
+                'received_data' => $request->all() // Include received data in the response
+            ], 500);
+        }
     }
-}
+
+    
+
+    
 
 
 
@@ -110,48 +118,56 @@ $user->save();
      * @return \Illuminate\Http\Response
      */
     // UserController.php
-public function update(Request $request, $id)
-{
-    try {
-        // Find the user with the given id
-        $user = User::find($id);
-
-        // Check if user exists
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+    // UserController.php
+    public function update(Request $request, $id)
+    {
+        try {
+            // Find the user with the given id
+            $user = User::find($id);
+    
+            // Check if user exists
+            if (!$user) {
+                return response()->json(['message' => 'User not found'], 404);
+            }
+    
+            // Validate request data
+            $validatedData = $request->validate([
+                'name' => 'required|string',
+                'email' => 'required|email|unique:users,email,'.$id,
+                'role_name' => 'required|string|in:Admin,Agent,Superviseur,Agent Commercial',
+            ]);
+    
+            // Store old data
+            $oldData = $user->toArray();
+    
+            // Update user data
+            $user->name = $validatedData['name'];
+            $user->email = $validatedData['email'];
+            $user->role = $validatedData['role_name']; // Assign role name directly
+            $user->save();
+    
+            // Return a response indicating success with old and updated data
+            return response()->json([
+                'message' => 'User updated successfully',
+                'old_data' => $oldData,
+                'updated_data' => $user->toArray()
+            ]);
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Failed to update user: ' . $e->getMessage());
+    
+            // If an error occurs, return a response with error message and old and updated data
+            return response()->json([
+                'message' => 'Failed to update user: ' . $e->getMessage(),
+                'old_data' => $oldData ?? null,
+                'updated_data' => $user->toArray() ?? null
+            ], 500);
         }
-
-        // Map role name to role ID
-        $roleIds = [
-            'Admin' => 1,
-            'Agent' => 2,
-            'Superviseur' => 3,
-            'Agent Commercial' => 4,
-        ];
-
-        // Validate request data
-        $validatedData = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users,email,'.$id,
-            'role_id' => 'required|exists:roles,id',
-        ]);
-
-        // Update user data
-        $user->name = $validatedData['name'];
-        $user->email = $validatedData['email'];
-        $user->role_id = $validatedData['role_id'];
-        $user->save();
-
-        // Return a response indicating success
-        return response()->json(['message' => 'User updated successfully', 'user' => $user]);
-    } catch (\Exception $e) {
-        // Log the error
-        Log::error('Failed to update user: ' . $e->getMessage());
-
-        // Return a response with error message
-        return response()->json(['message' => 'Failed to update user: ' . $e->getMessage()], 500);
     }
-}
+    
+
+
+    
 
 
     /**
@@ -176,4 +192,4 @@ public function update(Request $request, $id)
         // Return a response indicating success
         return response()->json(['message' => 'User deleted successfully']);
     }
-    }
+}
