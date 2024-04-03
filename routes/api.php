@@ -14,6 +14,7 @@ Route::post('/users', [UserController::class, 'store']);
 // Route::middleware('auth:sanctum')->group(function () {
      // Route for fetching all users
      Route::get('users', [UserController::class, 'index']);
+     Route::put('/users/{id}', [UserController::class, 'update']);
      Route::get('/csrf-token', function() {
         return response()->json(['csrfToken' => csrf_token()]);
     });
