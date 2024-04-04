@@ -78,46 +78,6 @@ const DisplayCalendar = () => {
                     />
                 ))}
             </div>
-        <div>
-        <Row style={{ margin: "10px 20px" }}>
-                <Col
-                    span={12}
-                    style={{
-                        textAlign: "left",
-                        fontWeight: "bold",
-                        fontSize: "20px",
-                    }}
-                >
-                    Ajouter Agenda
-                </Col>
-                <Col span={12} style={{ textAlign: "right" }}>
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        onClick={handleOpenAddAgendaModal}
-                    >
-                        Ajouter Agenda
-                    </Button>
-                </Col>
-            </Row>
-        
-            <AddAgendaModal
-            onCreate={handleCreateCalendar}
-                visible={addAgendaModalVisible}
-                onCancel={() => setAddAgendaModalVisible(false)}
-            />
-            <div >
-                {calendars.map((calendar, index) => (
-                    <CalendarComponent
-                        key={index}
-                        title={calendar.title}
-                        contact={calendar.contact}
-                        appointments={appointments} // Pass appointments to CalendarComponent
-
-                    />
-                ))}
-            </div>
-        </div>
         </div>
     );
 };
