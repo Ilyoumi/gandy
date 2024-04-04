@@ -4,7 +4,6 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import frLocale from '@fullcalendar/core/locales/fr';
-import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 import { Modal, Card, Button, Radio } from 'antd';
 import AddAppointment from "./AddAppoitment";
 import NewButton from '../../../constants/NewButton';
@@ -87,7 +86,7 @@ function MyCalendar({ title, contact }) {
                 onCancel={() => setAddAgendaModalVisible(false)}
             />
                 <FullCalendar
-                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, bootstrap5Plugin]}
+                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                     initialView="dayGridMonth"
                     eventResizableFromStart={true}
                     ref={calendarRef}
