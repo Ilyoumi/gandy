@@ -79,16 +79,6 @@ class UserController extends Controller
         }
     }
 
-    
-
-    
-
-
-
-
-
-
-
 
     /**
      * Display the specified resource.
@@ -164,11 +154,6 @@ class UserController extends Controller
             ], 500);
         }
     }
-    
-
-
-    
-
 
     /**
      * Remove the specified resource from storage.
@@ -192,4 +177,30 @@ class UserController extends Controller
         // Return a response indicating success
         return response()->json(['message' => 'User deleted successfully']);
     }
+
+
+    // UserController.php
+// UserController.php
+
+// UserController.php
+
+public function getUsersByRole()
+{
+    try {
+        // Fetch users with the role "Agent Commercial"
+        $users = User::where('role', 'Agent Commercial')->get();
+
+        // Return JSON response with users
+        return response()->json(['users' => $users]);
+    } catch (\Exception $e) {
+        // Log the error
+        Log::error('Failed to fetch users by role: ' . $e->getMessage());
+
+        // If an error occurs, return a response with error message
+        return response()->json(['message' => 'Failed to fetch users by role: ' . $e->getMessage()], 500);
+    }
+}
+
+
+
 }
