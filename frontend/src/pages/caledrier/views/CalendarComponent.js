@@ -3,9 +3,9 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from "@fullcalendar/timegrid";
-import { Modal, Col, Row } from "antd";
+import { Modal } from "antd";
 import AddAppointment from "./AddAppoitment";
-
+import frLocale from '@fullcalendar/core/locales/fr';
 
 import dayjs from 'dayjs';
 import { Alert, Calendar } from 'antd';
@@ -40,6 +40,10 @@ const handleCloseModal = () => {
 const handleFormSubmit = (newAppointment) => {
     setAppointments([...appointments, newAppointment]);
     handleCloseModal();
+};
+const handleDropdownItemClick = (item) => {
+  console.log(`Selected option: ${item}`);
+  // Faire quelque chose avec l'élément sélectionné
 };
 
   useEffect(() => {
@@ -76,12 +80,35 @@ const handleFormSubmit = (newAppointment) => {
                 eventDisplay="block" // Display events as blocks
                 eventBackgroundColor="#52c41a" // Custom color for added appointments
                 eventBorderColor="#87d068" // Custom border color for added appointments
-                locale="fr" // Set the calendar language to French
+                locale={frLocale}
+
                 headerToolbar={{
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                }}
+                  left: 'myDropdown',
+                  center: 'title',
+                  right: 'today prev,next dayGridMonth,timeGridWeek,timeGridDay',
+              }}
+              customButtons={{
+                  myDropdown: {
+                      text: 'Dropdown',
+                      click: () => {
+                          // Cette fonction sera appelée lors du clic sur le bouton Dropdown
+                          const dropdownItems = ['Contact 1', 'Contact 2', 'Contact 3'];
+                          const selectedItem = window.prompt('Select an option:\n' + dropdownItems.join('\n'));
+                          if (selectedItem) {
+                              handleDropdownItemClick(selectedItem);
+                          }
+                      }
+                  }
+              }}
+              buttonText={{
+                  today:    'Aujourd\'hui',
+                  month:    'Mois',
+                  week:     'Semaine',
+                  day:      'Jour',
+                  list:     'Liste'
+              }}
+              slotDuration={'00:30:00'}
+              handleWindowResize={true}
             />
             <Modal
                 visible={showModal}
