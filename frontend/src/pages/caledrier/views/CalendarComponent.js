@@ -5,7 +5,6 @@ import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { Modal, Col, Row } from "antd";
 import AddAppointment from "./AddAppoitment";
-import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 
 
 import dayjs from 'dayjs';
@@ -59,16 +58,11 @@ const handleFormSubmit = (newAppointment) => {
 
   return (
     <div style={{ marginBottom:"30px" }}>
-      <Row>
-        <Col>
-          {/* <Alert message={`You selected date: ${selectedValue?.format('YYYY-MM-DD')}`} /> */}
-          <Calendar value={value}  />
-        </Col>
-      </Row>
+      
         
             <FullCalendar
             ref={calendarRef}
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, bootstrap5Plugin]}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView="timeGridWeek"
                 eventResizableFromStart={true}
                 droppable={true}
@@ -83,7 +77,6 @@ const handleFormSubmit = (newAppointment) => {
                 eventBackgroundColor="#52c41a" // Custom color for added appointments
                 eventBorderColor="#87d068" // Custom border color for added appointments
                 locale="fr" // Set the calendar language to French
-                themeSystem='bootstrap5'
                 headerToolbar={{
                     left: 'prev,next today',
                     center: 'title',

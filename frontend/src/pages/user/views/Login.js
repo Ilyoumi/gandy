@@ -13,20 +13,98 @@ import signinbg from "../../../assets/images/loginbg.png";
 import logo from "../../../assets/images/gy.png";
 import { useHistory } from "react-router-dom";
 import { axiosClient } from "../../../api/axios";
-
+import { useAuth } from "../../../AuthContext";
 const { Title } = Typography;
 const { Content } = Layout;
 
 const Login = () => {
     const [remember, setRemember] = useState(true);
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const { handleLoginSuccess } = useAuth();
+    
+    
+    const [form] = Form.useForm();
     const history = useHistory();
-
-    const onFinish = async (values) => {
-        const axios = axiosClient.defaults
-        console.log(values, axios)
+    const onFinish = () => {
+        form.validateFields().then((values) => { // validateFields is used to get form values
+            const data = {
+                email: values.email,
+                password: values.password,
+            };
+    
+            axiosClient.get("/sanctum/csrf-cookie")
+                .then((response) => {
+                    axiosClient.post(`api/login`, data)
+                        .then((res) => {
+                            if (res.data.status === 200) {
+                                localStorage.setItem("auth_token", res.data.token);
+                                localStorage.setItem("auth_name", res.data.username);
+                                handleLoginSuccess(res.data.username);
+                                fetchAndUpdateRole(res.data.token);
+                                console.log("res:",res.data)
+                                console.log(localStorage)
+    
+                                if (res.data.role === "admin") {
+                                    history.push("/admin/dashboard");
+                                } else {
+                                    history.push("/dashboard");
+                                }
+                            } else if (res.data.status === 401) {
+                                // Handle 401 Unauthorized error if needed
+                            } else {
+                                // Handle other status codes or validation errors
+                                console.error("Login failed:", res.data.message);
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("An error occurred during login:", error);
+                            // Log the error
+                            // You can also handle the error or display an error message to the user if needed
+                        });
+                })
+                .catch((error) => {
+                    console.error("An error occurred while fetching CSRF token:", error);
+                    // Log the error
+                    // You can also handle the error or display an error message to the user if needed
+                });
+        }).catch((error) => {
+            console.error("Form validation failed:", error);
+            // Log the validation error
+            // You can also handle the validation error or display an error message to the user if needed
+        });
     };
+
+    const fetchAndUpdateRole = (token) => {
+        axiosClient.get("/api/user", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
+            .then((response) => {
+                const { role } = response.data;
+                if (role) {
+                    localStorage.setItem("user_role", role); // Update user role in localStorage
+                    handleLoginSuccess(response.data.name);
+                    console.log("role",localStorage )
+                    if (role === "admin") {
+                        history.push("/admin/dashboard");
+                    } else {
+                        history.push("/dashboard");
+                    }
+                } else {
+                    console.error("User role not found in response data");
+                }
+            })
+            .catch((error) => {
+                console.error("An error occurred while fetching user data:", error);
+            });
+    };
+    
+    
+    
+    
+    
+    
+    
 
     const onFinishFailed = (errorInfo) => {
         console.log("Failed:", errorInfo);
@@ -74,6 +152,7 @@ const Login = () => {
                                 vous connecter
                             </Title>
                             <Form
+                            form={form}
                                 onFinish={onFinish}
                                 onFinishFailed={onFinishFailed}
                                 layout="vertical"
@@ -83,8 +162,9 @@ const Login = () => {
                                     className="username"
                                     label="Email"
                                     name="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    validateStatus={form.getFieldError('email') ? 'error' : ''}
+    help={form.getFieldError('email')?.[0]}
+                                    
                                     rules={[
                                         {
                                             required: true,
@@ -100,10 +180,9 @@ const Login = () => {
                                     className="username"
                                     label="Password"
                                     name="password"
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
+                                    validateStatus={form.getFieldError('password') ? 'error' : ''}
+    help={form.getFieldError('password')?.[0]}
+                                    
                                     rules={[
                                         {
                                             required: true,
@@ -113,6 +192,7 @@ const Login = () => {
                                     ]}
                                 >
                                     <Input placeholder="Password" />
+                                    
                                 </Form.Item>
 
                                 <Form.Item

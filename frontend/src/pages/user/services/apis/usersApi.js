@@ -12,4 +12,15 @@ export async function fetchUsers() {
     throw error;
   }
 }
+
+export const deleteUser = async (userId) => {
+  try {
+      const response = await fetch(`http://localhost:8000/api/users/${userId}`, {
+          method: "DELETE",
+      });
+      return response;
+  } catch (error) {
+      throw new Error("Failed to delete user: " + error.message);
+  }
+};
 export default fetchUsers;
