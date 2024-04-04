@@ -40,7 +40,7 @@ function App() {
         <SidebarProvider>
           <div className="App">
             <Switch>
-              <Route path="/sign-in" exact component={SignIn} />
+              <Route path="/login" exact component={SignIn} />
               <Route path="/" exact component={Card} />
               <Main>
                 <Route exact path="/dashboard" component={Home} />
@@ -52,7 +52,7 @@ function App() {
                 <Route exact path="/agenda" component={Agenda} />
                 <Route exact path="/creer-utilisateur" component={AddUserForm} />
                 <Route exact path="/utilisateurs" component={DisplayUsers} />
-                <Redirect from="*" to="/dashboard" />
+                <Redirect from="*" to="/calendrier" />
               </Main>
             </Switch>
           </div>

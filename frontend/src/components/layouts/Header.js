@@ -266,6 +266,7 @@ function Header({
     const [visible, setVisible] = useState(false);
     const [sidenavType, setSidenavType] = useState("transparent");
     const { isLogged, username } = useAuth();
+    const [userRole, setUserRole] = useState("");
     const history = useHistory();
 
     const logoutSubmit = (e) => {
@@ -286,6 +287,29 @@ function Header({
               // Handle the error appropriately, such as displaying an error message to the user
           });
   };
+  useEffect(() => {
+    fetchUserData();
+}, []); // Run only once on component mount
+
+const fetchUserData = async () => {
+    try {
+        const authToken = localStorage.getItem("auth_token");
+        if (!authToken) {
+            return;
+        }
+
+        const response = await axiosClient.get("/api/user", {
+            headers: {
+                Authorization: `Bearer ${authToken}`,
+            },
+        });
+        const { role } = response.data;
+        console.log(role)
+        setUserRole(role);
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+    }
+};
   
 
 
@@ -485,7 +509,7 @@ function Header({
                         >
                             {profile}
 
-                            <span>Bienvenue, {username}</span>
+                            <span>{username}</span>
                             <Button onClick={logoutSubmit} style={{border:"none", backgroundColor:"transparent", boxShadow:"none", padding:0, margin:0}}>
                             <LogoutOutlined style={{ marginRight: "10px" }} />
 
