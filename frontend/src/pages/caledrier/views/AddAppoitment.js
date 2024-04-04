@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Form, Input, Button, DatePicker, Radio, Row, Col, Card, Space,ConfigProvider } from "antd";
+import { Form, Input, Button, DatePicker, Radio, Row, Col, Card, Space,ConfigProvider,Select } from "antd";
 import DynamicSelect from "../../../constants/SearchSelect";
 import moment from "moment";
 import frFR from "antd/lib/locale/fr_FR";
 import SaveButton from '../../../constants/SaveButton';
 
 const { RangePicker } = DatePicker;
-
+const { Option } = Select;
 const AddAppointment = ({ selectedDate, onFormSubmit }) => {
     const [showAdditionalInput, setShowAdditionalInput] = useState(false);
     const [ppvValue, setPpvValue] = useState("");
@@ -42,6 +42,19 @@ const AddAppointment = ({ selectedDate, onFormSubmit }) => {
             end: values.endTime.toDate(),
         });
     };
+    // 
+    const prefixSelector = (
+        <Form.Item name="prefix" noStyle>
+        <Select
+            style={{
+            width: 70,
+            }}
+        >
+            <Option value="86">+86</Option>
+            <Option value="87">+87</Option>
+        </Select>
+        </Form.Item>
+    );
 
     return (
         <Form layout="vertical" onFinish={handleFormSubmit}>
@@ -54,6 +67,8 @@ const AddAppointment = ({ selectedDate, onFormSubmit }) => {
                                 defaultValue={moment("2015-01-01", "YYYY-MM-DD")}
                             />
                         </ConfigProvider>
+                        
+
                     </Col>
                     <Col span={12}>
                         <SaveButton onClick={handleClick} loading={loading} />
@@ -62,20 +77,6 @@ const AddAppointment = ({ selectedDate, onFormSubmit }) => {
             </Card>
             <Card>
                 <Row gutter={[16, 16]}>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item
-                            label="Titre"
-                            name="title"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Veuillez entrer le titre !",
-                                },
-                            ]}
-                        >
-                            <Input />
-                        </Form.Item>
-                    </Col>
                     <Col xs={24} sm={12} lg={8}>
                         <Form.Item
                             label="Nom"
@@ -125,9 +126,28 @@ const AddAppointment = ({ selectedDate, onFormSubmit }) => {
                         </Form.Item>
                     </Col>
                     <Col xs={24} sm={12} lg={8}>
-                        <Form.Item label="Téléphone" name="tel">
+                        {/* <Form.Item label="Téléphone" name="tel">
                             <Input />
-                        </Form.Item>
+                        </Form.Item> */}
+
+                        
+                    <Form.Item
+                        name="phone"
+                        label="Phone Number"
+                        rules={[
+                        {
+                            required: true,
+                            message: 'Please input your phone number!',
+                        },
+                        ]}
+                    >
+                        <Input
+                        addonBefore={prefixSelector}
+                        style={{
+                            width: '100%',
+                        }}
+                        />
+                    </Form.Item>
                     </Col>
                     <Col xs={24} sm={12} lg={8}>
                         <Form.Item label="GSM" name="gsm">
@@ -136,7 +156,23 @@ const AddAppointment = ({ selectedDate, onFormSubmit }) => {
                     </Col>
 
                     <Col xs={24} sm={12} lg={8}>
-                        <Form.Item
+                    <Form.Item
+                        name="gender"
+                        label="Gender"
+                        rules={[
+                        {
+                            required: true,
+                            message: 'Please select gender!',
+                        },
+                        ]}
+                    >
+                        <Select placeholder="select your gender">
+                        <Option value="male">Male</Option>
+                        <Option value="female">Female</Option>
+                        <Option value="other">Other</Option>
+                        </Select>
+                    </Form.Item>
+                        {/* <Form.Item
                             label="Fournisseur"
                             name="fournisseur"
                             rules={[
@@ -146,8 +182,8 @@ const AddAppointment = ({ selectedDate, onFormSubmit }) => {
                                         "Veuillez sélectionner votre fournisseur actuel !",
                                 },
                             ]}
-                        >
-                            <DynamicSelect
+                        > */}
+                            {/* <DynamicSelect
                                 value={value} // Ensure value and onChange are passed
                                 onChange={handleSelectChange}
                                 placeholder="Sélectionner un fournisseur"
@@ -166,7 +202,7 @@ const AddAppointment = ({ selectedDate, onFormSubmit }) => {
                                     },
                                 ]}
                             />
-                        </Form.Item>
+                        </Form.Item> */}
                     </Col>
                     <Col xs={24} sm={12} lg={8}>
                         <Form.Item

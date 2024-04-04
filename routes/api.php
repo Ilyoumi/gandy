@@ -16,7 +16,8 @@ Route::post('/users', [UserController::class, 'store']);
 // Route::middleware('auth:sanctum')->group(function () {
      // Route for fetching all users
     Route::get('users', [UserController::class, 'index']);
-    Route::post('/users', [UserController::class, 'store'])->middleware('web');
+    Route::post('/agenda', [AgentController::class, 'store']);
+    Route::post('/users',[UserController::class, 'store'])->middleware('web');
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
     Route::get('/csrf-token', function () {

@@ -87,7 +87,7 @@ function MyCalendar({ title, contact }) {
             />
                 <FullCalendar
                     plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                    initialView="dayGridMonth"
+                    initialView="timeGridWeek"
                     eventResizableFromStart={true}
                     ref={calendarRef}
                     droppable={true}
