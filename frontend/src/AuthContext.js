@@ -1,5 +1,6 @@
 // Import necessary modules
 import React, { createContext, useContext, useState } from "react";
+import { useHistory } from "react-router-dom";
 
 // Create a new context for authentication
 const AuthContext = createContext();
@@ -12,12 +13,15 @@ export const AuthProvider = ({ children }) => {
     const [isLogged, setIsLogged] = useState(localStorage.getItem("auth_token") !== null);
     const [username, setUsername] = useState(localStorage.getItem("auth_name"));
     const [userRole, setUserRole] = useState(localStorage.getItem("user_role"));
+    const history = useHistory();
+
 
     // Function to handle successful login
     const handleLoginSuccess = (name, role) => {
         setIsLogged(true);
         setUsername(name);
         setUserRole(role);
+        history.push("/calendrier");
     };
 
     // Function to handle logout
