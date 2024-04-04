@@ -59,12 +59,7 @@ const handleFormSubmit = (newAppointment) => {
 
   return (
     <div style={{ marginBottom:"30px" }}>
-      <Row>
-        <Col>
-          {/* <Alert message={`You selected date: ${selectedValue?.format('YYYY-MM-DD')}`} /> */}
-          <Calendar value={value}  />
-        </Col>
-      </Row>
+  
         
             <FullCalendar
             ref={calendarRef}
