@@ -12,7 +12,7 @@ const CardComponent = () => {
       </header>
       
       <div className="container2">
-        <Link to="/sign-in" className="card-link2">
+        <Link to="/login" className="card-link2">
           <div class="card2">
             <div class="content2">
               <h2>01</h2>
@@ -26,7 +26,7 @@ const CardComponent = () => {
             <div class="glow2"></div>
           </div>
         </Link>
-        <Link to="/sign-in" className="card-link2">
+        <Link to="/login" className="card-link2">
           <div class="card2">
             <div class="content2">
               <h2>02</h2>
@@ -40,7 +40,7 @@ const CardComponent = () => {
             <div class="glow2"></div>
           </div>
         </Link>
-        <Link to="/sign-in" className="card-link2">
+        <Link to="/login" className="card-link2">
           <div class="card2">
             <div class="content2">
               <h2>03</h2>
@@ -54,7 +54,7 @@ const CardComponent = () => {
             <div class="glow2"></div>
           </div>
         </Link>
-        <Link to="/sign-in" className="card-link2">
+        <Link to="/login" className="card-link2">
           <div class="card2">
             <div class="content2">
               <h2>04</h2>
