@@ -68,6 +68,7 @@ function MyCalendar({ title, contact }) {
             });
         }
     }, [title, contact]);
+    
 
     const handleCreateCalendar = (newCalendar) => {
         setCalendars([
