@@ -9,7 +9,7 @@ class AgendaController extends Controller
 {
     public function index()
     {
-        return Agenda::all();
+        return Agenda::with('calendar')->get();
     }
 
     public function store(Request $request)
@@ -19,22 +19,19 @@ class AgendaController extends Controller
             'name' => 'required|string|unique:agendas',
             'contact_id' => 'required|exists:users,id',
             'description' => 'nullable|string',
-             
         ]);
-        // Generate a unique ID for the calendar
-        $calendar_id = Str::uuid();
+        
 
         // Create the agenda with provided data
         $agenda = Agenda::create([
             'name' => $request->name,
             'contact_id' => $request->contact_id,
             'description' => $request->description,
-            'calendar_id' => $calendar_id, 
         ]);
+        
 
         return response()->json([
             'agenda' => $agenda,
-            'calendar_id' => $calendar_id, 
         ], 201);
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
@@ -42,11 +39,16 @@ class AgendaController extends Controller
 }
 
 
-
-    public function show($id)
-    {
-        return Agenda::findOrFail($id);
+public function show($id)
+{
+    try {
+        $agenda = Agenda::with('calendar')->findOrFail($id);
+        return response()->json(['agenda' => $agenda], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 404);
     }
+}
+
 
     public function update(Request $request, $id)
     {
