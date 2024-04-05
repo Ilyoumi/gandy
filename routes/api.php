@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\CalendarController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -30,9 +31,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/agendas', [AgendaController::class, 'store']);
+Route::get('/agendas/{id}', [AgendaController::class, 'show']);
 
 // Routes pour les agendas
 Route::apiResource('agendas', AgendaController::class);
+Route::get('/agendas/{agendaId}/calendar', [CalendarController::class, 'getCalendarEvents']);
+
+// Define the route for creating calendar events
+Route::post('/calendars', [CalendarController::class, 'store']);
 
 // Routes pour les rendez-vous (RDVs)
 Route::apiResource('rdvs', 'RdvController');

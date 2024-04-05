@@ -65,14 +65,20 @@ class AuthenticatedSessionController extends Controller
         }
         else
         {
-        $user = User::where('email', $request->email)->first();
         
-        if(!$user || !Hash::check($request->password,$user->password))
-        {
-        return response()->json([
-        'status'=>401,
-        'message'=>'Invalid Credentials',
-        ]);
+        $credentials = $request->only('email', 'password');
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            // Log the provided password and the hashed password from the database
+            Log::info('Login failed: Provided Password - ' . $credentials['password'] . ', Hashed Password - ' . $user->password);
+
+            return response()->json([
+                'status' => 401,
+                'message' => 'Invalid Credentials',
+                'provided_password' => $credentials['password'],
+                'hashed_password' => $user ? $user->password : null, // Include hashed password if user exists
+            ]);
         }
         else
         {

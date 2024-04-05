@@ -6,7 +6,7 @@ import { axiosClient } from "../../../api/axios";
 
 const { Option } = Select;
 
-const AddAgendaModal = ({ visible, onCancel, onCreate }) => {
+const AddAgendaModal = ({ visible, onCancel, onAgendaCreated }) => {
     const [form] = Form.useForm();
     const [agentCommercialUsers, setAgentCommercialUsers] = useState([]);
     const [calendarId, setCalendarId] = useState(null);
@@ -29,34 +29,68 @@ const AddAgendaModal = ({ visible, onCancel, onCreate }) => {
 
     const handleSubmit = async (values) => {
         try {
-            console.log('Submitting agenda form with values:', values);
-    
-            const response = await axiosClient.post('/api/agendas', {
-                ...values,
-                calendar_id: calendarId // Include calendar_id in the request data
+            // Log the sending data
+            console.log("Sending data to create agenda:", values);
+
+            // Send request to create agenda
+            const response = await axiosClient.post("/api/agendas", {
+                ...values, // Check if values.contact is correct here
+                contact_id: values.contact,
             });
-            console.log('Response from backend:', response.data);
-    
-            const { agenda, calendar_id } = response.data;
-            console.log('Received agenda data:', agenda);
-            console.log('Received calendar ID:', calendar_id);
-            setCalendarId(calendar_id);
-            console.log('Set calendar ID:', calendar_id);
-    
-            onCreate(agenda);
-            console.log('Created agenda:', agenda);
-    
-            onCancel();
-            console.log('Cancelled modal');
-    
+            console.log("Agenda created:", response.data.agenda);
+
+            // Verify the agenda ID received from the server
+            const agendaId = response.data.agenda.id;
+            if (!agendaId) {
+                console.error("Invalid agenda ID received:", agendaId);
+                return;
+            }
+
+            // Format datetime strings for MySQL
+            const startDatetime = new Date()
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " "); // Remove milliseconds and 'T'
+            const endDatetime = new Date(Date.now() + 1 * 60 * 60 * 1000)
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " "); // Add 1 hour to start time
+
+            // Log the data for creating the calendar
+            // Log the data for creating the calendar
+            const calendarData = {
+                agenda_name: values.name, 
+                agenda_id: agendaId,
+                created_at: startDatetime, 
+                updated_at: endDatetime, 
+            };
+
+            console.log("Sending data to create calendar:", calendarData);
+
+            // Send request to create calendar associated with the agenda
+            const calendarResponse = await axiosClient.post(
+                "/api/calendars",
+                calendarData
+            );
+            console.log(
+                "Calendar created. Received data:",
+                calendarResponse.data.calendar
+            );
+
+            // Call onAgendaCreated with the agendaId
+            onAgendaCreated(agendaId);
+
+            // Reset form fields and close modal
             form.resetFields();
-            console.log('Form fields reset');
+            onCancel();
         } catch (error) {
-            console.log("ERROR", error);
+            // Log error and response data if available
+            console.error("Error creating agenda and calendar:", error);
+            if (error.response) {
+                console.error("Response data:", error.response.data);
+            }
         }
     };
-    
-    
 
     return (
         <Modal
@@ -77,7 +111,7 @@ const AddAgendaModal = ({ visible, onCancel, onCreate }) => {
                 }}
             >
                 <Card>
-                <Form.Item
+                    <Form.Item
                         label="Calendrier"
                         name="calendarId"
                         initialValue={calendarId}
@@ -97,7 +131,7 @@ const AddAgendaModal = ({ visible, onCancel, onCreate }) => {
                     >
                         <Input />
                     </Form.Item>
-                    
+
                     <Form.Item
                         label="Contact"
                         name="contact"
@@ -111,7 +145,7 @@ const AddAgendaModal = ({ visible, onCancel, onCreate }) => {
                         <Select placeholder="Sélectionner un contact">
                             {agentCommercialUsers.map((user) => (
                                 <Option key={user.id} value={user.id}>
-                                    {user.name}
+                                    {user.prenom} {user.nom}
                                 </Option>
                             ))}
                         </Select>
