@@ -129,7 +129,35 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                 setLoading(false); // Reset loading state if an error occurs
                 console.error('Error adding appointment:', error);
             });
+=========
+
+        // Prepare data to be sent
+        const dataToSend = {
+            ...values,
+            start: values.startTime.toDate(),
+            end: values.endTime.toDate(),
+        };
+
+        try {
+            // Send data via Axios
+            const response = await axios.post('your_api_endpoint', dataToSend);
+            console.log(response.data); // Log response from server
+        } catch (error) {
+            console.error('Error:', error);
+            // Handle error
+        }
+>>>>>>>>> Temporary merge branch 2
     };
+
+    // 
+    const prefixSelector = (
+        <Form.Item name="prefix" noStyle>
+            <Select style={{ width: 70 }}>
+                <Option value="86">+86</Option>
+                <Option value="87">+87</Option>
+            </Select>
+        </Form.Item>
+    );
 
     return (
         <Form layout="vertical" onFinish={handleFormSubmit}>

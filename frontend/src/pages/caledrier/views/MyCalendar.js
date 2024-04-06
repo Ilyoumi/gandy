@@ -161,6 +161,7 @@ function MyCalendar() {
                     ))}
                 </Checkbox.Group>
             </Card>
+<<<<<<< HEAD
             <Card style={{ width: '83%' }}>
             <NewButton onClick={handleOpenAddAgendaModal} loading={loading} buttonText="Nouveau Calendrier" />
             <AddAgendaModal
@@ -200,6 +201,8 @@ function MyCalendar() {
                     slotDuration={'00:30:00'}
                     handleWindowResize={true}
                 />
+=======
+>>>>>>> cfa0b1797a78e4b4e8ec59bcf396fd1c9dea1acc
             <Card style={{ width: "83%" }}>
                 <NewButton
                     onClick={handleOpenAddAgendaModal}
