@@ -45,7 +45,7 @@ function App() {
               <Main>
                 <Route exact path="/dashboard" component={Home} />
                 <Route exact path="/calendrier" component={MyCalendar} />
-                {/* <Route exact path="/mycl" component={MyCalendar} /> */}
+                <Route exact path="/mycl" component={MyCalendar} />
                 <Route exact path="/rdv" component={Tables} />
                 <Route exact path="/history" component={History} />
                 <Route exact path="/contact" component={Contacts} />
