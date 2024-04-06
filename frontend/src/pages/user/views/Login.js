@@ -77,6 +77,7 @@ const Login = () => {
                                         )} ${localStorage.getItem("auth_name")}`
                                     );
                                 } else if (res.data.status === 401) {
+                                    console.log(res.data)
                                     setAlertVisible(true); // Show error message
                                     setAlertMessage(<p key="error-message">L'adresse e-mail ou le mot de passe est incorrect. <br></br> Veuillez réessayer.</p>);
 

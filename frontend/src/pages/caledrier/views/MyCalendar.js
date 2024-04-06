@@ -1,122 +1,210 @@
-import React, { useEffect, useRef, useState } from 'react';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import frLocale from '@fullcalendar/core/locales/fr';
-import { Modal, Card, Button, Radio } from 'antd';
+import React, { useEffect, useState, useRef } from "react";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import frLocale from "@fullcalendar/core/locales/fr";
+import { Modal, Card, Checkbox } from "antd";
 import AddAppointment from "./AddAppoitment";
-import NewButton from '../../../constants/NewButton';
+import NewButton from "../../../constants/NewButton";
 import AddAgendaModal from "./AddAgenda";
+import { axiosClient } from "../../../api/axios";
 
-function MyCalendar({ title, contact }) {
+function MyCalendar() {
     const [showModal, setShowModal] = useState(false);
     const [appointments, setAppointments] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
-    const [selectedItem, setSelectedItem] = useState(null);
     const calendarRef = useRef(null);
-    const [calendars, setCalendars] = useState([]);
-    
-    const radioItems = ['Contact 1', 'Contact 2', 'Contact 3'];
     const [loading, setLoading] = useState(false);
     const [addAgendaModalVisible, setAddAgendaModalVisible] = useState(false);
+    const [agentCommercialUsers, setAgentCommercialUsers] = useState([]);
+    const [agendas, setAgendas] = useState([]);
+    const [selectedItems, setSelectedItems] = useState([]);
+    const [agendaCalendars, setAgendaCalendars] = useState([]);
+
+    useEffect(() => {
+        // Fetch users with role "Agent Commercial" when the component mounts
+        fetchAgentCommercialUsers();
+        fetchAgendas();
+    }, []);
+
+    const fetchAgentCommercialUsers = async () => {
+        try {
+            const response = await axiosClient.get(
+                "/api/users/agent-commercial"
+            );
+            setAgentCommercialUsers(response.data.users);
+        } catch (error) {
+            console.error("Error fetching agent commercial users:", error);
+        }
+    };
 
     const handleOpenAddAgendaModal = () => {
         setAddAgendaModalVisible(true);
     };
-    const handleClick = () => {
-      setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
-    };
+
     const handleDateClick = (arg) => {
         setSelectedDate(arg.date);
         setShowModal(true);
     };
-    
+
     const handleCloseModal = () => {
         setShowModal(false);
     };
-    
+
     const handleFormSubmit = (newAppointment) => {
         setAppointments([...appointments, newAppointment]);
         handleCloseModal();
     };
 
-    useEffect(() => {
-        if (calendarRef.current) {
-            const calendarApi = calendarRef.current.getApi();
-            calendarApi.addEvent({
-                title: title,
-                start: new Date(),
-                allDay: true,
-                extendedProps: {
-                    contact: contact
-                }
-            });
+    const fetchAgendas = async () => {
+        try {
+            const response = await axiosClient.get("/api/agendas");
+            setAgendas(response.data.agendas);
+            console.log("response", response.data);
+        } catch (error) {
+            console.error("Error fetching agendas:", error);
         }
-    }, [title, contact]);
-
-    const handleCreateCalendar = (newCalendar) => {
-        setCalendars([...calendars, { title: newCalendar.title, contact: newCalendar.contact }]);
     };
-  
-        const handleRadioChange = (e) => {
-            setSelectedItem(e.target.value);
+
+    function fullCalendarConfig() {
+        return {
+            initialView: "dayGridMonth",
+            droppable: true,
+            weekends: true,
+            editable: true,
+            selectable: true,
+            selectMirror: true,
+            dayMaxEvents: true,
+            eventDisplay: "block",
+            eventBackgroundColor: "#52c41a",
+            eventBorderColor: "#87d068",
+            locale: frLocale,
+            headerToolbar: {
+                left: "prev,next today",
+                center: "title",
+                right: "dayGridMonth,timeGridWeek,timeGridDay",
+            },
+            buttonText: {
+                today: "Aujourd'hui",
+                month: "Mois",
+                week: "Semaine",
+                day: "Jour",
+                list: "Liste",
+            },
+            slotDuration: "00:30:00",
+            handleWindowResize: true,
+            dateClick: handleDateClick,
+            events: [...appointments],
         };
-    
+    }
+
+    const handleAgendaCreated = async (agendaId, agendaName) => {
+        try {
+            // Combine the default event with existing events from the database
+            const updatedEvents = [...appointments];
+            const config = fullCalendarConfig();
+            console.log("fullCalendarConfig", config);
+
+            // Update existing agenda with FullCalendar data
+            const response = await axiosClient.put(`/api/agendas/${agendaId}`, {
+                fullcalendar_config: config,
+            });
+
+            console.log(
+                "Agenda updated with FullCalendar data:",
+                response.data
+            );
+
+            // Update agendaCalendars state with the new FullCalendar
+            setAgendaCalendars((prevState) => [
+                ...prevState,
+                {
+                    agendaId: agendaId,
+                    agendaName: agendaName,
+                    calendarRef: React.createRef(),
+                },
+            ]);
+
+            // Update appointments state with the updated events
+            setAppointments(updatedEvents);
+        } catch (error) {
+            console.log("Response data:", error.response.data);
+
+            console.error(
+                "Error updating agenda with FullCalendar data:",
+                error
+            );
+            // Handle error
+        }
+    };
+
+    const config = fullCalendarConfig();
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px' }}>
-            <Card title="Calendriers des contacts" style={{ width: '15%' }}>
-                <Radio.Group onChange={handleRadioChange} value={selectedItem}>
-                    {radioItems.map((item, index) => (
-                        <Radio key={index} value={index}>
-                            {item}
-                        </Radio>
+        <div
+            style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "30px",
+            }}
+        >
+            <Card title="Calendriers des contacts" style={{ width: "15%" }}>
+                <Checkbox.Group
+                    onChange={setSelectedItems}
+                    value={selectedItems}
+                >
+                    {agentCommercialUsers.map((user, index) => (
+                        <Checkbox key={index} value={user.id}>
+                            {user.prenom} {user.nom}
+                        </Checkbox>
                     ))}
-                </Radio.Group>
+                </Checkbox.Group>
             </Card>
-            <Card style={{ width: '83%' }}>
-            <NewButton onClick={handleOpenAddAgendaModal} loading={loading} buttonText="Nouveau Calendrier" />
-            <AddAgendaModal
-            onCreate={handleCreateCalendar}
-                visible={addAgendaModalVisible}
-                onCancel={() => setAddAgendaModalVisible(false)}
-            />
-                <FullCalendar
-                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                    initialView="timeGridWeek"
-                    eventResizableFromStart={true}
-                    ref={calendarRef}
-                    droppable={true}
-                    weekends={true}
-                    editable={true}
-                    selectable={true}
-                    selectMirror={true}
-                    dayMaxEvents={true}
-                    dateClick={handleDateClick}
-                    events={appointments}
-                    eventDisplay="block"
-                    eventBackgroundColor="#52c41a"
-                    eventBorderColor="#87d068"
-                    locale={frLocale}
-                    headerToolbar={{
-                        left:'prev,next today',
-                        center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                    }}
-                    buttonText={{
-                        today: 'Aujourd\'hui',
-                        month: 'Mois',
-                        week: 'Semaine',
-                        day: 'Jour',
-                        list: 'Liste'
-                    }}
-                    slotDuration={'00:30:00'}
-                    handleWindowResize={true}
+            <Card style={{ width: "83%" }}>
+                <NewButton
+                    onClick={handleOpenAddAgendaModal}
+                    loading={loading}
+                    buttonText="Nouveau Calendrier"
                 />
+                <AddAgendaModal
+                    visible={addAgendaModalVisible}
+                    onCancel={() => setAddAgendaModalVisible(false)}
+                    onAgendaCreated={handleAgendaCreated}
+                />
+                {agendas.length === 0 && (
+                    <div>
+                        <h2>Agenda par défaut</h2>
+                        <Card style={{ marginBottom: "30px" }}>
+                            <FullCalendar
+                                plugins={[
+                                    dayGridPlugin,
+                                    timeGridPlugin,
+                                    interactionPlugin,
+                                ]}
+                                {...config}
+                            />
+                        </Card>
+                    </div>
+                )}
+
+                {agendas.map((agenda, index) => (
+                    <div key={index}>
+                        <h2>{agenda.name}</h2>
+                        <Card style={{ marginBottom: "30px" }}>
+                            {agenda.fullcalendar_config && (
+                                <FullCalendar
+                                    plugins={[
+                                        dayGridPlugin,
+                                        timeGridPlugin,
+                                        interactionPlugin,
+                                    ]}
+                                    {...JSON.parse(agenda.fullcalendar_config)}
+                                />
+                            )}
+                        </Card>
+                    </div>
+                ))}
             </Card>
             <Modal
                 visible={showModal}

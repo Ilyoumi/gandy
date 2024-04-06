@@ -28,65 +28,57 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        try {
-            // Log the incoming request data
-            Log::info('Incoming request data:', $request->all());
+{
+    try {
+        // Log the incoming request data
+        Log::info('Incoming request data:', $request->all());
 
-            // Validate incoming request
-            $validatedData = $request->validate([
-                'nom' => 'required|string|max:255',
-                'prenom' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',
-                'role_name' => 'required|string|in:Admin,Agent,Superviseur,Agent Commercial',
-                'password' => 'required|string|min:8',
-            ]);
+        // Validate incoming request
+        $validatedData = $request->validate([
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'role_name' => 'required|string|in:Admin,Agent,Superviseur,Agent Commercial',
+            'password' => 'required|string|min:8',
+        ]);
 
-            // Map role name to role ID
-            $roleIds = [
-                'Admin' => 1,
-                'Agent' => 2,
-                'Superviseur' => 3,
-                'Agent Commercial' => 4,
-            ];
+        // Map role name to role ID
+        $roleIds = [
+            'Admin' => 1,
+            'Agent' => 2,
+            'Superviseur' => 3,
+            'Agent Commercial' => 4,
+        ];
 
-            // Get role ID based on role name
-            $roleId = $roleIds[$validatedData['role_name']];
+        // Get role ID based on role name
+        $roleId = $roleIds[$validatedData['role_name']];
 
-            // Create the user
-            $user = new User();
-            $user->name = $validatedData['nom'] . ' ' . $validatedData['prenom'];
-            $user->email = $validatedData['email'];
-            $user->password = Hash::make($validatedData['password']);
-            $user->role = $validatedData['role_name']; // Assign role name directly
-            $user->save();
+        // Create the user
+        $user = new User();
+        $user->nom = $validatedData['nom'];
+        $user->prenom = $validatedData['prenom'];
+        $user->email = $validatedData['email'];
+        $user->password = Hash::make($validatedData['password']);
+        $user->role = $validatedData['role_name']; // Assign role name directly
+        $user->save();
 
-            // Return a response indicating success
-            return response()->json([
-                'message' => 'User created successfully',
-                'user' => $user,
-                'received_data' => $validatedData // Include received data in the response
-            ], 201);
-        } catch (\Exception $e) {
-            // Log the error message
-            Log::error('Failed to create user: ' . $e->getMessage());
+        // Return a response indicating success
+        return response()->json([
+            'message' => 'User created successfully',
+            'user' => $user,
+            'received_data' => $validatedData // Include received data in the response
+        ], 201);
+    } catch (\Exception $e) {
+        // Log the error message
+        Log::error('Failed to create user: ' . $e->getMessage());
 
-            // Return a response with error message if an exception occurs
-            return response()->json([
-                'message' => 'Failed to create user: ' . $e->getMessage(),
-                'received_data' => $request->all() // Include received data in the response
-            ], 500);
-        }
+        // Return a response with error message if an exception occurs
+        return response()->json([
+            'message' => 'Failed to create user: ' . $e->getMessage(),
+            'received_data' => $request->all() // Include received data in the response
+        ], 500);
     }
-
-    
-
-    
-
-
-
-
-
+}
 
 
 
@@ -164,11 +156,6 @@ class UserController extends Controller
             ], 500);
         }
     }
-    
-
-
-    
-
 
     /**
      * Remove the specified resource from storage.
@@ -192,4 +179,30 @@ class UserController extends Controller
         // Return a response indicating success
         return response()->json(['message' => 'User deleted successfully']);
     }
+
+
+    // UserController.php
+// UserController.php
+
+// UserController.php
+
+public function getUsersByRole()
+{
+    try {
+        // Fetch users with the role "Agent Commercial"
+        $users = User::where('role', 'Agent Commercial')->get();
+
+        // Return JSON response with users
+        return response()->json(['users' => $users]);
+    } catch (\Exception $e) {
+        // Log the error
+        Log::error('Failed to fetch users by role: ' . $e->getMessage());
+
+        // If an error occurs, return a response with error message
+        return response()->json(['message' => 'Failed to fetch users by role: ' . $e->getMessage()], 500);
+    }
+}
+
+
+
 }
