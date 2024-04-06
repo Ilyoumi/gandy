@@ -129,7 +129,6 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                 setLoading(false); // Reset loading state if an error occurs
                 console.error('Error adding appointment:', error);
             });
-=========
 
         // Prepare data to be sent
         const dataToSend = {
@@ -146,7 +145,6 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
             console.error('Error:', error);
             // Handle error
         }
->>>>>>>>> Temporary merge branch 2
     };
 
     // 

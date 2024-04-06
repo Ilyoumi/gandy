@@ -161,48 +161,6 @@ function MyCalendar() {
                     ))}
                 </Checkbox.Group>
             </Card>
-<<<<<<< HEAD
-            <Card style={{ width: '83%' }}>
-            <NewButton onClick={handleOpenAddAgendaModal} loading={loading} buttonText="Nouveau Calendrier" />
-            <AddAgendaModal
-            onCreate={handleCreateCalendar}
-                visible={addAgendaModalVisible}
-                onCancel={() => setAddAgendaModalVisible(false)}
-            />
-                <FullCalendar
-                    plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                    initialView="timeGridWeek"
-                    eventResizableFromStart={true}
-                    ref={calendarRef}
-                    droppable={true}
-                    weekends={true}
-                    editable={true}
-                    selectable={true}
-                    selectMirror={true}
-                    dayMaxEvents={true}
-                    dateClick={handleDateClick}
-                    events={appointments}
-                    eventDisplay="block"
-                    eventBackgroundColor="#52c41a"
-                    eventBorderColor="#87d068"
-                    locale={frLocale}
-                    headerToolbar={{
-                        left:'prev,next today',
-                        center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                    }}
-                    buttonText={{
-                        today: 'Aujourd\'hui',
-                        month: 'Mois',
-                        week: 'Semaine',
-                        day: 'Jour',
-                        list: 'Liste'
-                    }}
-                    slotDuration={'00:30:00'}
-                    handleWindowResize={true}
-                />
-=======
->>>>>>> cfa0b1797a78e4b4e8ec59bcf396fd1c9dea1acc
             <Card style={{ width: "83%" }}>
                 <NewButton
                     onClick={handleOpenAddAgendaModal}

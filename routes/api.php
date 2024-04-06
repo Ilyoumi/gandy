@@ -15,13 +15,8 @@ Route::post('/login', [AuthenticatedSessionController::class, 'login']);
 Route::get('/login', [AuthenticatedSessionController::class, 'getUser']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'logout']);
 Route::post('/users', [UserController::class, 'store']);
-<<<<<<< HEAD
-Route::get('/users/agent-commercial', [UserController::class, 'getUsersByRole']);
-
-=======
 
 Route::get('/users/agent-commercial', [UserController::class, 'getUsersByRole']);
->>>>>>> cfa0b1797a78e4b4e8ec59bcf396fd1c9dea1acc
 // Route::middleware('auth:sanctum')->group(function () {
 // Route for fetching all users
 Route::get('users', [UserController::class, 'index']);
