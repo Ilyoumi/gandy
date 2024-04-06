@@ -5,9 +5,10 @@ import './SaveButton.css';
 
 const SaveButton = ({ onClick, loading }) => {
   return (
-    <Button className="save-button" onClick={onClick} loading={loading}>
+    <Button className="save-button" htmlType="submit" loading={loading}>
         Enregistrer
     </Button>
+
   );
 };
 
