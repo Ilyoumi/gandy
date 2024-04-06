@@ -4,6 +4,7 @@ import DynamicSelect from "../../../constants/SearchSelect";
 import moment from "moment";
 import frFR from "antd/lib/locale/fr_FR";
 import SaveButton from '../../../constants/SaveButton';
+import { axiosClient } from "../../../api/axios";
 
 const { RangePicker } = DatePicker;
 
@@ -36,11 +37,16 @@ const AddAppointment = ({ selectedDate, onFormSubmit }) => {
             setError("Please select an option"); // Set error if no option selected
             return;
         }
-        onFormSubmit({
-            ...values,
-            start: values.startTime.toDate(),
-            end: values.endTime.toDate(),
-        });
+        setLoading(true); // Set loading state while making the request
+        axiosClient.post('/api/rdvs', values) // Assuming your API endpoint for creating appointments is '/api/rdvs'
+            .then(response => {
+                setLoading(false); // Reset loading state after the request is completed
+                onFormSubmit(response.data); // Pass the created appointment data to the parent component
+            })
+            .catch(error => {
+                setLoading(false); // Reset loading state if an error occurs
+                console.error('Error adding appointment:', error);
+            });
     };
 
     return (

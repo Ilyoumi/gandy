@@ -15,13 +15,11 @@ class agenda extends Model
      *
      * @var array
      */
+    
     protected $fillable = [
         'contact_id', 'name', 'description',
     ];
-    public function calendars()
-{
-    return $this->belongsToMany(Calendar::class);
-}
+    
 
     /**
      * Get the user that owns the agenda item.
