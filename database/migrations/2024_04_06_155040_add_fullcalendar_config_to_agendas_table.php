@@ -13,12 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('calendars', function (Blueprint $table) {
-            $table->id();
-            $table->string('agenda_name');
-            $table->unsignedBigInteger('agenda_id');
-            $table->foreign('agenda_id')->references('id')->on('agendas')->onDelete('cascade');
-            $table->timestamps();
+        Schema::table('agendas', function (Blueprint $table) {
+            $table->json('fullcalendar_config')->nullable()->after('events');
         });
     }
 
@@ -29,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('calendars');
+        Schema::table('agendas', function (Blueprint $table) {
+            $table->dropColumn('fullcalendar_config');
+        });
     }
 };

@@ -26,6 +26,7 @@ const AddAgendaModal = ({ visible, onCancel, onAgendaCreated }) => {
             console.error("Error fetching agent commercial users:", error);
         }
     };
+    
 
     const handleSubmit = async (values) => {
         try {
@@ -41,44 +42,14 @@ const AddAgendaModal = ({ visible, onCancel, onAgendaCreated }) => {
 
             // Verify the agenda ID received from the server
             const agendaId = response.data.agenda.id;
+            const agendaName = response.data.agenda.name;
             if (!agendaId) {
-                console.error("Invalid agenda ID received:", agendaId);
+                console.error("Invalid agenda ID received:", agendaId, agendaName);
                 return;
             }
 
-            // Format datetime strings for MySQL
-            const startDatetime = new Date()
-                .toISOString()
-                .slice(0, 19)
-                .replace("T", " "); // Remove milliseconds and 'T'
-            const endDatetime = new Date(Date.now() + 1 * 60 * 60 * 1000)
-                .toISOString()
-                .slice(0, 19)
-                .replace("T", " "); // Add 1 hour to start time
-
-            // Log the data for creating the calendar
-            // Log the data for creating the calendar
-            const calendarData = {
-                agenda_name: values.name, 
-                agenda_id: agendaId,
-                created_at: startDatetime, 
-                updated_at: endDatetime, 
-            };
-
-            console.log("Sending data to create calendar:", calendarData);
-
-            // Send request to create calendar associated with the agenda
-            const calendarResponse = await axiosClient.post(
-                "/api/calendars",
-                calendarData
-            );
-            console.log(
-                "Calendar created. Received data:",
-                calendarResponse.data.calendar
-            );
-
             // Call onAgendaCreated with the agendaId
-            onAgendaCreated(agendaId);
+            onAgendaCreated(agendaId, agendaName);
 
             // Reset form fields and close modal
             form.resetFields();

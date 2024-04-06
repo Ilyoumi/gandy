@@ -36,6 +36,7 @@ Route::get('/agendas/{id}', [AgendaController::class, 'show']);
 // Routes pour les agendas
 Route::apiResource('agendas', AgendaController::class);
 Route::get('/agendas/{agendaId}/calendar', [CalendarController::class, 'getCalendarEvents']);
+Route::put('/api/agendas/{id}', [AgendaController::class, 'update']);
 
 // Define the route for creating calendar events
 Route::post('/calendars', [CalendarController::class, 'store']);
