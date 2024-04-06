@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('tarification');
             $table->integer('nbr_comp_elect');
             $table->integer('nbr_comp_gaz');
+            $table->boolean('ppv');
             $table->boolean('tarif');
             $table->boolean('haute_tension');
             $table->text('commentaire')->nullable();
