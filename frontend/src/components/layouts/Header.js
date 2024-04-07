@@ -270,48 +270,51 @@ function Header({
     const history = useHistory();
 
     const logoutSubmit = (e) => {
-      axiosClient.post(`/api/logout`)
-          .then((res) => {
-              if (res.data.status === 200) {
-                  console.log("logout");
-                  localStorage.removeItem("auth_token");
-                  localStorage.removeItem("auth_name");
-                  localStorage.removeItem("user_role");
-                  history.push("/");
-              } else {
-                  console.log("Error occurred during logout:", res.data.error);
-              }
-          })
-          .catch((error) => {
-              console.error("Error occurred during logout:", error);
-              // Handle the error appropriately, such as displaying an error message to the user
-          });
-  };
-  useEffect(() => {
-    fetchUserData();
-}, []); // Run only once on component mount
+        axiosClient
+            .post(`/api/logout`)
+            .then((res) => {
+                if (res.data.status === 200) {
+                    console.log("logout");
+                    localStorage.removeItem("auth_token");
+                    localStorage.removeItem("auth_name");
+                    localStorage.removeItem("user_role");
+                    history.push("/");
+                } else {
+                    console.log(
+                        "Error occurred during logout:",
+                        res.data.error
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error occurred during logout:", error);
+                // Handle the error appropriately, such as displaying an error message to the user
+            });
+    };
+    useEffect(() => {
+        fetchUserData();
+    }, []); // Run only once on component mount
 
-const fetchUserData = async () => {
-    try {
-        const authToken = localStorage.getItem("auth_token");
-        if (!authToken) {
-            return;
+    const fetchUserData = async () => {
+        try {
+            const authToken = localStorage.getItem("auth_token");
+            if (!authToken) {
+                return;
+            }
+
+            const response = await axiosClient.get("/api/user", {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            });
+            const { role, name } = response.data;
+            console.log('fetchUserData response.data', response.data);
+            setUserRole(role);
+            
+        } catch (error) {
+            console.error("Error fetching user data:", error);
         }
-
-        const response = await axiosClient.get("/api/user", {
-            headers: {
-                Authorization: `Bearer ${authToken}`,
-            },
-        });
-        const { role } = response.data;
-        console.log(role)
-        setUserRole(role);
-    } catch (error) {
-        console.error("Error fetching user data:", error);
-    }
-};
-  
-
+    };
 
     useEffect(() => window.scrollTo(0, 0));
 
@@ -503,16 +506,26 @@ const fetchUserData = async () => {
                                 display: "flex",
                                 justifyContent: "space-between",
                                 alignContent: "center",
-                                alignItems:"center",
+                                alignItems: "center",
                                 gap: 10,
                             }}
                         >
                             {profile}
 
                             <span>{username}</span>
-                            <Button onClick={logoutSubmit} style={{border:"none", backgroundColor:"transparent", boxShadow:"none", padding:0, margin:0}}>
-                            <LogoutOutlined style={{ marginRight: "10px" }} />
-
+                            <Button
+                                onClick={logoutSubmit}
+                                style={{
+                                    border: "none",
+                                    backgroundColor: "transparent",
+                                    boxShadow: "none",
+                                    padding: 0,
+                                    margin: 0,
+                                }}
+                            >
+                                <LogoutOutlined
+                                    style={{ marginRight: "10px" }}
+                                />
                             </Button>
                         </div>
                     ) : (

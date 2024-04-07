@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\RdvController;
 
 Route::post('/register', [RegisteredUserController::class, 'store']);
 
@@ -42,4 +43,5 @@ Route::put('/api/agendas/{id}', [AgendaController::class, 'update']);
 Route::post('/calendars', [CalendarController::class, 'store']);
 
 // Routes pour les rendez-vous (RDVs)
-Route::apiResource('rdvs', 'RdvController');
+Route::post('/rdvs', [RdvController::class, 'store']);
+

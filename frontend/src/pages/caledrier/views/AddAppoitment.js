@@ -1,19 +1,34 @@
 import React, { useState } from "react";
-import { Form, Input, Button, DatePicker,Switch, Radio, Row, Col, Card, Space,ConfigProvider,Select } from "antd";
-import DynamicSelect from "../../../constants/SearchSelect";
+import { Form, Input, DatePicker,Switch, Row, Col, Card,ConfigProvider,Select } from "antd";
 import moment from "moment";
 import frFR from "antd/lib/locale/fr_FR";
-import SaveButton from '../../../constants/SaveButton';
+import SaveButton from "../../../constants/SaveButton";
 import { axiosClient } from "../../../api/axios";
-import axios from 'axios'; // Import Axios library
 
-const { RangePicker } = DatePicker;
 const { Option } = Select;
-const AddAppointment = ({ selectedDate , onFormSubmit }) => {
+const AddAppointment = ({ selectedDate , onFormSubmit,agentId,agendaId }) => {
     const [showAdditionalInput, setShowAdditionalInput] = useState(false);
-    const [ppvValue, setPpvValue] = useState("");
-    const [value, setValue] = useState(""); // Define value state
-    const [error, setError] = useState(null);
+
+
+    const [formData, setFormData] = useState({
+        title: "",
+        nom: "",
+        prenom: "",
+        nom_ste: "",
+        postal: "",
+        adresse: "",
+        tva: "",
+        tel: "",
+        gsm: "",
+        fournisseur: "",
+        nbr_comp_elect: "",
+        nbr_comp_gaz: "",
+        ppv: false,
+        tarif: false,
+        haute_tension: false,
+        tarification: "",
+        commentaire: "",
+    });
 
     const [loading, setLoading] = useState(false);
 
@@ -24,130 +39,40 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
         }, 2000);
     };
 
-    const handlePpvChange = (value) => {
-        setPpvValue(value);
-        setShowAdditionalInput(value === "oui");
-    };
-    const handleSelectChange = (value) => {
-        setValue(value);
-        setError(null); // Clear error when selecting an option
-    };
+    
 
-    // const handleFormSubmit = () => {
-    //     Form.valisateFields().then((values) => {
-    //         const data = {
-    //             nom: values.nom,
-    //             prenom: values.prenom,
-    //             nom_ste: values.nom_ste,
-    //             tva: values.tva,
-    //             adresse: values.adresse,
-    //             postal: values.postal,
-    //             tel: values.tel,
-    //             gsm: values.gsm,
-    //             fournisseur: values.fournisseur,
-    //             tarification: values.tarification,
-    //             nbr_comp_elect: values.nbr_comp_elect,
-    //             nbr_comp_gaz: values.nbr_comp_gaz,
-    //             tarif: values.tarif,
-    //             haute_tension: values.haute_tension,
-    //             commentaire: values.commentaire,
-    //             ppv: values.ppv,
-    //             id_agent: values.id_agent,
-    //             id_agenda: values.id_agenda,               
-    //         };
-    //         axiosClient
-    //         .get("/sanctum/csrf-cookie")
-    //         .then((response) => {
-    //             axiosClient
-    //                 .post(`api/login`, data)
-    //                 .then((res) => {
-    //                     if (res.data.status === 200) {
-    //                         localStorage.setItem(
-    //                             "auth_token",
-    //                             res.data.token
-    //                         );
-    //                         localStorage.setItem(
-    //                             "auth_name",
-    //                             res.data.username
-    //                         );
-    //                         handleLoginSuccess(res.data.username);
-    //                         fetchAndUpdateRole(res.data.token);
-    //                         console.log("res:", res.data);
-    //                         console.log(localStorage);
-    //                         setName(res.data.username);
-    //                         message.success(
-    //                             `Bienvenue: ${localStorage.getItem(
-    //                                 "user_role"
-    //                             )} ${localStorage.getItem("auth_name")}`
-    //                         );
-    //                     } else if (res.data.status === 401) {
-    //                         setAlertVisible(true); // Show error message
-    //                         setAlertMessage(<p key="error-message">L'adresse e-mail ou le mot de passe est incorrect. <br></br> Veuillez réessayer.</p>);
 
-    //                     } else {
-    //                         // Handle other status codes or validation errors
-    //                         console.error(
-    //                             "Login failed:",
-    //                             res.data.message
-    //                         );
-    //                     }
-    //                 })
-    //                 .catch((error) => {
-    //                     console.error(
-    //                         "An error occurred during login:",
-    //                         error
-    //                     );
-    //                     // Log the error
-    //                     // You can also handle the error or display an error message to the user if needed
-    //                 });
-    //         })
-    //         .catch((error) => {
-    //             console.error(
-    //                 "An error occurred while fetching CSRF token:",
-    //                 error
-    //             );
-    //             // Log the error
-    //             // You can also handle the error or display an error message to the user if needed
-    //         });
-
-    //     })
-
-    // }
-
-        const handleFormSubmit = async (values) => {
-        if (!value) {
-            setError("Please select an option"); // Set error if no option selected
-            return;
-        }
-        setLoading(true); // Set loading state while making the request
-        axiosClient.post('/api/rdvs', values) // Assuming your API endpoint for creating appointments is '/api/rdvs'
-            .then(response => {
-                setLoading(false); // Reset loading state after the request is completed
-                onFormSubmit(response.data); // Pass the created appointment data to the parent component
-            })
-            .catch(error => {
-                setLoading(false); // Reset loading state if an error occurs
-                console.error('Error adding appointment:', error);
-            });
-
-        // Prepare data to be sent
-        const dataToSend = {
-            ...values,
-            start: values.startTime.toDate(),
-            end: values.endTime.toDate(),
-        };
+    const handleFormSubmit = async () => {
+        setLoading(true);
+        let formDataToSend
 
         try {
-            // Send data via Axios
-            const response = await axios.post('your_api_endpoint', dataToSend);
-            console.log(response.data); // Log response from server
+            if (!agentId) {
+                console.log("agentId value not :", agentId);
+
+            }
+            console.log("agentId value:", agentId);
+
+            formDataToSend = {
+                ...formData,
+                id_agent: agentId, 
+                id_agenda:agendaId,
+                tarification: formData.tarification.toString(),
+            };
+            console.log("Form submission with:", formDataToSend,);
+
+            const response = await axiosClient.post("/api/rdvs", formDataToSend);
+            setLoading(false);
+            console.log("Form submission successful. Response:", response.data);
+            onFormSubmit(response.data);
         } catch (error) {
-            console.error('Error:', error);
-            // Handle error
+            setLoading(false);
+
+            console.error("Response data:", error.response.data);
+            console.error('Error adding appointment:', error);
         }
     };
 
-    // 
     const prefixSelector = (
         <Form.Item name="prefix" noStyle>
             <Select style={{ width: 70 }}>
@@ -159,7 +84,7 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
 
     return (
         <Form layout="vertical" onFinish={handleFormSubmit}>
-            <Card style={{  marginBottom: "10px" }}>
+            <Card style={{ marginBottom: "10px" }}>
                 <Row gutter={[16, 16]}>
                     <Col span={12}>
                         <ConfigProvider locale={frFR}>
@@ -189,7 +114,7 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                                             name="nom"
                                             rules={[{ required: true, message: "Veuillez entrer votre nom !" }]}
                                         >
-                                            <Input />
+                                            <Input onChange={(e) => setFormData({ ...formData, nom: e.target.value })} />
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
@@ -198,7 +123,7 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                                             name="prenom"
                                             rules={[{ required: true, message: "Veuillez entrer votre prénom !" }]}
                                         >
-                                            <Input />
+                                            <Input onChange={(e) => setFormData({ ...formData, prenom: e.target.value })} />
                                         </Form.Item>
                                     </Col>
                                 </Row>
@@ -207,12 +132,12 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                                 <Row gutter={[16, 16]}>
                                     <Col xs={24} sm={12} lg={12}>
                                         <Form.Item label="Nom de Société" name="nom_ste">
-                                            <Input />
+                                        <Input onChange={(e) => setFormData({ ...formData, nom_ste: e.target.value })} />
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
                                         <Form.Item label="TVA" name="tva">
-                                            <Input />
+                                        <Input onChange={(e) => setFormData({ ...formData, tva: e.target.value })} />
                                         </Form.Item>
                                     </Col>
                                     
@@ -222,12 +147,12 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                                 <Row gutter={[16, 16]}>
                                     <Col xs={24} sm={12} lg={12}>
                                         <Form.Item label="Adresse" name="adresse">
-                                            <Input />
+                                        <Input onChange={(e) => setFormData({ ...formData, adresse: e.target.value })} />
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
                                         <Form.Item label="Code Postal" name="postal">
-                                            <Input />
+                                        <Input onChange={(e) => setFormData({ ...formData, postal: e.target.value })} />
                                         </Form.Item>
                                     </Col>
                                 </Row>
@@ -240,12 +165,12 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                                             label="Téléphone"
                                             rules={[{ required: true, message: 'Veuillez saisir votre numéro de téléphone!' }]}
                                         >
-                                            <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
+                                            <Input addonBefore={prefixSelector} style={{ width: '100%' }} onChange={(e) => setFormData({ ...formData, tel: e.target.value })}/>
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
                                         <Form.Item label="GSM" name="gsm">
-                                            <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
+                                            <Input addonBefore={prefixSelector} style={{ width: '100%' }} onChange={(e) => setFormData({ ...formData, gsm: e.target.value })} />
                                         </Form.Item>
                                     </Col>
                                 </Row>
@@ -260,8 +185,7 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                                             rules={[{ required: true, message: "Veuillez sélectionner le nombre de compteurs de gaz !" }]}
                                         >
                                             <Select
-                                                value={value} // Assurez-vous que value et onChange sont transmis
-                                                onChange={handleSelectChange}
+                                                onChange={(value) => setFormData({ ...formData, nbr_comp_elect: value })}
                                                 placeholder="Sélectionner le nombre de compteurs électriques"
                                             >
                                                 <Select.Option value="1">1</Select.Option>
@@ -279,8 +203,7 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                                             rules={[{ required: true, message: "Veuillez sélectionner le nombre de compteurs de gaz !" }]}
                                         >
                                             <Select
-                                                value={value} // Assurez-vous que value et onChange sont transmis
-                                                onChange={handleSelectChange}
+                                                onChange={(value) => setFormData({ ...formData, nbr_comp_gaz: value })}
                                                 placeholder="Sélectionner le nombre de compteurs gaz"
                                             >
                                                 <Select.Option value="1">1</Select.Option>
@@ -306,7 +229,10 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                                             label="Fournisseur"
                                             rules={[{ required: true, message: 'Veuillez sélectionner votre fournisseur actuel!' }]}
                                         >
-                                            <Select placeholder="sélectionner votre fournisseur">
+                                            <Select
+                                        placeholder="sélectionner votre fournisseur"
+                                        onChange={(value) => setFormData({ ...formData, fournisseur: value })}
+                                    >
                                                 <Option value="fournisseur1">Fournisseur 1</Option>
                                                 <Option value="fournisseur2">Fournisseur 2</Option>
                                                 <Option value="fournisseur3">Fournisseur 3</Option>
@@ -319,7 +245,7 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                                     name="ppv"
                                     rules={[{ required: true }]}
                                 >
-                                <Switch checkedChildren="Oui" unCheckedChildren="Non" />
+                                <Switch checkedChildren="Oui" unCheckedChildren="Non" onChange={(value) => setFormData({ ...formData, ppv: value })} />
 
                                 </Form.Item>
 
@@ -343,7 +269,7 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                                     name="tarif"
                                     rules={[{ required: true, message: "Veuillez sélectionner si vous avez un tarif social ou non !" }]}
                                 >
-                                    <Switch checkedChildren="Oui" unCheckedChildren="Non" />
+                                    <Switch checkedChildren="Oui" unCheckedChildren="Non" onChange={(value) => setFormData({ ...formData, tarif: value })}/>
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
@@ -352,7 +278,7 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                                     name="haute_tension"
                                     rules={[{ required: true, message: "Veuillez sélectionner si vous êtes en haute tension ou non !" }]}
                                 >
-                                    <Switch checkedChildren="Oui" unCheckedChildren="Non" />
+                                    <Switch checkedChildren="Oui" unCheckedChildren="Non" onChange={(value) => setFormData({ ...formData, haute_tension: value })} />
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
@@ -361,7 +287,7 @@ const AddAppointment = ({ selectedDate , onFormSubmit }) => {
                                     name="tarification"
                                     rules={[{ required: true, message: "Veuillez sélectionner votre type de tarification !" }]}
                                 >
-                                    <Switch checkedChildren="Fixe" unCheckedChildren="Variable" />
+                                    <Switch checkedChildren="Fixe" unCheckedChildren="Variable" onChange={(value) => setFormData({ ...formData, tarification: value })} />
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
