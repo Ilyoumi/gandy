@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('rdvs', function (Blueprint $table) {
-            $table->string('fournisseur')->change(); // Change column type to string
+        Schema::table('agendas', function (Blueprint $table) {
+            $table->json('fullcalendar_config')->nullable()->after('events');
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('rdvs', function (Blueprint $table) {
-            //
+        Schema::table('agendas', function (Blueprint $table) {
+            $table->dropColumn('fullcalendar_config');
         });
     }
 };

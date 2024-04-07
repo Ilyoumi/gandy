@@ -29,12 +29,13 @@ class RdvController extends Controller
             'tva' => 'required|string',
             'tel' => 'required|string',
             'gsm' => 'required|string',
-            'postal' => 'required|string',
+            'postal' => 'required|string', 
             'adresse' => 'required|string',
-            'fournisseur' => 'required|boolean',
+            'fournisseur' => 'required|string',
             'tarification' => 'required|string',
             'nbr_comp_elect' => 'required|integer',
             'nbr_comp_gaz' => 'required|integer',
+            'ppv' => 'required|boolean', 
             'tarif' => 'required|boolean',
             'haute_tension' => 'required|boolean',
             'id_agent' => 'required|exists:users,id',
@@ -61,6 +62,7 @@ class RdvController extends Controller
         ], 500);
     }
 }
+
 
 
 

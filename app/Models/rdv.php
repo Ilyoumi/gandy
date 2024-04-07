@@ -10,11 +10,7 @@ class Rdv extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'nom', 'prenom', 'nom_ste', 'tva', 'tel', 'gsm', 'fournisseur',
-        'tarification', 'nbr_comp_elect', 'nbr_comp_gaz', 'tarif',
-        'haute_tension', 'commentaire', 'id_user', 'id_agenda'
-    ];
+    protected $guarded = [];
 
     // Définir les relations
     public function user()

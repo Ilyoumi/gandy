@@ -21,6 +21,8 @@ function MyCalendar() {
     const [agendas, setAgendas] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
     const [agendaCalendars, setAgendaCalendars] = useState([]);
+    const [agentId, setAgentId] = useState(null);
+    const [agendaId, setAgendaId] = useState(null);
 
     useEffect(() => {
         // Fetch users with role "Agent Commercial" when the component mounts
@@ -43,10 +45,13 @@ function MyCalendar() {
         setAddAgendaModalVisible(true);
     };
 
-    const handleAddAppointment = (arg, contactId) => {
-        setSelectedDate({ date: arg.date, contactId });
+    const handleAddAppointment = (arg, agentId) => {
+        setSelectedDate({ date: arg.date, agentId }); 
+        console.log("handle agentId", agentId);
+
         setShowModal(true);
     };
+    
 
     const handleCloseModal = () => {
         setShowModal(false);
@@ -61,7 +66,13 @@ function MyCalendar() {
         try {
             const response = await axiosClient.get("/api/agendas");
             setAgendas(response.data.agendas);
-            console.log("response", response.data);
+            if (response.data.agendas.length > 0) {
+                const defaultAgenda = response.data.agendas[0];
+                setAgentId(defaultAgenda.contact_id);
+                setAgendaId(defaultAgenda.id);
+            }
+            console.log('response.data.agendas[0].contact_id', response.data.agendas[0].contact_id)
+            console.log("agendas response", response.data);
         } catch (error) {
             console.error("Error fetching agendas:", error);
         }
@@ -218,7 +229,8 @@ function MyCalendar() {
                 <AddAppointment
                     selectedDate={selectedDate}
                     onFormSubmit={handleFormSubmit}
-                    
+                    agentId={agentId}
+                    agendaId={agendaId}
                 />
             </Modal>
         </div>

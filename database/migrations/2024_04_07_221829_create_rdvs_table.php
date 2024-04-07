@@ -30,8 +30,8 @@ return new class extends Migration
             $table->boolean('tarif');
             $table->boolean('haute_tension');
             $table->text('commentaire')->nullable();
-            $table->unsignedBigInteger('id_agent'); // Ajout de la clé étrangère id_user
-            $table->unsignedBigInteger('id_agenda'); // Ajout de la clé étrangère id_agenda
+            $table->unsignedBigInteger('id_agent'); 
+            $table->unsignedBigInteger('id_agenda');
             $table->foreign('id_agent')->references('id')->on('users');
             $table->foreign('id_agenda')->references('id')->on('agendas');
             $table->timestamps();

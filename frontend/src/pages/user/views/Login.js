@@ -58,6 +58,7 @@ const Login = () => {
                             .post(`api/login`, data)
                             .then((res) => {
                                 if (res.data.status === 200) {
+                                    console.log("res:", res.data);
                                     localStorage.setItem(
                                         "auth_token",
                                         res.data.token
@@ -68,7 +69,6 @@ const Login = () => {
                                     );
                                     handleLoginSuccess(res.data.username);
                                     fetchAndUpdateRole(res.data.token);
-                                    console.log("res:", res.data);
                                     console.log(localStorage);
                                     setName(res.data.username);
                                     message.success(
