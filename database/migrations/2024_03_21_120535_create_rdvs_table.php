@@ -22,10 +22,11 @@ return new class extends Migration
             $table->string('gsm');
             $table->string('postal');
             $table->string('adresse');
-            $table->boolean('fournisseur');
+            $table->string('fournisseur');
             $table->string('tarification');
             $table->integer('nbr_comp_elect');
             $table->integer('nbr_comp_gaz');
+            $table->boolean('ppv');
             $table->boolean('tarif');
             $table->boolean('haute_tension');
             $table->text('commentaire')->nullable();

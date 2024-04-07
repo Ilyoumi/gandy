@@ -1,21 +1,15 @@
 import React, { useState } from "react";
-import {
-    Form,
-    Input,
-    DatePicker,
-    Radio,
-    Row,
-    Col,
-    Card,
-    ConfigProvider,
-} from "antd";
+import { Form, Input, Button, DatePicker,Switch, Radio, Row, Col, Card, Space,ConfigProvider,Select } from "antd";
 import DynamicSelect from "../../../constants/SearchSelect";
 import moment from "moment";
 import frFR from "antd/lib/locale/fr_FR";
 import SaveButton from "../../../constants/SaveButton";
 import { axiosClient } from "../../../api/axios";
+import axios from 'axios'; // Import Axios library
 
-const AddAppointment = ({ selectedDate, onFormSubmit,contactId }) => {
+const { RangePicker } = DatePicker;
+const { Option } = Select;
+const AddAppointment = ({ selectedDate , onFormSubmit }) => {
     const [showAdditionalInput, setShowAdditionalInput] = useState(false);
     const [value, setValue] = useState("");
     const [tarifSocial, setTarifSocial] = useState(true);
@@ -66,14 +60,97 @@ const AddAppointment = ({ selectedDate, onFormSubmit,contactId }) => {
         });
         setShowAdditionalInput(value === "oui");
     };
-    const handleSelectChange = (name, value) => {
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
+    const handleSelectChange = (value) => {
+        setValue(value);
+        setError(null); // Clear error when selecting an option
     };
 
-    const handleFormSubmit = () => {
+    // const handleFormSubmit = () => {
+    //     Form.valisateFields().then((values) => {
+    //         const data = {
+    //             nom: values.nom,
+    //             prenom: values.prenom,
+    //             nom_ste: values.nom_ste,
+    //             tva: values.tva,
+    //             adresse: values.adresse,
+    //             postal: values.postal,
+    //             tel: values.tel,
+    //             gsm: values.gsm,
+    //             fournisseur: values.fournisseur,
+    //             tarification: values.tarification,
+    //             nbr_comp_elect: values.nbr_comp_elect,
+    //             nbr_comp_gaz: values.nbr_comp_gaz,
+    //             tarif: values.tarif,
+    //             haute_tension: values.haute_tension,
+    //             commentaire: values.commentaire,
+    //             ppv: values.ppv,
+    //             id_agent: values.id_agent,
+    //             id_agenda: values.id_agenda,               
+    //         };
+    //         axiosClient
+    //         .get("/sanctum/csrf-cookie")
+    //         .then((response) => {
+    //             axiosClient
+    //                 .post(`api/login`, data)
+    //                 .then((res) => {
+    //                     if (res.data.status === 200) {
+    //                         localStorage.setItem(
+    //                             "auth_token",
+    //                             res.data.token
+    //                         );
+    //                         localStorage.setItem(
+    //                             "auth_name",
+    //                             res.data.username
+    //                         );
+    //                         handleLoginSuccess(res.data.username);
+    //                         fetchAndUpdateRole(res.data.token);
+    //                         console.log("res:", res.data);
+    //                         console.log(localStorage);
+    //                         setName(res.data.username);
+    //                         message.success(
+    //                             `Bienvenue: ${localStorage.getItem(
+    //                                 "user_role"
+    //                             )} ${localStorage.getItem("auth_name")}`
+    //                         );
+    //                     } else if (res.data.status === 401) {
+    //                         setAlertVisible(true); // Show error message
+    //                         setAlertMessage(<p key="error-message">L'adresse e-mail ou le mot de passe est incorrect. <br></br> Veuillez réessayer.</p>);
+
+    //                     } else {
+    //                         // Handle other status codes or validation errors
+    //                         console.error(
+    //                             "Login failed:",
+    //                             res.data.message
+    //                         );
+    //                     }
+    //                 })
+    //                 .catch((error) => {
+    //                     console.error(
+    //                         "An error occurred during login:",
+    //                         error
+    //                     );
+    //                     // Log the error
+    //                     // You can also handle the error or display an error message to the user if needed
+    //                 });
+    //         })
+    //         .catch((error) => {
+    //             console.error(
+    //                 "An error occurred while fetching CSRF token:",
+    //                 error
+    //             );
+    //             // Log the error
+    //             // You can also handle the error or display an error message to the user if needed
+    //         });
+
+    //     })
+
+    // }
+
+        const handleFormSubmit = async (values) => {
+        if (!value) {
+            setError("Please select an option"); // Set error if no option selected
+            return;
+        }
         setLoading(true); // Set loading state while making the request
 
         // Log the form data being sent
@@ -101,10 +178,35 @@ const AddAppointment = ({ selectedDate, onFormSubmit,contactId }) => {
             })
             .catch((error) => {
                 setLoading(false); // Reset loading state if an error occurs
-                console.error("Error adding appointment:", error);
-                console.log("Response data:", error.response.data); // Log the error response data
+                console.error('Error adding appointment:', error);
             });
+
+        // Prepare data to be sent
+        const dataToSend = {
+            ...values,
+            start: values.startTime.toDate(),
+            end: values.endTime.toDate(),
+        };
+
+        try {
+            // Send data via Axios
+            const response = await axios.post('your_api_endpoint', dataToSend);
+            console.log(response.data); // Log response from server
+        } catch (error) {
+            console.error('Error:', error);
+            // Handle error
+        }
     };
+
+    // 
+    const prefixSelector = (
+        <Form.Item name="prefix" noStyle>
+            <Select style={{ width: 70 }}>
+                <Option value="86">+86</Option>
+                <Option value="87">+87</Option>
+            </Select>
+        </Form.Item>
+    );
 
     return (
         <Form layout="vertical" onFinish={handleFormSubmit}>
@@ -113,351 +215,217 @@ const AddAppointment = ({ selectedDate, onFormSubmit,contactId }) => {
                     <Col span={12}>
                         <ConfigProvider locale={frFR}>
                             <DatePicker.RangePicker
-                                showTime={true}
-                                defaultValue={moment(
-                                    "2015-01-01",
-                                    "YYYY-MM-DD"
-                                )}
+                            showTime={true}
+                            defaultValue={[moment("2015-01-01", "YYYY-MM-DD"), moment("2015-01-01", "YYYY-MM-DD")]}
                             />
                         </ConfigProvider>
+                        
+
                     </Col>
                     <Col span={12}>
                         <SaveButton onClick={handleClick} loading={loading} />
                     </Col>
                 </Row>
             </Card>
-            <Card>
-                <Row gutter={[16, 16]}>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item
-                            label="Titre"
-                            name="title"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Veuillez entrer le titre !",
-                                },
-                            ]}
-                        >
-                            <Input
-                                value={formData.title}
-                                onChange={(e) =>
-                                    handleSelectChange("title", e.target.value)
-                                }
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item
-                            label="Nom"
-                            name="nom"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Veuillez entrer votre nom !",
-                                },
-                            ]}
-                        >
-                            <Input
-                                value={formData.nom}
-                                onChange={(e) =>
-                                    handleSelectChange("nom", e.target.value)
-                                }
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item
-                            label="Prénom"
-                            name="prenom"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Veuillez entrer votre prénom !",
-                                },
-                            ]}
-                        >
-                            <Input
-                                value={formData.prenom}
-                                onChange={(e) =>
-                                    handleSelectChange("prenom", e.target.value)
-                                }
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item label="Société" name="nom_ste">
-                            <Input
-                                value={formData.nom_ste}
-                                onChange={(e) =>
-                                    handleSelectChange(
-                                        "nom_ste",
-                                        e.target.value
-                                    )
-                                }
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item label="Code Postal" name="postal">
-                            <Input
-                                value={formData.codeP}
-                                onChange={(e) =>
-                                    handleSelectChange("postal", e.target.value)
-                                }
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item label="Adress" name="adresse">
-                            <Input
-                                value={formData.adress}
-                                onChange={(e) =>
-                                    handleSelectChange("adresse", e.target.value)
-                                }
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item label="TVA" name="tva">
-                            <Input
-                                value={formData.tva}
-                                onChange={(e) =>
-                                    handleSelectChange("tva", e.target.value)
-                                }
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item label="Téléphone" name="tel">
-                            <Input
-                                value={formData.tel}
-                                onChange={(e) =>
-                                    handleSelectChange("tel", e.target.value)
-                                }
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item label="GSM" name="gsm">
-                            <Input
-                                value={formData.gsm}
-                                onChange={(e) =>
-                                    handleSelectChange("gsm", e.target.value)
-                                }
-                            />
-                        </Form.Item>
-                    </Col>
+            <Row gutter={[16, 16]}>
 
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item
-                            label="Fournisseur"
-                            name="fournisseur"
-                            rules={[
-                                {
-                                    required: true,
-                                    message:
-                                        "Veuillez sélectionner votre fournisseur actuel !",
-                                },
-                            ]}
-                        >
-                            <DynamicSelect
-                                value={value}
-                                onChange={(value) =>
-                                    handleSelectChange("fournisseur", value)
-                                }
-                                placeholder="Sélectionner un fournisseur"
-                                options={[
-                                    {
-                                        value: "fournisseur1",
-                                        label: "Fournisseur 1",
-                                    },
-                                    {
-                                        value: "fournisseur2",
-                                        label: "Fournisseur 2",
-                                    },
-                                    {
-                                        value: "fournisseur3",
-                                        label: "Fournisseur 3",
-                                    },
-                                ]}
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item
-                            label="Nombre de Compteurs Électriques"
-                            name="nbr_comp_elect"
-                            rules={[
-                                {
-                                    required: true,
-                                    message:
-                                        "Veuillez sélectionner le nombre de compteurs de gaz !",
-                                },
-                            ]}
-                        >
-                            <DynamicSelect
-                                value={value} // Ensure value and onChange are passed
-                                onChange={(value) =>
-                                    handleSelectChange("nbr_comp_elect", value)
-                                }
-                                placeholder="Sélectionner le nombre de compteurs électriques"
-                                options={[
-                                    { value: "1", label: "1" },
-                                    { value: "2", label: "2" },
-                                    { value: "3", label: "3" },
-                                    { value: "4", label: "4" },
-                                    { value: "+4", label: "+4" },
-                                ]}
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item
-                            label="Nombre de Compteurs Gaz"
-                            name="nbr_comp_gaz"
-                            rules={[
-                                {
-                                    required: true,
-                                    message:
-                                        "Veuillez sélectionner le nombre de compteurs de gaz !",
-                                },
-                            ]}
-                        >
-                            <DynamicSelect
-                                value={value} // Ensure value and onChange are passed
-                                onChange={(value) =>
-                                    handleSelectChange("nbr_comp_gaz", value)
-                                }
-                                placeholder="Sélectionner le nombre de compteurs gaz"
-                                options={[
-                                    { value: "1", label: "1" },
-                                    { value: "2", label: "2" },
-                                    { value: "3", label: "3" },
-                                    { value: "4", label: "4" },
-                                    { value: "+4", label: "+4" },
-                                ]}
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item
-                            label="PPV"
-                            name="ppv"
-                            rules={[{ required: true }]}
-                        >
-                            <Radio.Group
-                                onChange={(e) =>
-                                    handlePpvChange(e.target.value)
-                                }
-                            >
-                                <Radio value="oui">Oui</Radio>
-                                <Radio value="non">Non</Radio>
-                            </Radio.Group>
-                        </Form.Item>
+                <Col span={16}>
+                    <Card>
+                        <Row gutter={[16, 16]}>
+                            <Col span={24}>
+                                <Row gutter={[16, 16]}>
+                                    <Col xs={24} sm={12} lg={12}>
+                                        <Form.Item
+                                            label="Nom"
+                                            name="nom"
+                                            rules={[{ required: true, message: "Veuillez entrer votre nom !" }]}
+                                        >
+                                            <Input />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col xs={24} sm={12} lg={12}>
+                                        <Form.Item
+                                            label="Prénom"
+                                            name="prenom"
+                                            rules={[{ required: true, message: "Veuillez entrer votre prénom !" }]}
+                                        >
+                                            <Input />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                            </Col>
+                            <Col span={24}>
+                                <Row gutter={[16, 16]}>
+                                    <Col xs={24} sm={12} lg={12}>
+                                        <Form.Item label="Nom de Société" name="nom_ste">
+                                            <Input />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col xs={24} sm={12} lg={12}>
+                                        <Form.Item label="TVA" name="tva">
+                                            <Input />
+                                        </Form.Item>
+                                    </Col>
+                                    
+                                </Row>
+                            </Col>
+                            <Col span={24}>
+                                <Row gutter={[16, 16]}>
+                                    <Col xs={24} sm={12} lg={12}>
+                                        <Form.Item label="Adresse" name="adresse">
+                                            <Input />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col xs={24} sm={12} lg={12}>
+                                        <Form.Item label="Code Postal" name="postal">
+                                            <Input />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                            </Col>
+                            <Col span={24}>
+                                <Row gutter={[16, 16]}>
+                                    <Col xs={24} sm={12} lg={12}>
+                                        <Form.Item
+                                            name="tel"
+                                            label="Téléphone"
+                                            rules={[{ required: true, message: 'Veuillez saisir votre numéro de téléphone!' }]}
+                                        >
+                                            <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col xs={24} sm={12} lg={12}>
+                                        <Form.Item label="GSM" name="gsm">
+                                            <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                            </Col>
+                            <Col span={24}>
+                                <Row gutter={[16, 16]}>
 
-                        {showAdditionalInput && (
-                            <Row>
-                                <Col span={24}>
-                                    <Form.Item
-                                        label="Additional Input"
-                                        name="additionalInput"
-                                        rules={[{ required: true }]}
-                                    >
-                                        <Input
-                                            value={formData.additionalInput}
-                                            onChange={(e) =>
-                                                handleSelectChange(
-                                                    "additionalInput",
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-                        )}
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item
-                            label="Tarif Social"
-                            name="tarif"
-                            rules={[
-                                {
-                                    required: true,
-                                    message:
-                                        "Veuillez sélectionner si vous avez un tarif social ou non !",
-                                },
-                            ]}
-                        >
-                            <Radio.Group
-                                onChange={handleTarifSocialChange}
-                                value={tarifSocial}
-                            >
-                                <Radio value={true}>Oui</Radio>
-                                <Radio value={false}>Non</Radio>
-                            </Radio.Group>
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item
-                            label="Haute Tension"
-                            name="haute_tension"
-                            rules={[
-                                {
-                                    required: true,
-                                    message:
-                                        "Veuillez sélectionner si vous êtes en haute tension ou non !",
-                                },
-                            ]}
-                        >
-                            <Radio.Group
-                                onChange={handleHauteTensionChange}
-                                value={tarifSocial}
-                            >
-                                <Radio value={true}>Oui</Radio>
-                                <Radio value={false}>Non</Radio>
-                            </Radio.Group>
-                        </Form.Item>
-                    </Col>
-                    <Col xs={24} sm={12} lg={8}>
-                        <Form.Item
-                            label="Tarification"
-                            name="tarification"
-                            rules={[
-                                {
-                                    required: true,
-                                    message:
-                                        "Veuillez sélectionner votre type de tarification !",
-                                },
-                            ]}
-                        >
-                            <Radio.Group
-                                onChange={handleTarifChange}
-                                value={tarifSocial}
-                            >
-                                <Radio value={true}>Oui</Radio>
-                                <Radio value={false}>Non</Radio>
-                            </Radio.Group>
-                        </Form.Item>
-                    </Col>
+                                    <Col span={12}>
+                                        <Form.Item
+                                            label="Nombre de Compteurs Électriques"
+                                            name="nbr_comp_elect"
+                                            rules={[{ required: true, message: "Veuillez sélectionner le nombre de compteurs de gaz !" }]}
+                                        >
+                                            <Select
+                                                value={value} // Assurez-vous que value et onChange sont transmis
+                                                onChange={handleSelectChange}
+                                                placeholder="Sélectionner le nombre de compteurs électriques"
+                                            >
+                                                <Select.Option value="1">1</Select.Option>
+                                                <Select.Option value="2">2</Select.Option>
+                                                <Select.Option value="3">3</Select.Option>
+                                                <Select.Option value="4">4</Select.Option>
+                                                <Select.Option value="+4">+4</Select.Option>
+                                            </Select>
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={12}>
+                                        <Form.Item
+                                            label="Nombre de Compteurs Gaz"
+                                            name="nbr_comp_gaz"
+                                            rules={[{ required: true, message: "Veuillez sélectionner le nombre de compteurs de gaz !" }]}
+                                        >
+                                            <Select
+                                                value={value} // Assurez-vous que value et onChange sont transmis
+                                                onChange={handleSelectChange}
+                                                placeholder="Sélectionner le nombre de compteurs gaz"
+                                            >
+                                                <Select.Option value="1">1</Select.Option>
+                                                <Select.Option value="2">2</Select.Option>
+                                                <Select.Option value="3">3</Select.Option>
+                                                <Select.Option value="4">4</Select.Option>
+                                                <Select.Option value="+4">+4</Select.Option>
+                                            </Select>
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                            </Col>
+                            
+                        </Row>
+                    </Card>
+                </Col>
+                <Col span={8}>
+                    <Card>
+                        <Row gutter={[16, 16]}>
+                        <Col span={24}>
+                                        <Form.Item
+                                            name="fournisseur"
+                                            label="Fournisseur"
+                                            rules={[{ required: true, message: 'Veuillez sélectionner votre fournisseur actuel!' }]}
+                                        >
+                                            <Select placeholder="sélectionner votre fournisseur">
+                                                <Option value="fournisseur1">Fournisseur 1</Option>
+                                                <Option value="fournisseur2">Fournisseur 2</Option>
+                                                <Option value="fournisseur3">Fournisseur 3</Option>
+                                            </Select>
+                                        </Form.Item>
+                                    </Col>
+                            <Col span={12}>
+                                <Form.Item
+                                    label="PPV"
+                                    name="ppv"
+                                    rules={[{ required: true }]}
+                                >
+                                <Switch checkedChildren="Oui" unCheckedChildren="Non" />
 
-                    <Col xs={24} sm={12} lg={16}>
-                        <Form.Item label="Commentaire" name="commentaire">
-                            <Input.TextArea
-                                value={formData.commentaire}
-                                onChange={(e) =>
-                                    handleSelectChange(
-                                        "commentaire",
-                                        e.target.value
-                                    )
-                                }
-                                rows={2}
-                            />
-                        </Form.Item>
-                    </Col>
-                </Row>
-            </Card>
+                                </Form.Item>
+
+                                {showAdditionalInput && (
+                                    <Row>
+                                        <Col span={24}>
+                                            <Form.Item
+                                                label="Additional Input"
+                                                name="additionalInput"
+                                                rules={[{ required: true }]}
+                                            >
+                                                <Input />
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                )}
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item
+                                    label="Tarif Social"
+                                    name="tarif"
+                                    rules={[{ required: true, message: "Veuillez sélectionner si vous avez un tarif social ou non !" }]}
+                                >
+                                    <Switch checkedChildren="Oui" unCheckedChildren="Non" />
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item
+                                    label="Haute Tension"
+                                    name="haute_tension"
+                                    rules={[{ required: true, message: "Veuillez sélectionner si vous êtes en haute tension ou non !" }]}
+                                >
+                                    <Switch checkedChildren="Oui" unCheckedChildren="Non" />
+                                </Form.Item>
+                            </Col>
+                            <Col span={12}>
+                                <Form.Item
+                                    label="Tarification"
+                                    name="tarification"
+                                    rules={[{ required: true, message: "Veuillez sélectionner votre type de tarification !" }]}
+                                >
+                                    <Switch checkedChildren="Fixe" unCheckedChildren="Variable" />
+                                </Form.Item>
+                            </Col>
+                            <Col span={24}>
+                                <Form.Item label="Commentaire" name="commentaire">
+                                    <Input.TextArea rows={5} />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                    </Card>
+                </Col>
+        </Row>
+
+          
         </Form>
     );
 };
