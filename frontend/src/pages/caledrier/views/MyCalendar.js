@@ -43,8 +43,8 @@ function MyCalendar() {
         setAddAgendaModalVisible(true);
     };
 
-    const handleDateClick = (arg) => {
-        setSelectedDate(arg.date);
+    const handleAddAppointment = (arg, contactId) => {
+        setSelectedDate({ date: arg.date, contactId });
         setShowModal(true);
     };
 
@@ -94,7 +94,7 @@ function MyCalendar() {
             },
             slotDuration: "00:30:00",
             handleWindowResize: true,
-            dateClick: handleDateClick,
+            dateClick: handleAddAppointment,
             events: [...appointments],
         };
     }
@@ -200,6 +200,8 @@ function MyCalendar() {
                                         interactionPlugin,
                                     ]}
                                     {...JSON.parse(agenda.fullcalendar_config)}
+                                    dateClick={(arg) => handleAddAppointment(arg, agenda.contact_id)}
+                                    
                                 />
                             )}
                         </Card>
@@ -216,6 +218,7 @@ function MyCalendar() {
                 <AddAppointment
                     selectedDate={selectedDate}
                     onFormSubmit={handleFormSubmit}
+                    
                 />
             </Modal>
         </div>

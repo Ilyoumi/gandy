@@ -3,9 +3,9 @@ import { Button } from 'antd';
 import './SaveButton.css';
 
 
-const SaveButton = ({ onClick, loading }) => {
+const SaveButton = ({ loading }) => {
   return (
-    <Button className="save-button" onClick={onClick} loading={loading}>
+    <Button className="save-button"  loading={loading} htmlType="submit">
         Enregistrer
     </Button>
   );

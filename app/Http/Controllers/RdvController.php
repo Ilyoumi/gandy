@@ -6,6 +6,7 @@ use App\Models\rdv;
 use Illuminate\Http\Request;
 use App\Models\Agenda;
 use App\Models\User; 
+use Illuminate\Support\Facades\Log;
 
 class RdvController extends Controller
 {
@@ -17,13 +18,19 @@ class RdvController extends Controller
     public function store(Request $request)
 {
     try {
-        $request->validate([
+        // Log the incoming request data
+        Log::info('Incoming request data:', $request->all());
+
+        // Validate incoming request
+        $validatedData = $request->validate([
             'nom' => 'required|string',
             'prenom' => 'required|string',
             'nom_ste' => 'required|string',
             'tva' => 'required|string',
             'tel' => 'required|string',
             'gsm' => 'required|string',
+            'postal' => 'required|string',
+            'adresse' => 'required|string',
             'fournisseur' => 'required|boolean',
             'tarification' => 'required|string',
             'nbr_comp_elect' => 'required|integer',
@@ -34,13 +41,27 @@ class RdvController extends Controller
             'id_agenda' => 'required|exists:agendas,id',
         ]);
 
-        $rdv = Rdv::create($request->all());
+        // Create the Rdv
+        $rdv = Rdv::create($validatedData);
 
-        return response()->json($rdv, 201);
+        // Return a response indicating success
+        return response()->json([
+            'message' => 'Rdv created successfully',
+            'rdv' => $rdv,
+            'received_data' => $validatedData // Include received data in the response
+        ], 201);
     } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
+        // Log the error message
+        Log::error('Failed to create Rdv: ' . $e->getMessage());
+
+        // Return a response with error message if an exception occurs
+        return response()->json([
+            'message' => 'Failed to create Rdv: ' . $e->getMessage(),
+            'received_data' => $request->all() // Include received data in the response
+        ], 500);
     }
 }
+
 
 
     public function show($id)
