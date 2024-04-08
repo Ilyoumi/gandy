@@ -29,6 +29,12 @@ function MyCalendar() {
         fetchAgentCommercialUsers();
         fetchAgendas();
     }, []);
+    useEffect(() => {
+        // Fetch appointments for the default agenda when agendas or default agenda change
+        if (agendaId) {
+            fetchAppointmentsForAgenda(agendaId);
+        }
+    }, [agendaId]);
 
     const fetchAgentCommercialUsers = async () => {
         try {
@@ -46,12 +52,11 @@ function MyCalendar() {
     };
 
     const handleAddAppointment = (arg, agentId) => {
-        setSelectedDate({ date: arg.date, agentId }); 
+        setSelectedDate({ date: arg.date, agentId });
         console.log("handle agentId", agentId);
 
         setShowModal(true);
     };
-    
 
     const handleCloseModal = () => {
         setShowModal(false);
@@ -59,6 +64,7 @@ function MyCalendar() {
 
     const handleFormSubmit = (newAppointment) => {
         setAppointments([...appointments, newAppointment]);
+        fetchAppointmentsForAgenda(agendaId);
         handleCloseModal();
     };
 
@@ -71,7 +77,10 @@ function MyCalendar() {
                 setAgentId(defaultAgenda.contact_id);
                 setAgendaId(defaultAgenda.id);
             }
-            console.log('response.data.agendas[0].contact_id', response.data.agendas[0].contact_id)
+            console.log(
+                "response.data.agendas[0].contact_id",
+                response.data.agendas[0].contact_id
+            );
             console.log("agendas response", response.data);
         } catch (error) {
             console.error("Error fetching agendas:", error);
@@ -106,9 +115,47 @@ function MyCalendar() {
             slotDuration: "00:30:00",
             handleWindowResize: true,
             dateClick: handleAddAppointment,
-            events: [...appointments],
+            events: appointments.map((appointment) => ({
+                title: `${appointment.nom} ${appointment.prenom}`,
+                start: appointment.start_date
+                    ? new Date(appointment.start_date.replace(" ", "T"))
+                    : null,
+                end: appointment.end_date
+                    ? new Date(appointment.end_date.replace(" ", "T"))
+                    : null,
+                postal: appointment.postal, // Include postal information
+            })),
         };
     }
+
+    // Fetch appointments for a specific agenda
+    const fetchAppointmentsForAgenda = async (agendaId) => {
+        try {
+            const response = await axiosClient.get(
+                `/api/agendas/${agendaId}/appointments`
+            );
+            const appointmentsForAgenda = response.data.rdvs.map(
+                (appointment) => ({
+                    title: `${appointment.nom} ${appointment.prenom}`,
+                    start: appointment.start_date
+                        ? new Date(appointment.start_date.replace(" ", "T"))
+                        : null,
+                    end: appointment.end_date
+                        ? new Date(appointment.end_date.replace(" ", "T"))
+                        : null,
+                    agendaId: agendaId,
+                    postal: appointment.postal,
+                })
+            );
+
+            setAppointments(appointmentsForAgenda);
+        } catch (error) {
+            console.error(
+                `Error fetching appointments for agenda ${agendaId}:`,
+                error
+            );
+        }
+    };
 
     const handleAgendaCreated = async (agendaId, agendaName) => {
         try {
@@ -199,25 +246,58 @@ function MyCalendar() {
                     </div>
                 )}
 
-                {agendas.map((agenda, index) => (
-                    <div key={index}>
-                        <h2>{agenda.name}</h2>
-                        <Card style={{ marginBottom: "30px" }}>
-                            {agenda.fullcalendar_config && (
-                                <FullCalendar
-                                    plugins={[
-                                        dayGridPlugin,
-                                        timeGridPlugin,
-                                        interactionPlugin,
-                                    ]}
-                                    {...JSON.parse(agenda.fullcalendar_config)}
-                                    dateClick={(arg) => handleAddAppointment(arg, agenda.contact_id)}
-                                    
-                                />
-                            )}
-                        </Card>
-                    </div>
-                ))}
+                {agendas.map((agenda, index) => {
+                    console.log("Agenda ID:", agenda.id); // Log agenda id
+                    const filteredAppointments = appointments.filter(
+                        (appointment) => appointment.agendaId === agenda.id
+                    );
+                    console.log(
+                        "Appointments before filtering:",
+                        appointments.length
+                    );
+                    console.log("Filtered Appointments:", filteredAppointments);
+                    console.log(
+                        "Filtered Appointments length:",
+                        filteredAppointments.length
+                    );
+
+                    return (
+                        <div key={index}>
+                            <h2>{agenda.name}</h2>
+                            <Card style={{ marginBottom: "30px" }}>
+                                {agenda.fullcalendar_config && (
+                                    <FullCalendar
+                                        plugins={[
+                                            dayGridPlugin,
+                                            timeGridPlugin,
+                                            interactionPlugin,
+                                        ]}
+                                        {...JSON.parse(
+                                            agenda.fullcalendar_config
+                                        )}
+                                        dateClick={(arg) =>
+                                            handleAddAppointment(
+                                                arg,
+                                                agenda.contact_id
+                                            )
+                                        }
+                                        events={appointments
+                                            .filter(
+                                                (appointment) =>
+                                                    appointment.agendaId ===
+                                                    agenda.id
+                                            )
+                                            .map((filteredAppointment) => ({
+                                                title: `${filteredAppointment.title} - ${filteredAppointment.postal}`,
+                                                start: filteredAppointment.start,
+                                                end: filteredAppointment.end,
+                                            }))}
+                                    />
+                                )}
+                            </Card>
+                        </div>
+                    );
+                })}
             </Card>
             <Modal
                 visible={showModal}

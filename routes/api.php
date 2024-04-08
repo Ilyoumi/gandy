@@ -44,4 +44,5 @@ Route::post('/calendars', [CalendarController::class, 'store']);
 
 // Routes pour les rendez-vous (RDVs)
 Route::post('/rdvs', [RdvController::class, 'store']);
+Route::get('/agendas/{agendaId}/appointments', [AgendaController::class, 'getAppointments']);
 

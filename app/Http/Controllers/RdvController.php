@@ -15,6 +15,8 @@ class RdvController extends Controller
         return Rdv::all();
     }
 
+    
+
     public function store(Request $request)
 {
     try {
@@ -40,7 +42,16 @@ class RdvController extends Controller
             'haute_tension' => 'required|boolean',
             'id_agent' => 'required|exists:users,id',
             'id_agenda' => 'required|exists:agendas,id',
+            'start_date' => 'required|date',
+                'end_date' => 'required|date|after:start_date',
         ]);
+        // Convert dates to MySQL compatible format
+        $validatedData['start_date'] = date('Y-m-d H:i:s', strtotime($validatedData['start_date']));
+        $validatedData['end_date'] = date('Y-m-d H:i:s', strtotime($validatedData['end_date']));
+
+        // Create the Rdv
+        $rdv = Rdv::create($validatedData);
+
 
         // Create the Rdv
         $rdv = Rdv::create($validatedData);

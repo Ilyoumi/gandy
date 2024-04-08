@@ -1,14 +1,23 @@
 import React, { useState } from "react";
-import { Form, Input, DatePicker,Switch, Row, Col, Card,ConfigProvider,Select } from "antd";
+import {
+    Form,
+    Input,
+    DatePicker,
+    Switch,
+    Row,
+    Col,
+    Card,
+    ConfigProvider,
+    Select,
+} from "antd";
 import moment from "moment";
 import frFR from "antd/lib/locale/fr_FR";
 import SaveButton from "../../../constants/SaveButton";
 import { axiosClient } from "../../../api/axios";
 
 const { Option } = Select;
-const AddAppointment = ({ selectedDate , onFormSubmit,agentId,agendaId }) => {
+const AddAppointment = ({ selectedDate, onFormSubmit, agentId, agendaId }) => {
     const [showAdditionalInput, setShowAdditionalInput] = useState(false);
-
 
     const [formData, setFormData] = useState({
         title: "",
@@ -28,6 +37,7 @@ const AddAppointment = ({ selectedDate , onFormSubmit,agentId,agendaId }) => {
         haute_tension: false,
         tarification: "",
         commentaire: "",
+        appointment_date: null,
     });
 
     const [loading, setLoading] = useState(false);
@@ -39,29 +49,29 @@ const AddAppointment = ({ selectedDate , onFormSubmit,agentId,agendaId }) => {
         }, 2000);
     };
 
-    
-
-
     const handleFormSubmit = async () => {
         setLoading(true);
-        let formDataToSend
+        let formDataToSend;
+        // Validate appointment date
+        if (!formData.appointment_date) {
+            throw new Error("The appointment date field is required.");
+        }
 
         try {
-            if (!agentId) {
-                console.log("agentId value not :", agentId);
-
-            }
-            console.log("agentId value:", agentId);
-
             formDataToSend = {
                 ...formData,
-                id_agent: agentId, 
-                id_agenda:agendaId,
+                start_date: formData.appointment_date[0],
+                end_date: formData.appointment_date[1],
+                id_agent: agentId,
+                id_agenda: agendaId,
                 tarification: formData.tarification.toString(),
             };
-            console.log("Form submission with:", formDataToSend,);
+            console.log("Form submission with:", formDataToSend);
 
-            const response = await axiosClient.post("/api/rdvs", formDataToSend);
+            const response = await axiosClient.post(
+                "/api/rdvs",
+                formDataToSend
+            );
             setLoading(false);
             console.log("Form submission successful. Response:", response.data);
             onFormSubmit(response.data);
@@ -69,7 +79,7 @@ const AddAppointment = ({ selectedDate , onFormSubmit,agentId,agendaId }) => {
             setLoading(false);
 
             console.error("Response data:", error.response.data);
-            console.error('Error adding appointment:', error);
+            console.error("Error adding appointment:", error);
         }
     };
 
@@ -89,12 +99,17 @@ const AddAppointment = ({ selectedDate , onFormSubmit,agentId,agendaId }) => {
                     <Col span={12}>
                         <ConfigProvider locale={frFR}>
                             <DatePicker.RangePicker
-                            showTime={true}
-                            defaultValue={[moment("2015-01-01", "YYYY-MM-DD"), moment("2015-01-01", "YYYY-MM-DD")]}
+                                name="appointment_date"
+                                showTime={true}
+                                defaultValue={[moment(), moment()]}
+                                onChange={(dates) =>
+                                    setFormData({
+                                        ...formData,
+                                        appointment_date: dates,
+                                    })
+                                }
                             />
                         </ConfigProvider>
-                        
-
                     </Col>
                     <Col span={12}>
                         <SaveButton onClick={handleClick} loading={loading} />
@@ -102,7 +117,6 @@ const AddAppointment = ({ selectedDate , onFormSubmit,agentId,agendaId }) => {
                 </Row>
             </Card>
             <Row gutter={[16, 16]}>
-
                 <Col span={16}>
                     <Card>
                         <Row gutter={[16, 16]}>
@@ -112,18 +126,44 @@ const AddAppointment = ({ selectedDate , onFormSubmit,agentId,agendaId }) => {
                                         <Form.Item
                                             label="Nom"
                                             name="nom"
-                                            rules={[{ required: true, message: "Veuillez entrer votre nom !" }]}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez entrer votre nom !",
+                                                },
+                                            ]}
                                         >
-                                            <Input onChange={(e) => setFormData({ ...formData, nom: e.target.value })} />
+                                            <Input
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        nom: e.target.value,
+                                                    })
+                                                }
+                                            />
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
                                         <Form.Item
                                             label="Prénom"
                                             name="prenom"
-                                            rules={[{ required: true, message: "Veuillez entrer votre prénom !" }]}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez entrer votre prénom !",
+                                                },
+                                            ]}
                                         >
-                                            <Input onChange={(e) => setFormData({ ...formData, prenom: e.target.value })} />
+                                            <Input
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        prenom: e.target.value,
+                                                    })
+                                                }
+                                            />
                                         </Form.Item>
                                     </Col>
                                 </Row>
@@ -131,28 +171,64 @@ const AddAppointment = ({ selectedDate , onFormSubmit,agentId,agendaId }) => {
                             <Col span={24}>
                                 <Row gutter={[16, 16]}>
                                     <Col xs={24} sm={12} lg={12}>
-                                        <Form.Item label="Nom de Société" name="nom_ste">
-                                        <Input onChange={(e) => setFormData({ ...formData, nom_ste: e.target.value })} />
+                                        <Form.Item
+                                            label="Nom de Société"
+                                            name="nom_ste"
+                                        >
+                                            <Input
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        nom_ste: e.target.value,
+                                                    })
+                                                }
+                                            />
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
                                         <Form.Item label="TVA" name="tva">
-                                        <Input onChange={(e) => setFormData({ ...formData, tva: e.target.value })} />
+                                            <Input
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        tva: e.target.value,
+                                                    })
+                                                }
+                                            />
                                         </Form.Item>
                                     </Col>
-                                    
                                 </Row>
                             </Col>
                             <Col span={24}>
                                 <Row gutter={[16, 16]}>
                                     <Col xs={24} sm={12} lg={12}>
-                                        <Form.Item label="Adresse" name="adresse">
-                                        <Input onChange={(e) => setFormData({ ...formData, adresse: e.target.value })} />
+                                        <Form.Item
+                                            label="Adresse"
+                                            name="adresse"
+                                        >
+                                            <Input
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        adresse: e.target.value,
+                                                    })
+                                                }
+                                            />
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
-                                        <Form.Item label="Code Postal" name="postal">
-                                        <Input onChange={(e) => setFormData({ ...formData, postal: e.target.value })} />
+                                        <Form.Item
+                                            label="Code Postal"
+                                            name="postal"
+                                        >
+                                            <Input
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        postal: e.target.value,
+                                                    })
+                                                }
+                                            />
                                         </Form.Item>
                                     </Col>
                                 </Row>
@@ -163,36 +239,80 @@ const AddAppointment = ({ selectedDate , onFormSubmit,agentId,agendaId }) => {
                                         <Form.Item
                                             name="tel"
                                             label="Téléphone"
-                                            rules={[{ required: true, message: 'Veuillez saisir votre numéro de téléphone!' }]}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez saisir votre numéro de téléphone!",
+                                                },
+                                            ]}
                                         >
-                                            <Input addonBefore={prefixSelector} style={{ width: '100%' }} onChange={(e) => setFormData({ ...formData, tel: e.target.value })}/>
+                                            <Input
+                                                addonBefore={prefixSelector}
+                                                style={{ width: "100%" }}
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        tel: e.target.value,
+                                                    })
+                                                }
+                                            />
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
                                         <Form.Item label="GSM" name="gsm">
-                                            <Input addonBefore={prefixSelector} style={{ width: '100%' }} onChange={(e) => setFormData({ ...formData, gsm: e.target.value })} />
+                                            <Input
+                                                addonBefore={prefixSelector}
+                                                style={{ width: "100%" }}
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        gsm: e.target.value,
+                                                    })
+                                                }
+                                            />
                                         </Form.Item>
                                     </Col>
                                 </Row>
                             </Col>
                             <Col span={24}>
                                 <Row gutter={[16, 16]}>
-
                                     <Col span={12}>
                                         <Form.Item
                                             label="Nombre de Compteurs Électriques"
                                             name="nbr_comp_elect"
-                                            rules={[{ required: true, message: "Veuillez sélectionner le nombre de compteurs de gaz !" }]}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez sélectionner le nombre de compteurs de gaz !",
+                                                },
+                                            ]}
                                         >
                                             <Select
-                                                onChange={(value) => setFormData({ ...formData, nbr_comp_elect: value })}
+                                                onChange={(value) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        nbr_comp_elect: value,
+                                                    })
+                                                }
                                                 placeholder="Sélectionner le nombre de compteurs électriques"
                                             >
-                                                <Select.Option value="1">1</Select.Option>
-                                                <Select.Option value="2">2</Select.Option>
-                                                <Select.Option value="3">3</Select.Option>
-                                                <Select.Option value="4">4</Select.Option>
-                                                <Select.Option value="+4">+4</Select.Option>
+                                                <Select.Option value="1">
+                                                    1
+                                                </Select.Option>
+                                                <Select.Option value="2">
+                                                    2
+                                                </Select.Option>
+                                                <Select.Option value="3">
+                                                    3
+                                                </Select.Option>
+                                                <Select.Option value="4">
+                                                    4
+                                                </Select.Option>
+                                                <Select.Option value="+4">
+                                                    +4
+                                                </Select.Option>
                                             </Select>
                                         </Form.Item>
                                     </Col>
@@ -200,53 +320,98 @@ const AddAppointment = ({ selectedDate , onFormSubmit,agentId,agendaId }) => {
                                         <Form.Item
                                             label="Nombre de Compteurs Gaz"
                                             name="nbr_comp_gaz"
-                                            rules={[{ required: true, message: "Veuillez sélectionner le nombre de compteurs de gaz !" }]}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez sélectionner le nombre de compteurs de gaz !",
+                                                },
+                                            ]}
                                         >
                                             <Select
-                                                onChange={(value) => setFormData({ ...formData, nbr_comp_gaz: value })}
+                                                onChange={(value) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        nbr_comp_gaz: value,
+                                                    })
+                                                }
                                                 placeholder="Sélectionner le nombre de compteurs gaz"
                                             >
-                                                <Select.Option value="1">1</Select.Option>
-                                                <Select.Option value="2">2</Select.Option>
-                                                <Select.Option value="3">3</Select.Option>
-                                                <Select.Option value="4">4</Select.Option>
-                                                <Select.Option value="+4">+4</Select.Option>
+                                                <Select.Option value="1">
+                                                    1
+                                                </Select.Option>
+                                                <Select.Option value="2">
+                                                    2
+                                                </Select.Option>
+                                                <Select.Option value="3">
+                                                    3
+                                                </Select.Option>
+                                                <Select.Option value="4">
+                                                    4
+                                                </Select.Option>
+                                                <Select.Option value="+4">
+                                                    +4
+                                                </Select.Option>
                                             </Select>
                                         </Form.Item>
                                     </Col>
                                 </Row>
                             </Col>
-                            
                         </Row>
                     </Card>
                 </Col>
                 <Col span={8}>
                     <Card>
                         <Row gutter={[16, 16]}>
-                        <Col span={24}>
-                                        <Form.Item
-                                            name="fournisseur"
-                                            label="Fournisseur"
-                                            rules={[{ required: true, message: 'Veuillez sélectionner votre fournisseur actuel!' }]}
-                                        >
-                                            <Select
+                            <Col span={24}>
+                                <Form.Item
+                                    name="fournisseur"
+                                    label="Fournisseur"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                "Veuillez sélectionner votre fournisseur actuel!",
+                                        },
+                                    ]}
+                                >
+                                    <Select
                                         placeholder="sélectionner votre fournisseur"
-                                        onChange={(value) => setFormData({ ...formData, fournisseur: value })}
+                                        onChange={(value) =>
+                                            setFormData({
+                                                ...formData,
+                                                fournisseur: value,
+                                            })
+                                        }
                                     >
-                                                <Option value="fournisseur1">Fournisseur 1</Option>
-                                                <Option value="fournisseur2">Fournisseur 2</Option>
-                                                <Option value="fournisseur3">Fournisseur 3</Option>
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
+                                        <Option value="fournisseur1">
+                                            Fournisseur 1
+                                        </Option>
+                                        <Option value="fournisseur2">
+                                            Fournisseur 2
+                                        </Option>
+                                        <Option value="fournisseur3">
+                                            Fournisseur 3
+                                        </Option>
+                                    </Select>
+                                </Form.Item>
+                            </Col>
                             <Col span={12}>
                                 <Form.Item
                                     label="PPV"
                                     name="ppv"
                                     rules={[{ required: true }]}
                                 >
-                                <Switch checkedChildren="Oui" unCheckedChildren="Non" onChange={(value) => setFormData({ ...formData, ppv: value })} />
-
+                                    <Switch
+                                        checkedChildren="Oui"
+                                        unCheckedChildren="Non"
+                                        onChange={(value) =>
+                                            setFormData({
+                                                ...formData,
+                                                ppv: value,
+                                            })
+                                        }
+                                    />
                                 </Form.Item>
 
                                 {showAdditionalInput && (
@@ -267,40 +432,86 @@ const AddAppointment = ({ selectedDate , onFormSubmit,agentId,agendaId }) => {
                                 <Form.Item
                                     label="Tarif Social"
                                     name="tarif"
-                                    rules={[{ required: true, message: "Veuillez sélectionner si vous avez un tarif social ou non !" }]}
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                "Veuillez sélectionner si vous avez un tarif social ou non !",
+                                        },
+                                    ]}
                                 >
-                                    <Switch checkedChildren="Oui" unCheckedChildren="Non" onChange={(value) => setFormData({ ...formData, tarif: value })}/>
+                                    <Switch
+                                        checkedChildren="Oui"
+                                        unCheckedChildren="Non"
+                                        onChange={(value) =>
+                                            setFormData({
+                                                ...formData,
+                                                tarif: value,
+                                            })
+                                        }
+                                    />
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
                                 <Form.Item
                                     label="Haute Tension"
                                     name="haute_tension"
-                                    rules={[{ required: true, message: "Veuillez sélectionner si vous êtes en haute tension ou non !" }]}
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                "Veuillez sélectionner si vous êtes en haute tension ou non !",
+                                        },
+                                    ]}
                                 >
-                                    <Switch checkedChildren="Oui" unCheckedChildren="Non" onChange={(value) => setFormData({ ...formData, haute_tension: value })} />
+                                    <Switch
+                                        checkedChildren="Oui"
+                                        unCheckedChildren="Non"
+                                        onChange={(value) =>
+                                            setFormData({
+                                                ...formData,
+                                                haute_tension: value,
+                                            })
+                                        }
+                                    />
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
                                 <Form.Item
                                     label="Tarification"
                                     name="tarification"
-                                    rules={[{ required: true, message: "Veuillez sélectionner votre type de tarification !" }]}
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                "Veuillez sélectionner votre type de tarification !",
+                                        },
+                                    ]}
                                 >
-                                    <Switch checkedChildren="Fixe" unCheckedChildren="Variable" onChange={(value) => setFormData({ ...formData, tarification: value })} />
+                                    <Switch
+                                        checkedChildren="Fixe"
+                                        unCheckedChildren="Variable"
+                                        onChange={(value) =>
+                                            setFormData({
+                                                ...formData,
+                                                tarification: value,
+                                            })
+                                        }
+                                    />
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                                <Form.Item label="Commentaire" name="commentaire">
+                                <Form.Item
+                                    label="Commentaire"
+                                    name="commentaire"
+                                >
                                     <Input.TextArea rows={5} />
                                 </Form.Item>
                             </Col>
                         </Row>
                     </Card>
                 </Col>
-        </Row>
-
-          
+            </Row>
         </Form>
     );
 };

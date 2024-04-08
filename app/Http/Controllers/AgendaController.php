@@ -16,6 +16,19 @@ class AgendaController extends Controller
         return response()->json(['agendas' => $agendas], 200);
     }
 
+    // Function to fetch appointments for a specific agenda
+    public function getAppointments($agendaId)
+{
+    try {
+        $agenda = Agenda::findOrFail($agendaId);
+        $rdvs = $agenda->rdvs()->get(); 
+        return response()->json(['rdvs' => $rdvs], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 404);
+    }
+}
+
+
     public function store(Request $request)
 {
     try {

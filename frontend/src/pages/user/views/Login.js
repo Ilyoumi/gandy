@@ -258,6 +258,7 @@ const Login = () => {
                                         type="primary"
                                         style={{ width: "100%" }}
                                         htmlType="submit"
+                                        
                                     >
                                         Se connecter
                                     </Button>
