@@ -38,11 +38,14 @@ Route::get('/agendas/{id}', [AgendaController::class, 'show']);
 Route::apiResource('agendas', AgendaController::class);
 Route::get('/agendas/{agendaId}/calendar', [CalendarController::class, 'getCalendarEvents']);
 Route::put('/api/agendas/{id}', [AgendaController::class, 'update']);
-
+Route::get('/agendas/{agendaId}/appointments', [AgendaController::class, 'getAppointments']);
+Route::get('/users/{userId}/agendas', 'App\Http\Controllers\AgendaController@getUserAgendas');
 // Define the route for creating calendar events
 Route::post('/calendars', [CalendarController::class, 'store']);
 
 // Routes pour les rendez-vous (RDVs)
 Route::post('/rdvs', [RdvController::class, 'store']);
-Route::get('/agendas/{agendaId}/appointments', [AgendaController::class, 'getAppointments']);
+Route::put('/rdvs/{id}', [RdvController::class, 'update']);
+
+
 

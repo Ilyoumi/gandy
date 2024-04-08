@@ -52,10 +52,6 @@ class RdvController extends Controller
         // Create the Rdv
         $rdv = Rdv::create($validatedData);
 
-
-        // Create the Rdv
-        $rdv = Rdv::create($validatedData);
-
         // Return a response indicating success
         return response()->json([
             'message' => 'Rdv created successfully',
@@ -84,10 +80,39 @@ class RdvController extends Controller
 
     public function update(Request $request, $id)
     {
-        $rdv = Rdv::findOrFail($id);
-        $rdv->update($request->all());
+        try {
+            // Find the Rdv by id
+            $rdv = Rdv::findOrFail($id);
 
-        return $rdv;
+            // Validate incoming request
+            $validatedData = $request->validate([
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after:start_date',
+            ]);
+
+            // Convert dates to MySQL compatible format
+            $validatedData['start_date'] = date('Y-m-d H:i:s', strtotime($validatedData['start_date']));
+            $validatedData['end_date'] = date('Y-m-d H:i:s', strtotime($validatedData['end_date']));
+
+            // Update the Rdv with the new data
+            $rdv->update($validatedData);
+
+            // Return a response indicating success
+            return response()->json([
+                'message' => 'Rdv updated successfully',
+                'rdv' => $rdv,
+                'received_data' => $validatedData // Include received data in the response
+            ], 200);
+        } catch (\Exception $e) {
+            // Log the error message
+            Log::error('Failed to update Rdv: ' . $e->getMessage());
+
+            // Return a response with error message if an exception occurs
+            return response()->json([
+                'message' => 'Failed to update Rdv: ' . $e->getMessage(),
+                'received_data' => $request->all() // Include received data in the response
+            ], 500);
+        }
     }
 
     public function destroy($id)

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
     Form,
     Input,
@@ -16,8 +16,9 @@ import SaveButton from "../../../constants/SaveButton";
 import { axiosClient } from "../../../api/axios";
 
 const { Option } = Select;
-const AddAppointment = ({ selectedDate, onFormSubmit, agentId, agendaId }) => {
+const AddAppointment = ({ onFormSubmit, agendaId }) => {
     const [showAdditionalInput, setShowAdditionalInput] = useState(false);
+    const [userId, setUserId] = useState(null);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -48,13 +49,40 @@ const AddAppointment = ({ selectedDate, onFormSubmit, agentId, agendaId }) => {
             setLoading(false);
         }, 2000);
     };
+    const fetchUserData = async () => {
+        try {
+            // Check if the user is logged in
+            const authToken = localStorage.getItem("auth_token");
+            if (!authToken) {
+                // User is not logged in, do nothing
+                console.log("User is not logged in")
+                return;
+            }
+    
+            // User is logged in, fetch user data
+            const response = await axiosClient.get("/api/user", {
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                },
+            });
+            const { id } = response.data; // Assuming user ID is available in response
+            setUserId(id);
+
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUserData(); 
+    }, []);
 
     const handleFormSubmit = async () => {
         setLoading(true);
         let formDataToSend;
         // Validate appointment date
         if (!formData.appointment_date) {
-            throw new Error("The appointment date field is required.");
+            console.log("The appointment date field is required.");
         }
 
         try {
@@ -62,7 +90,7 @@ const AddAppointment = ({ selectedDate, onFormSubmit, agentId, agendaId }) => {
                 ...formData,
                 start_date: formData.appointment_date[0],
                 end_date: formData.appointment_date[1],
-                id_agent: agentId,
+                id_agent: userId,
                 id_agenda: agendaId,
                 tarification: formData.tarification.toString(),
             };

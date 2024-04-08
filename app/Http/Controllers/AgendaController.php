@@ -28,6 +28,19 @@ class AgendaController extends Controller
     }
 }
 
+public function getUserAgendas($userId)
+    {
+        try {
+            // Fetch agendas for the specified user
+            $agendas = Agenda::where('contact_id', $userId)->get();
+
+            // return response with agendas
+            return response()->json(['agendas' => $agendas], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 
     public function store(Request $request)
 {
