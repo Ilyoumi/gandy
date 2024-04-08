@@ -116,12 +116,27 @@ class RdvController extends Controller
     }
 
     public function destroy($id)
-    {
+{
+    try {
         $rdv = Rdv::findOrFail($id);
         $rdv->delete();
 
-        return 204; // No content
+        return response()->json([
+            'message' => 'Rdv deleted successfully',
+        ], 204);
+    } catch (\Exception $e) {
+        // Log the error message
+        Log::error('Failed to delete Rdv: ' . $e->getMessage());
+
+        // Return a response with error message if an exception occurs
+        return response()->json([
+            'message' => 'Failed to delete Rdv: ' . $e->getMessage(),
+        ], 500);
     }
+}
+
+
+    
     // /**
     //  * Store a newly created resource in storage.
     //  *

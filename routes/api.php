@@ -45,7 +45,9 @@ Route::post('/calendars', [CalendarController::class, 'store']);
 
 // Routes pour les rendez-vous (RDVs)
 Route::post('/rdvs', [RdvController::class, 'store']);
+Route::get('/rdvs', [RdvController::class, 'index']);
 Route::put('/rdvs/{id}', [RdvController::class, 'update']);
+Route::delete('/rdvs/{id}', [RdvController::class, 'destroy']);
 
 
 
