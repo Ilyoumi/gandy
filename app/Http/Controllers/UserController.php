@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use App\Models\Role;
+
 class UserController extends Controller
 {
     /**
@@ -42,24 +44,18 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
-        // Map role name to role ID
-        $roleIds = [
-            'Admin' => 1,
-            'Agent' => 2,
-            'Superviseur' => 3,
-            'Agent Commercial' => 4,
-        ];
-
-        // Get role ID based on role name
-        $roleId = $roleIds[$validatedData['role_name']];
-
         // Create the user
         $user = new User();
         $user->nom = $validatedData['nom'];
         $user->prenom = $validatedData['prenom'];
         $user->email = $validatedData['email'];
         $user->password = Hash::make($validatedData['password']);
-        $user->role = $validatedData['role_name']; // Assign role name directly
+
+        // Get role ID based on role name
+        $role = Role::where('name', $validatedData['role_name'])->firstOrFail();
+        $user->role_id = $role->id; // Assign role ID based on role name
+        $user->role = $role->name; // Assign role name
+
         $user->save();
 
         // Return a response indicating success
@@ -79,6 +75,9 @@ class UserController extends Controller
         ], 500);
     }
 }
+
+
+
 
 
 

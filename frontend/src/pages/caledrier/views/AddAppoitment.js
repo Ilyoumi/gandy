@@ -102,7 +102,7 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
             );
             setLoading(false);
             console.log("Form submission successful. Response:", response.data);
-            onFormSubmit(response.data);
+            onFormSubmit({ ...response.data, id: response.data.id });
         } catch (error) {
             setLoading(false);
 
