@@ -7,13 +7,19 @@ use Illuminate\Http\Request;
 use App\Models\Agenda;
 use App\Models\User; 
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 class RdvController extends Controller
 {
     public function index()
-    {
-        return Rdv::all();
+{
+    try {
+        $rdvs = Rdv::all();
+        return response()->json($rdvs);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred while fetching RDVs.'], 500);
     }
+}
+
 
     
 
@@ -73,46 +79,49 @@ class RdvController extends Controller
 
 
 
-    public function show($id)
-    {
-        return Rdv::findOrFail($id);
+public function show($id)
+{
+    try {
+        $rdv = Rdv::findOrFail($id);
+        return response()->json($rdv);
+    } catch (ModelNotFoundException $e) {
+        return response()->json(['error' => 'Appointment not found.'], 404);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred while fetching appointment details.'], 500);
     }
+}
+
+public function indexByUser($userId)
+{
+    try {
+        // Fetch appointments for the specified user ID
+        $rdvs = Rdv::where('id_agent', $userId)->get();
+
+        return response()->json($rdvs);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred while fetching RDVs.'], 500);
+    }
+}
+
+public function indexExceptUser(Request $request)
+{
+    try {
+        // Get the logged-in user's ID
+        $loggedInUserId = auth()->user()->id;
+
+        // Fetch all appointments except those associated with the logged-in user
+        $rdvs = Rdv::where('id_agent', '!=', $loggedInUserId)->get();
+
+        return response()->json($rdvs);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred while fetching RDVs.'], 500);
+    }
+}
+
 
     public function update(Request $request, $id)
     {
-        try {
-            // Find the Rdv by id
-            $rdv = Rdv::findOrFail($id);
-
-            // Validate incoming request
-            $validatedData = $request->validate([
-                'start_date' => 'required|date',
-                'end_date' => 'required|date|after:start_date',
-            ]);
-
-            // Convert dates to MySQL compatible format
-            $validatedData['start_date'] = date('Y-m-d H:i:s', strtotime($validatedData['start_date']));
-            $validatedData['end_date'] = date('Y-m-d H:i:s', strtotime($validatedData['end_date']));
-
-            // Update the Rdv with the new data
-            $rdv->update($validatedData);
-
-            // Return a response indicating success
-            return response()->json([
-                'message' => 'Rdv updated successfully',
-                'rdv' => $rdv,
-                'received_data' => $validatedData // Include received data in the response
-            ], 200);
-        } catch (\Exception $e) {
-            // Log the error message
-            Log::error('Failed to update Rdv: ' . $e->getMessage());
-
-            // Return a response with error message if an exception occurs
-            return response()->json([
-                'message' => 'Failed to update Rdv: ' . $e->getMessage(),
-                'received_data' => $request->all() // Include received data in the response
-            ], 500);
-        }
+        
     }
 
     public function destroy($id)

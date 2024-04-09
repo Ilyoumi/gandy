@@ -4,30 +4,72 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import frLocale from "@fullcalendar/core/locales/fr";
-import { Modal, Card, Checkbox } from "antd";
+import { Modal, Card, Checkbox, Button, Space } from "antd";
 import AddAppointment from "./AddAppoitment";
 import NewButton from "../../../constants/NewButton";
 import AddAgendaModal from "./AddAgenda";
 import { axiosClient } from "../../../api/axios";
+import UpdateRdv from "../../rdv/views/UpdateRdv";
 
 function MyCalendar() {
-    const [showModal, setShowModal] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
     const [appointments, setAppointments] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
-    const calendarRef = useRef(null);
     const [loading, setLoading] = useState(false);
     const [addAgendaModalVisible, setAddAgendaModalVisible] = useState(false);
     const [agentCommercialUsers, setAgentCommercialUsers] = useState([]);
     const [agendas, setAgendas] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
-    const [agendaCalendars, setAgendaCalendars] = useState([]);
     const [agentId, setAgentId] = useState(null);
     const [agendaId, setAgendaId] = useState(null);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [userRole, setUserRole] = useState("");
+    const [userId, setUserId] = useState("");
+    const [agent, setAgent] = useState("");
+
+
+    useEffect(() => {
+        // Function to fetch user data
+        const fetchUserData = async () => {
+            try {
+                // Check if the user is logged in
+                const authToken = localStorage.getItem("auth_token");
+                if (!authToken) {
+                    // User is not logged in, do nothing
+                    console.log("User is not logged in");
+                    return;
+                }
+
+                // User is logged in, fetch user data
+                const response = await axiosClient.get("/api/user", {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`,
+                    },
+                });
+                const { role, id } = response.data;
+                setUserRole(response.data.role);
+                setUserId(response.data.id);
+                console.log("User info", role, id);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        // Initial fetch
+        fetchUserData();
+
+        // Periodically fetch user data every second
+        const interval = setInterval(fetchUserData, 5 * 60 * 1000);
+
+        // Cleanup interval on unmount
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         // Fetch users with role "Agent Commercial" when the component mounts
         fetchAgentCommercialUsers();
-        fetchAgendas();
+        fetchAgendasAndAppointments();
     }, []);
 
     useEffect(() => {
@@ -40,9 +82,12 @@ function MyCalendar() {
     useEffect(() => {
         // Fetch appointments for the default agenda when agendas or default agenda change
         if (agendaId) {
-            fetchAppointmentsForAgenda(agendaId);
+            fetchAgendasAndAppointments(agendaId);
+            fetchAppointmentsForUser()
         }
     }, [agendaId]);
+
+    // Function to handle appointment click
 
     const fetchAgentCommercialUsers = async () => {
         try {
@@ -63,30 +108,71 @@ function MyCalendar() {
         console.log("Agent ID:", agentId);
         console.log("Agenda ID:", agendaId);
         setSelectedDate({ date: arg.date, agentId, agendaId });
-        setShowModal(true);
+        setShowAddModal(true);
     };
 
     const handleCloseModal = () => {
-        setShowModal(false);
+        setShowAddModal(false);
     };
 
     const handleFormSubmit = (newAppointment) => {
         setAppointments([...appointments, newAppointment]);
-        fetchAppointmentsForAgenda(agendaId);
+        fetchAgendasAndAppointments(agendaId);
         handleCloseModal();
     };
 
-    const fetchAgendas = async () => {
+    const fetchAppointmentsForUser = async () => {
         try {
-            const response = await axiosClient.get("/api/agendas");
-            setAgendas(response.data.agendas);
-            console.log(
-                "response.data.agendas[0].contact_id",
-                response.data.agendas[0].contact_id
-            );
-            console.log("agendas response", response.data);
+
+            // Fetch appointments for the user using the user ID
+            const response = await axiosClient.get(`/api/appointments/user/${userId}`);
+            const userAppointments = response.data;
+            console.log("RDV for user id", userId) 
+            console.log("RDV for user", response.data) 
+            setAgent(response.data.id_agent)
+            // Set the fetched appointments to the state
+            setAppointments(userAppointments);
         } catch (error) {
-            console.error("Error fetching agendas:", error);
+            console.error("Error fetching appointments for the user:", error);
+        }
+    };
+
+    const fetchAgendasAndAppointments = async () => {
+        try {
+            // Fetch all agendas
+
+            const agendasResponse = await axiosClient.get("/api/agendas");
+            const agendas = agendasResponse.data.agendas;
+            console.log("Agendas:", agendas);
+
+            // Fetch appointments for each agenda
+            const allAppointments = [];
+            for (const agenda of agendas) {
+                const appointmentsResponse = await axiosClient.get(
+                    `/api/agendas/${agenda.id}/appointments`
+                );
+                const appointmentsForAgenda =
+                    appointmentsResponse.data.rdvs.map((appointment) => ({
+                        title: `${appointment.nom} ${appointment.prenom}`,
+                        start: appointment.start_date
+                            ? new Date(appointment.start_date.replace(" ", "T"))
+                            : null,
+                        end: appointment.end_date
+                            ? new Date(appointment.end_date.replace(" ", "T"))
+                            : null,
+                        agendaId: agenda.id,
+                        postal: appointment.postal,
+                    }));
+                allAppointments.push(...appointmentsForAgenda);
+            }
+
+            console.log("All Appointments:", allAppointments);
+
+            // Update state with agendas and appointments
+            setAgendas(agendas);
+            setAppointments(allAppointments);
+        } catch (error) {
+            console.error("Error fetching agendas and appointments:", error);
         }
     };
 
@@ -165,39 +251,10 @@ function MyCalendar() {
                 end: appointment.end_date
                     ? new Date(appointment.end_date.replace(" ", "T"))
                     : null,
-                postal: appointment.postal, // Include postal information
+                postal: appointment.postal,
             })),
         };
     }
-
-    // Fetch appointments for a specific agenda
-    const fetchAppointmentsForAgenda = async (agendaId) => {
-        try {
-            const response = await axiosClient.get(
-                `/api/agendas/${agendaId}/appointments`
-            );
-            const appointmentsForAgenda = response.data.rdvs.map(
-                (appointment) => ({
-                    title: `${appointment.nom} ${appointment.prenom}`,
-                    start: appointment.start_date
-                        ? new Date(appointment.start_date.replace(" ", "T"))
-                        : null,
-                    end: appointment.end_date
-                        ? new Date(appointment.end_date.replace(" ", "T"))
-                        : null,
-                    agendaId: agendaId,
-                    postal: appointment.postal,
-                })
-            );
-
-            setAppointments(appointmentsForAgenda);
-        } catch (error) {
-            console.error(
-                `Error fetching appointments for agenda ${agendaId}:`,
-                error
-            );
-        }
-    };
 
     const handleAgendaCreated = async (agendaId, agendaName) => {
         try {
@@ -216,16 +273,6 @@ function MyCalendar() {
                 response.data
             );
 
-            // Update agendaCalendars state with the new FullCalendar
-            setAgendaCalendars((prevState) => [
-                ...prevState,
-                {
-                    agendaId: agendaId,
-                    agendaName: agendaName,
-                    calendarRef: React.createRef(),
-                },
-            ]);
-
             // Update appointments state with the updated events
             setAppointments(updatedEvents);
         } catch (error) {
@@ -238,8 +285,6 @@ function MyCalendar() {
             // Handle error
         }
     };
-
-    
 
     const handleCheckboxClick = async (userId) => {
         try {
@@ -261,7 +306,7 @@ function MyCalendar() {
                     `/api/users/${userId}/agendas`
                 );
                 const userAgendas = response.data.agendas;
-                console.log('agenda id id ', response.data.agendas)
+                console.log("agenda id id ", response.data.agendas);
 
                 setAgendaId(userAgendas[0].id);
             }
@@ -272,9 +317,14 @@ function MyCalendar() {
     };
 
     const config = fullCalendarConfig();
-    useEffect(() => {
-        console.log("agenda id of user", agendaId);
-    }, [agendaId]);
+    const handleAppointmentClick = (event) => { 
+        if (userId === agent) {
+            console.log("Agent is logged in");
+        } else {
+            console.log("Agent is not logged in");
+        }
+    };
+
 
     return (
         <div
@@ -302,11 +352,13 @@ function MyCalendar() {
                 </Checkbox.Group>
             </Card>
             <Card style={{ width: "83%" }}>
-                <NewButton
-                    onClick={handleOpenAddAgendaModal}
-                    loading={loading}
-                    buttonText="Nouveau Calendrier"
-                />
+                {(userRole === "Admin" || userRole === "Superviseur") && (
+                    <NewButton
+                        onClick={handleOpenAddAgendaModal}
+                        loading={loading}
+                        buttonText="Nouveau Calendrier"
+                    />
+                )}
                 <AddAgendaModal
                     visible={addAgendaModalVisible}
                     onCancel={() => setAddAgendaModalVisible(false)}
@@ -368,6 +420,7 @@ function MyCalendar() {
                                                     agenda.id
                                                 )
                                             }
+                                            eventClick= {(info) => handleAppointmentClick(info.event)}
                                             events={appointments
                                                 .filter(
                                                     (appointment) =>
@@ -375,6 +428,7 @@ function MyCalendar() {
                                                         agenda.id
                                                 )
                                                 .map((filteredAppointment) => ({
+                                                    id: filteredAppointment.start,
                                                     title: `${filteredAppointment.title} - ${filteredAppointment.postal}`,
                                                     start: filteredAppointment.start,
                                                     end: filteredAppointment.end,
@@ -387,7 +441,7 @@ function MyCalendar() {
                     })}
             </Card>
             <Modal
-                visible={showModal}
+                visible={showAddModal}
                 title="Nouveau rendez-vous"
                 onCancel={handleCloseModal}
                 footer={null}
@@ -399,6 +453,20 @@ function MyCalendar() {
                     agentId={agentId}
                     agendaId={agendaId}
                 />
+            </Modal>
+            <Modal
+                visible={showUpdateModal}
+                title="Modifier rendez-vous"
+                onCancel={() => setShowUpdateModal(false)}
+                footer={null}
+                width={1000}
+            >
+                {selectedAppointment && (
+                    <UpdateRdv
+                        appointment={selectedAppointment}
+                        onClose={() => setShowUpdateModal(false)}
+                    />
+                )}
             </Modal>
         </div>
     );
