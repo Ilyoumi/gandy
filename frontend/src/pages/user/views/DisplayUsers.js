@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Avatar, Space, Table, Button , Row, Col, Card, message, Tag} from "antd";
 import UpdateUser from "./UpdateUser";
-import {fetchUsers, deleteUser} from "../services/apis/usersApi";
+import {fetchUsers, deleteUser} from "../services/api";
 import { pencil, deletebtn } from "../../../constants/icons";
 import { useHistory } from "react-router-dom";
 

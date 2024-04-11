@@ -1,6 +1,6 @@
-import face from "../../../assets/images/face-1.jpg";
+import face from "../assets/images/face-1.jpg";
 import { Avatar, Typography, Button } from "antd";
-import { pencil, deletebtn } from "../../../constants/icons";
+import { pencil, deletebtn } from "./icons";
 const { Title } = Typography;
 
 const data = [

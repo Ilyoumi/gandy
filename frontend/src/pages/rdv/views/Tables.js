@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { pencil, deletebtn } from "../../../constants/icons";
+
 import useColumnSearch from "../../../constants/tableSearchLogin";
 import { Table, Button, Modal } from "antd";
-import data from "../constants/data";
+import data from "../../../constants/data";
 import UpdateRdv from "./UpdateRdv";
 
 const DataTable = () => {

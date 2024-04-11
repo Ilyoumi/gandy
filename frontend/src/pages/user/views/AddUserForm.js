@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Col, Row, Upload, message , Card} from "antd";
-import SearchSelect from "../../../constants/SearchSelect";
+// import SearchSelect from "../../../constants/SearchSelect";
 import axios from 'axios';
 import {
     UserOutlined,
@@ -214,7 +214,7 @@ const AddUserForm = () => {
                                             },
                                         ]}
                                     >
-                                        <SearchSelect placeholder="Sélectionner un rôle" options={roleOptions} />
+                                        {/* <SearchSelect placeholder="Sélectionner un rôle" options={roleOptions} /> */}
                                     </Form.Item>
                                 </Col>
                                 <Col xs={24} sm={12}>

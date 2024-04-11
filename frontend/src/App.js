@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-d
 import { AuthProvider } from "./AuthContext";
 import Home from "./pages/Home";
 import Tables from "./pages/rdv/views/Tables";
-import SignIn from "./pages/user/views/Login";
+import SignIn from "./pages/login/Login";
 import Main from "./components/layouts/Main";
 import 'antd/dist/antd.min.css';
 import "./assets/styles/main.css";
