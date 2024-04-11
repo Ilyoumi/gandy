@@ -16,7 +16,6 @@ import signinbg from "../../assets/images/loginbg.png";
 import logo from "../../assets/images/gy.png";
 import { axiosClient } from "../../api/axios";
 import { useAuth } from "../../AuthContext";
-import handleLogin from "./services/api";
 const { Title } = Typography;
 const { Content } = Layout;
 
@@ -54,64 +53,90 @@ const Login = () => {
                     email: values.email,
                     password: values.password,
                 };
+
                 axiosClient
-                .get("/sanctum/csrf-cookie")
-                .then((response) => {
-                    axiosClient
-                        .post(`api/login`, data)
-                        .then((res) => {
-                            if (res.data.status === 200) {
-                                console.log("res:", res.data);
-                                localStorage.setItem(
-                                    "auth_token",
-                                    res.data.token
-                                );
-                                localStorage.setItem(
-                                    "auth_name",
-                                    res.data.username
-                                );
-                                handleLoginSuccess(res.data.username);
-                                fetchAndUpdateRole(res.data.token);
-                                console.log(localStorage);
-                                setName(res.data.username);
-                                message.success(
-                                    `Bienvenue: ${localStorage.getItem(
-                                        "user_role"
-                                    )} ${localStorage.getItem("auth_name")}`
-                                );
-                            } else if (res.data.status === 401) {
-                                console.log(res.data)
-                                setAlertVisible(true); // Show error message
-                                setAlertMessage(<p key="error-message">L'adresse e-mail ou le mot de passe est incorrect. <br></br> Veuillez réessayer.</p>);
+                    .get("/sanctum/csrf-cookie")
+                    .then((response) => {
+                        axiosClient
+                            .post(`api/login`, data)
+                            .then((res) => {
+                                if (res.data.status === 200) {
+                                    console.log("res:", res.data);
+                                    localStorage.setItem(
+                                        "auth_token",
+                                        res.data.token
+                                    );
+                                    localStorage.setItem(
+                                        "auth_name",
+                                        res.data.nom + " " + res.data.prenom
+                                    );
+                                    localStorage.setItem(
+                                        "auth_nom",
+                                        res.data.nom
+                                    );
+                                    localStorage.setItem(
+                                        "auth_prenom",
+                                        res.data.prenom
+                                    );
+                                    localStorage.setItem(
+                                        "user_id",
+                                        res.data.id
+                                    );
+                                    localStorage.setItem(
+                                        "user_role",
+                                        res.data.role
+                                    );
 
-                            } else {
-                                // Handle other status codes or validation errors
+                                    handleLoginSuccess(
+                                        res.data.id,res.data.nom + " " + res.data.prenom
+                                    );
+                                    console.log("local Storage", localStorage);
+                                    setSuccessModalVisible(true);
+                                    setUserInfo({
+                                        name: localStorage.getItem("auth_name"),
+                                        role: localStorage.getItem("user_role"),
+                                    });
+                                    console.log("successModalVisible", successModalVisible)
+                                    console.log(
+                                        "user info from login: ",
+                                        localStorage.getItem("auth_name"),
+                                        localStorage.getItem("user_role")
+                                    );
+                                } else if (res.data.status === 401) {
+                                    console.log(res.data);
+                                    setAlertVisible(true); // Show error message
+                                    setAlertMessage(
+                                        <p key="error-message">
+                                            L'adresse e-mail ou le mot de passe
+                                            est incorrect. <br></br> Veuillez
+                                            réessayer.
+                                        </p>
+                                    );
+                                } else {
+                                    // Handle other status codes or validation errors
+                                    console.error(
+                                        "Login failed:",
+                                        res.data.message
+                                    );
+                                }
+                            })
+                            .catch((error) => {
                                 console.error(
-                                    "Login failed:",
-                                    res.data.message
+                                    "An error occurred during login:",
+                                    error
                                 );
-                            }
-                        })
-                        .catch((error) => {
-                            console.error(
-                                "An error occurred during login:",
-                                error
-                            );
-                            // Log the error
-                            // You can also handle the error or display an error message to the user if needed
-                        });
-                })
-                .catch((error) => {
-                    console.error(
-                        "An error occurred while fetching CSRF token:",
-                        error
-                    );
-                    // Log the error
-                    // You can also handle the error or display an error message to the user if needed
-                });
-
-
-                
+                                // Log the error
+                                // You can also handle the error or display an error message to the user if needed
+                            });
+                    })
+                    .catch((error) => {
+                        console.error(
+                            "An error occurred while fetching CSRF token:",
+                            error
+                        );
+                        // Log the error
+                        // You can also handle the error or display an error message to the user if needed
+                    });
             })
             .catch((error) => {
                 console.error("Form validation failed:", error);
