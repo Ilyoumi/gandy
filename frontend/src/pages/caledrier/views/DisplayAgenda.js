@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Button, Col, Row, Table, Modal, Space } from "antd";
-import useColumnSearch from "../../../constants/tableSearchLogin";
-import data from "../constants/data";
+import data from "../../../constants/data";
 import { pencil, deletebtn } from "../../../constants/icons";
 import AddAgendaModal from "./AddAgenda";
 import UpdateForm from "./UpdateAgenda";
@@ -10,7 +9,7 @@ const DisplayAgenda = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [addAgendaModalVisible, setAddAgendaModalVisible] = useState(false);
-    const { getColumnSearchProps } = useColumnSearch();
+    // const { getColumnSearchProps } = useColumnSearch();
     
 
     const handleOpenAddAgendaModal = () => {
@@ -26,39 +25,39 @@ const DisplayAgenda = () => {
         setIsModalVisible(false);
     };
 
-    const columns = [
-        {
-            title: "NOM",
-            dataIndex: "name",
-            key: "name",
-            width: "32%",
-            ...getColumnSearchProps("name"),
-        },
-        {
-            title: "AGENT",
-            key: "agent",
-            dataIndex: "agent",
-            ...getColumnSearchProps("agent"),
-        },
-        {
-            title: "ACTION",
-            key: "action",
-            render: (text, record) => (
-                <Space size="middle">
-                    <Button type="link" danger>
-                        {deletebtn}
-                    </Button>
-                    <Button
-                        type="link"
-                        className="darkbtn"
-                        onClick={() => handleUpdate(record)}
-                    >
-                        {pencil}
-                    </Button>
-                </Space>
-            ),
-        },
-    ];
+    // const columns = [
+    //     {
+    //         title: "NOM",
+    //         dataIndex: "name",
+    //         key: "name",
+    //         width: "32%",
+    //         ...getColumnSearchProps("name"),
+    //     },
+    //     {
+    //         title: "AGENT",
+    //         key: "agent",
+    //         dataIndex: "agent",
+    //         ...getColumnSearchProps("agent"),
+    //     },
+    //     {
+    //         title: "ACTION",
+    //         key: "action",
+    //         render: (text, record) => (
+    //             <Space size="middle">
+    //                 <Button type="link" danger>
+    //                     {deletebtn}
+    //                 </Button>
+    //                 <Button
+    //                     type="link"
+    //                     className="darkbtn"
+    //                     onClick={() => handleUpdate(record)}
+    //                 >
+    //                     {pencil}
+    //                 </Button>
+    //             </Space>
+    //         ),
+    //     },
+    // ];
 
     return (
         <div
@@ -89,14 +88,14 @@ const DisplayAgenda = () => {
                     </Button>
                 </Col>
             </Row>
-            <Table
+            {/* <Table
                 columns={columns}
                 dataSource={data}
                 pagination={{ pageSize: 5 }}
                 scroll={{ x: "max-content" }}
                 responsive={{ xs: 1, sm: 3 }}
                 style={{ padding: "10px 1px" }}
-            />
+            /> */}
             <Modal
                 title="Update Record"
                 visible={isModalVisible}

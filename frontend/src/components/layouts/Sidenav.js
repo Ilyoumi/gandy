@@ -4,44 +4,19 @@ import logo from "../../assets/images/gy-noir.png";
 import AdminAcess from "./accessUser/AdminAccess";
 import AgentCommAccess from "./accessUser/AgentComAccess";
 import SupervisorAccess from "./accessUser/SupervisorAccess";
-import { axiosClient } from "../../api/axios"; // Import your axios instance
+import fetchUserData from '../../api/acces';
+
+
 
 function Sidenav({ color }) {
     const [expanded, setExpanded] = useState(true);
     const [userRole, setUserRole] = useState("");
 
     useEffect(() => {
-        // Function to fetch user data
-        const fetchUserData = async () => {
-            try {
-                // Check if the user is logged in
-                const authToken = localStorage.getItem("auth_token");
-                if (!authToken) {
-                    // User is not logged in, do nothing
-                    console.log("User is not logged in")
-                    return;
-                }
-        
-                // User is logged in, fetch user data
-                const response = await axiosClient.get("/api/user", {
-                    headers: {
-                        Authorization: `Bearer ${authToken}`,
-                    },
-                });
-                const { role } = response.data;
-                setUserRole(role);
-                console.log("User Role", role)
-
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            }
-        };
-        
-
         // Initial fetch
         fetchUserData();
 
-        // Periodically fetch user data every second
+        // Periodically fetch user data every 5 minutes (5 * 60 * 1000 milliseconds)
         const interval = setInterval(fetchUserData, 5 * 60 * 1000);
 
         // Cleanup interval on unmount

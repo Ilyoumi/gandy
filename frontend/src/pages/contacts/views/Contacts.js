@@ -3,7 +3,7 @@ import { Table, Space, Button, Row, Col } from "antd";
 
 import { useHistory } from "react-router-dom";
 import UpdateContactModal from "./UpdateContact";
-import data from "../constants/contactsData"
+import data from "../../../constants/contactsData"
 import { pencil, deletebtn } from "../../../constants/icons";
 import useColumnSearch from "../../../constants/tableSearchLogin";
 const Contacts = () => {
