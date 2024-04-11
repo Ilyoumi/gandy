@@ -65,7 +65,7 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                     Authorization: `Bearer ${authToken}`,
                 },
             });
-            const { id } = response.data; // Assuming user ID is available in response
+            const { id } = response.data; 
             setUserId(id);
 
         } catch (error) {
@@ -100,9 +100,10 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                 "/api/rdvs",
                 formDataToSend
             );
+            const newAppointment = { ...response.data, id: response.data.id };
             setLoading(false);
             console.log("Form submission successful. Response:", response.data);
-            onFormSubmit({ ...response.data, id: response.data.id });
+            onFormSubmit({ ...response.data, newAppointment });
         } catch (error) {
             setLoading(false);
 

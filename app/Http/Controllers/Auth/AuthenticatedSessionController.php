@@ -97,14 +97,19 @@ class AuthenticatedSessionController extends Controller
     }
 
     public function logout()
-    {
-        try {
-            return Auth::logout();
-        } catch (\Exception $e) {
-            // Handle any exceptions that may occur during the logout process
-            return response()->json(['error' => 'Logout failed: ' . $e->getMessage()], 500);
-        }
+{
+    try {
+        // Invalidate the user's session
+        Auth::guard('web')->logout();
+
+        // If you want to return a response after successful logout
+        return response()->json(['message' => 'Logout successful'], 200);
+    } catch (\Exception $e) {
+        // Handle any exceptions that may occur during the logout process
+        return response()->json(['error' => 'Logout failed: ' . $e->getMessage()], 500);
     }
+}
+
 
 
     /**

@@ -5,6 +5,7 @@ import useColumnSearch from "../../../constants/tableSearchLogin";
 import UpdateRdv from "./UpdateRdv";
 import { axiosClient } from "../../../api/axios";
 import { EyeOutlined } from "@ant-design/icons";
+import AppointmentDetails from "./AppoitmnetDetails";
 
 const DataTable = () => {
     const [updateModalVisible, setUpdateModalVisible] = useState(false);
@@ -176,6 +177,9 @@ const DataTable = () => {
                 onCancel={() => setUpdateModalVisible(false)}
                 footer={null}
                 style={{ marginTop: "-50px" }}
+                width="80%"
+                bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }} // Ensure the modal body is scrollable if needed
+                destroyOnClose // Destroy modal content on close to reset form fields
             >
                 <UpdateRdv
                     initialValues={selectedRowData}
@@ -188,37 +192,12 @@ const DataTable = () => {
                 onCancel={() => setDetailsModalVisible(false)}
                 footer={null}
                 style={{ marginTop: "-50px" }}
+                width="80%"
+                bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }} // Ensure the modal body is scrollable if needed
+                destroyOnClose
             >
                 {selectedRowData && (
-                    <div>
-                        <p>Nom: {selectedRowData.nom}</p>
-                        <p>Prénom: {selectedRowData.prenom}</p>
-                        <p>Société: {selectedRowData.nom_ste}</p>
-                        <p>TVA: {selectedRowData.tva}</p>
-                        <p>Tel: {selectedRowData.tel}</p>
-                        <p>GSM: {selectedRowData.gsm}</p>
-                        <p>Adresse: {selectedRowData.adresse}</p>
-                        <p>Postal: {selectedRowData.postal}</p>
-                        <p>Fournisseur: {selectedRowData.fournisseur}</p>
-                        <p>
-                            Nombre de compagnie électronique:{" "}
-                            {selectedRowData.nbr_comp_elect}
-                        </p>
-                        <p>
-                            Nombre de compagnie gaz:{" "}
-                            {selectedRowData.nbr_comp_gaz}
-                        </p>
-                        <p>PPV: {selectedRowData.ppv ? "Yes" : "No"}</p>
-                        <p>Tarification: {selectedRowData.tarification}</p>
-                        <p>
-                            Haute Tension:{" "}
-                            {selectedRowData.haute_tension ? "Yes" : "No"}
-                        </p>
-                        <p>ID Agenda: {selectedRowData.id_agenda}</p>
-                        <p>ID Agent: {selectedRowData.id_agent}</p>
-                        <p>Date de début: {selectedRowData.start_date}</p>
-                        <p>Date de fin: {selectedRowData.end_date}</p>
-                    </div>
+                    <AppointmentDetails selectedRowData={selectedRowData} />
                 )}
             </Modal>
         </div>
