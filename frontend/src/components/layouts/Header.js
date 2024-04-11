@@ -269,28 +269,26 @@ function Header({
     const [userRole, setUserRole] = useState("");
     const history = useHistory();
 
-    const logoutSubmit = (e) => {
-        axiosClient
-            .post(`/api/logout`)
-            .then((res) => {
-                if (res.data.status === 200) {
-                    console.log("logout");
-                    localStorage.removeItem("auth_token");
-                    localStorage.removeItem("auth_name");
-                    localStorage.removeItem("user_role");
-                    history.push("/");
-                } else {
-                    console.log(
-                        "Error occurred during logout:",
-                        res.data.error
-                    );
-                }
-            })
-            .catch((error) => {
-                console.error("Error occurred during logout:", error);
-                // Handle the error appropriately, such as displaying an error message to the user
-            });
+    const logoutSubmit = async () => {
+        try {
+            const response = await axiosClient.post('/api/logout');
+            if (response.status === 200) {
+                console.log('Logout successful');
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('auth_name');
+                localStorage.removeItem('user_role');
+                history.push('/');
+            } else {
+                console.error('Logout failed:', response.data.error);
+            }
+        } catch (error) {
+            console.error('Error occurred during logout:', error);
+        }
     };
+    
+    
+    
+    
     useEffect(() => {
         fetchUserData();
     }, []); // Run only once on component mount

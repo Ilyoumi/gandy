@@ -52,6 +52,8 @@ Route::delete('/rdvs/{id}', [RdvController::class, 'destroy']);
 Route::get('/rdvs/{id}', [RdvController::class, 'show']);
 Route::get('/appointments/user/{userId}', [RdvController::class, 'indexByUser']);
 Route::get('/agendas/{agenda}/appointmentsExceptUser', [RdvController::class, 'indexExceptUser']);
+// Route to handle fetching appointment details by ID
+Route::get('/appointments/{id}/agent', [RdvController::class, 'getAgentByAppointmentId']);
 
 
 
