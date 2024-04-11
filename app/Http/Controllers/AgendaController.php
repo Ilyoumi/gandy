@@ -5,16 +5,53 @@ namespace App\Http\Controllers;
 use App\Models\agenda;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
+
 class AgendaController extends Controller
 {
     public function index()
-    {
+{
+    try {
         // Fetch all agendas
         $agendas = Agenda::all();
 
         // return response with agendas
         return response()->json(['agendas' => $agendas], 200);
+    } catch (\Exception $e) {
+        // Log the error message
+        Log::error('Failed to fetch agendas: ' . $e->getMessage());
+
+        // Return a response with error message if an exception occurs
+        return response()->json(['message' => 'Failed to fetch agendas'], 500);
     }
+}
+
+
+    // Function to fetch appointments for a specific agenda
+    public function getAppointments($agendaId)
+{
+    try {
+        $agenda = Agenda::findOrFail($agendaId);
+        $rdvs = $agenda->rdvs()->get(); 
+        return response()->json(['rdvs' => $rdvs], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 404);
+    }
+}
+
+public function getUserAgendas($userId)
+    {
+        try {
+            // Fetch agendas for the specified user
+            $agendas = Agenda::where('contact_id', $userId)->get();
+
+            // return response with agendas
+            return response()->json(['agendas' => $agendas], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
 
     public function store(Request $request)
 {

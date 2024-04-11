@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import AgentAccess from "./accessUser/AgentAcess"
 import logo from "../../assets/images/gy-noir.png";
 import AdminAcess from "./accessUser/AdminAccess";
 import AgentCommAccess from "./accessUser/AgentComAccess";
@@ -9,7 +9,6 @@ import fetchUserData from '../../api/acces';
 
 
 function Sidenav({ color }) {
-    const { pathname } = useLocation();
     const [expanded, setExpanded] = useState(true);
     const [userRole, setUserRole] = useState("");
 
@@ -41,7 +40,8 @@ function Sidenav({ color }) {
             </div>
             {userRole === "Admin" && <AdminAcess color={color} />}
             {userRole === "Agent Commercial" && <AgentCommAccess color={color} />}
-            {userRole === "Supperviseur" && <SupervisorAccess color={color} />}
+            {userRole === "Superviseur" && <SupervisorAccess color={color} />}
+            {userRole === "Agent" && <AgentAccess color={color} />}
         </div>
     );
 }

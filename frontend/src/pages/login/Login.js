@@ -10,6 +10,7 @@ import {
     Switch,
     message,
     Alert,
+    Modal,
 } from "antd";
 import signinbg from "../../assets/images/loginbg.png";
 import logo from "../../assets/images/gy.png";
@@ -26,6 +27,8 @@ const Login = () => {
     const [alertVisible, setAlertVisible] = useState(false);
     const [alertMessage, setAlertMessage] = useState([]);
     const { handleLoginSuccess } = useAuth();
+    const [successModalVisible, setSuccessModalVisible] = useState(false);
+    const [userInfo, setUserInfo] = useState({ name: "", role: "" });
 
     const [form] = Form.useForm();
     const [loadings, setLoadings] = useState([]);
@@ -117,31 +120,7 @@ const Login = () => {
             });
     };
 
-    const fetchAndUpdateRole = (token) => {
-        axiosClient
-            .get("/api/user", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((response) => {
-                const { role } = response.data;
-                if (role) {
-                    localStorage.setItem("user_role", role);
-                    setRole(role);
-                    handleLoginSuccess(response.data.name);
-                    console.log("role", localStorage);
-                } else {
-                    console.error("User role not found in response data");
-                }
-            })
-            .catch((error) => {
-                console.error(
-                    "An error occurred while fetching user data:",
-                    error
-                );
-            });
-    };
+    
 
     const onFinishFailed = (errorInfo) => {
         setAlertVisible(true);
@@ -201,12 +180,14 @@ const Login = () => {
                                     label="Email"
                                     name="email"
                                     validateStatus={
-                                        alertVisible && form.getFieldError("email")
+                                        alertVisible &&
+                                        form.getFieldError("email")
                                             ? "error"
                                             : ""
                                     }
                                     help={
-                                        alertVisible && form.getFieldError("email")?.[0]
+                                        alertVisible &&
+                                        form.getFieldError("email")?.[0]
                                     }
                                     rules={[
                                         {
@@ -214,10 +195,9 @@ const Login = () => {
                                             message:
                                                 "Veuillez saisir votre adresse e-mail!",
                                         },
-                                        
                                     ]}
                                 >
-                                    <Input placeholder="Email"  />
+                                    <Input placeholder="Email" />
                                 </Form.Item>
 
                                 <Form.Item
@@ -225,12 +205,14 @@ const Login = () => {
                                     label="Password"
                                     name="password"
                                     validateStatus={
-                                        alertVisible && form.getFieldError("password")
+                                        alertVisible &&
+                                        form.getFieldError("password")
                                             ? "error"
                                             : ""
                                     }
                                     help={
-                                        alertVisible && form.getFieldError("password")?.[0]
+                                        alertVisible &&
+                                        form.getFieldError("password")?.[0]
                                     }
                                     rules={[
                                         {
@@ -238,7 +220,6 @@ const Login = () => {
                                             message:
                                                 "Veuillez saisir votre mot de passe!",
                                         },
-                                        
                                     ]}
                                 >
                                     <Input.Password placeholder="Password" />
@@ -267,15 +248,15 @@ const Login = () => {
                                 </Form.Item>
                             </Form>
                             {alertVisible && (
-                <Alert
-                    message="Erreur de connexion"
-                    description={alertMessage}
-                    type="error"
-                    showIcon
-                    closable
-                    onClose={() => setAlertVisible(false)}
-                />
-            )}
+                                <Alert
+                                    message="Erreur de connexion"
+                                    description={alertMessage}
+                                    type="error"
+                                    showIcon
+                                    closable
+                                    onClose={() => setAlertVisible(false)}
+                                />
+                            )}
                         </Col>
                         <Col
                             xs={{ span: 24, offset: 0 }}
@@ -292,6 +273,21 @@ const Login = () => {
                             <img src={signinbg} alt="" />
                         </Col>
                     </Row>
+                    <Modal
+                        title="Connexion réussie"
+                        visible={successModalVisible}
+                        onCancel={() => setSuccessModalVisible(false)}
+                        footer={null}
+                    >
+                        <p>Bienvenue, {userInfo.name}!</p>
+                        <p>Votre rôle est {userInfo.role}.</p>
+                        <Button
+                            type="primary"
+                            onClick={() => setSuccessModalVisible(false)}
+                        >
+                            OK
+                        </Button>
+                    </Modal>
                 </Content>
                 {/* <Footer>
     <p className="copyright">
@@ -301,7 +297,6 @@ const Login = () => {
     </p>
   </Footer> */}
             </Layout>
-            
         </>
     );
 };

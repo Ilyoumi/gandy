@@ -31,17 +31,27 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/agendas', [AgendaController::class, 'store']);
-Route::get('/agendas/{id}', [AgendaController::class, 'show']);
+
 
 // Routes pour les agendas
-Route::apiResource('agendas', AgendaController::class);
+Route::post('/agendas', [AgendaController::class, 'store']);
+Route::get('/agendas/{id}', [AgendaController::class, 'show']);
 Route::get('/agendas/{agendaId}/calendar', [CalendarController::class, 'getCalendarEvents']);
-Route::put('/api/agendas/{id}', [AgendaController::class, 'update']);
-
+Route::put('/agendas/{id}', [AgendaController::class, 'update']);
+Route::get('/agendas', [AgendaController::class, 'index']);
+Route::get('/agendas/{agendaId}/appointments', [AgendaController::class, 'getAppointments']);
+Route::get('/users/{userId}/agendas', 'App\Http\Controllers\AgendaController@getUserAgendas');
 // Define the route for creating calendar events
 Route::post('/calendars', [CalendarController::class, 'store']);
 
 // Routes pour les rendez-vous (RDVs)
 Route::post('/rdvs', [RdvController::class, 'store']);
+Route::get('/rdvs', [RdvController::class, 'index']);
+Route::put('/rdvs/{id}', [RdvController::class, 'update']);
+Route::delete('/rdvs/{id}', [RdvController::class, 'destroy']);
+Route::get('/rdvs/{id}', [RdvController::class, 'show']);
+Route::get('/appointments/user/{userId}', [RdvController::class, 'indexByUser']);
+Route::get('/agendas/{agenda}/appointmentsExceptUser', [RdvController::class, 'indexExceptUser']);
+
+
 
