@@ -61,17 +61,20 @@ function MyCalendar() {
         // Initial fetch
         fetchUserData();
 
-        // Periodically fetch user data every second
-        const interval = setInterval(fetchUserData, 5 * 60 * 1000);
+        const interval = setInterval(fetchUserData, 1000);
 
-        // Cleanup interval on unmount
-        return () => clearInterval(interval);
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
         // Fetch users with role "Agent Commercial" when the component mounts
         fetchAgentCommercialUsers();
         fetchAgendasAndAppointments();
+        const interval = setInterval(fetchAgentCommercialUsers, 1000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
@@ -81,12 +84,29 @@ function MyCalendar() {
         }
     }, [agentCommercialUsers]);
 
+    
+
     useEffect(() => {
-        // Fetch appointments for the default agenda when agendas or default agenda change
-        if (agendaId) {
-            fetchAgendasAndAppointments(agendaId);
-        }
-    }, [agendaId]);
+        // Function to fetch agent commercial users
+        const fetchAgentCommercialUsers = async () => {
+            try {
+                const response = await axiosClient.get("/api/users/agent-commercial");
+                setAgentCommercialUsers(response.data.users);
+            } catch (error) {
+                console.error("Error fetching agent commercial users:", error);
+            }
+        };
+    
+        // Initial fetch
+        fetchAgentCommercialUsers();
+    
+        // Periodically fetch agent commercial users every second
+        const interval = setInterval(fetchAgentCommercialUsers, 5 * 60 * 1000);
+    
+        // Cleanup interval on unmount
+        return () => clearInterval(interval);
+    }, []);
+    
 
     // Function to handle appointment click
 
