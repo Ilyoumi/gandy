@@ -15,7 +15,7 @@ function MyCalendar() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [appointments, setAppointments] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [addAgendaModalVisible, setAddAgendaModalVisible] = useState(false);
     const [agentCommercialUsers, setAgentCommercialUsers] = useState([]);
     const [agendas, setAgendas] = useState([]);
@@ -296,35 +296,7 @@ if (firstAgenda) {
         }
     };
 
-    const handleCheckboxClick = async (userId) => {
-        try {
-            let updatedSelectedItems = [...selectedItems];
-            if (selectedItems.includes(userId)) {
-                // Remove the user if already selected
-                updatedSelectedItems = updatedSelectedItems.filter(
-                    (id) => id !== userId
-                );
-                // If there are no selected items, clear the agendaId
-                if (updatedSelectedItems.length === 0) {
-                    setAgendaId(null);
-                }
-            } else {
-                // Add the user if not already selected
-                updatedSelectedItems.push(userId);
-                // Fetch agendas for the selected user
-                const response = await axiosClient.get(
-                    `/api/users/${userId}/agendas`
-                );
-                const userAgendas = response.data.agendas;
-                console.log("agenda id id ", response.data.agendas);
-
-                setAgendaId(userAgendas[0].id);
-            }
-            setSelectedItems(updatedSelectedItems);
-        } catch (error) {
-            console.error("Error fetching agendas:", error);
-        }
-    };
+   
 
     const config = fullCalendarConfig();
     const handleAppointmentClick = (event) => { 
@@ -396,7 +368,67 @@ if (firstAgenda) {
                         </Card>
                     </div>
                 )}
+            {loading ? ( 
+                <Spin  style={{ textAlign: "center", paddingTop: "50vh", position:"relative", left:"50%" }} size="large" />
+            ) : (
+            <>
+                <ContactList
+                agentCommercialUsers={agentCommercialUsers}
+                selectedItems={selectedItems}
+                setSelectedItems={setSelectedItems}
+                agendas={agendas}
+                agentId={agentId}
+                setAgentId={setAgentId}
+                agendaId={agendaId}
+                setAgendaId={setAgendaId}
+            />
+                <Card style={{ width: "83%" }}>
+                    {(userContext.userRole === "Admin" ||
+                        userContext.userRole === "Superviseur") && (
+                        <NewButton
+                            onClick={handleOpenAddAgendaModal}
+                            loading={loading}
+                            buttonText="Nouveau Calendrier"
+                        />
+                    )}
+                    <AddAgendaModal
+                        visible={addAgendaModalVisible}
+                        onCancel={() => setAddAgendaModalVisible(false)}
+                        onAgendaCreated={handleAgendaCreated}
+                    />
+                    {agendas.length === 0 && (
+                        <div>
+                            <h2>Agenda par défaut</h2>
+                            <Card style={{ marginBottom: "30px" }}>
+                                <FullCalendar
+                                    plugins={[
+                                        dayGridPlugin,
+                                        timeGridPlugin,
+                                        interactionPlugin,
+                                    ]}
+                                    {...config}
+                                />
+                            </Card>
+                        </div>
+                    )}
 
+                    {agendas
+                        .filter((agenda) =>
+                            selectedItems.includes(agenda.contact_id)
+                        )
+                        .sort(
+                            (a, b) =>
+                                selectedItems.indexOf(a.contact_id) -
+                                selectedItems.indexOf(b.contact_id)
+                        )
+                        .map((agenda, index) => {
+                            // Find the user corresponding to the contact ID
+                            const user = agentCommercialUsers.find(
+                                (user) => user.id === agenda.contact_id
+                            );
+                            const userName = user
+                                ? `${user.prenom} ${user.nom}`
+                                : "Unknown User";
                 {agendas
                     .filter((agenda) =>
                         selectedItems.includes(agenda.contact_id)

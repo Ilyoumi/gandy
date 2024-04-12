@@ -1,18 +1,58 @@
-import React from "react";
-import { Form, Input, Select, Button } from "antd";
+import React, { useEffect, useState } from "react";
+import { Form, Input, Select, Button, Modal } from "antd";
+import { axiosClient } from "../../../api/axios";
 
 const { Option } = Select;
 
-const UpdateAgenda = ({ initialValues, onSubmit }) => {
+const UpdateAgenda = ({ initialValues, onSubmit, onClose, updateAgendas }) => {
+    const [agentCommercialUsers, setAgentCommercialUsers] = useState([]);
     const [form] = Form.useForm();
 
-    const handleSubmit = async () => {
+    useEffect(() => {
+        fetchAgentCommercialUsers();
+    }, []);
+
+    const fetchAgentCommercialUsers = async () => {
         try {
-            const values = await form.validateFields();
-            onSubmit(values);
-            form.resetFields(); // Reset form fields after submission
-        } catch (errorInfo) {
-            console.log("Failed:", errorInfo);
+            const response = await axiosClient.get(
+                "/api/users/agent-commercial"
+            );
+            setAgentCommercialUsers(response.data.users);
+            console.log("agentCommercialUsers", response.data.users);
+        } catch (error) {
+            console.error("Error fetching agent commercial users:", error);
+        }
+    };
+
+    const handleUpdateAgenda = async (values) => {
+        try {
+            // Make a PUT request to update the agenda data
+            const response = await axiosClient.put(
+                `/api/agendas/${initialValues.id}`,
+                values
+            );
+
+            // Handle success response
+            console.log("Agenda updated successfully:", response.data);
+            
+            try {
+                const response = await axiosClient.get(
+                    "http://localhost:8000/api/agendas"
+                );
+            console.log("Agenda updated :", response.data);
+            updateAgendas();
+            onClose();
+            
+                
+            } catch (error) {
+                
+                console.error("Error fetching agendas:", error);
+            }
+
+            // Optionally, update the state or perform any necessary actions
+        } catch (error) {
+            // Handle error response
+            console.error("Error updating agenda:", error.response.data.error);
         }
     };
 
@@ -20,39 +60,58 @@ const UpdateAgenda = ({ initialValues, onSubmit }) => {
         <Form
             form={form}
             layout="vertical"
-            onFinish={handleSubmit}
-            initialValues={initialValues} // Set initial form values
+            onFinish={handleUpdateAgenda}
+            initialValues={initialValues}
         >
             <Form.Item
                 label="Titre"
-                name="title"
+                name="name"
                 rules={[{ required: true, message: "Please input the titre!" }]}
             >
-                <Input />
+                <Input value={initialValues.name} />
             </Form.Item>
             <Form.Item
-                label="Contact"
-                name="contact"
-                rules={[{ required: true, message: "Please select a contact!" }]}
+                label="Agent"
+                name="contact_id"
+                rules={[
+                    { required: true, message: "Please select a contact!" },
+                ]}
             >
-                <Select placeholder="Sélectionner un contact">
-                    <Option value="contact1">Contact 1</Option>
-                    <Option value="contact2">Contact 2</Option>
-                    <Option value="contact3">Contact 3</Option>
-                    <Option value="contact4">Contact 4</Option>
-                    <Option value="contact5">Contact 5</Option>
+                <Select
+                    placeholder="Sélectionner un contact"
+                    onChange={(value) =>
+                        form.setFieldsValue({ contact_id: value })
+                    }
+                >
+                    {agentCommercialUsers.map((user) => (
+                        <Option
+                            key={user.id}
+                            value={user.id}
+                        >{`${user.prenom} ${user.nom}`}</Option>
+                    ))}
                 </Select>
             </Form.Item>
             <Form.Item
                 label="Description"
                 name="description"
-                rules={[{ required: true, message: "Please input the description!" }]}
+                rules={[
+                    {
+                        required: true,
+                        message: "Please input the description!",
+                    },
+                ]}
             >
-                <Input.TextArea rows={4} />
+                <Input.TextArea
+                    rows={4}
+                    value={initialValues.description}
+                    onChange={(e) =>
+                        form.setFieldsValue({ description: e.target.value })
+                    }
+                />
             </Form.Item>
             <Form.Item>
                 <Button type="primary" htmlType="submit">
-                    Mettre à jour
+                    Sauvegarder
                 </Button>
             </Form.Item>
         </Form>
