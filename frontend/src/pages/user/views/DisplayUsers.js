@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Avatar, Space, Table, Button , Row, Col, Card, message, Tag} from "antd";
+import { Avatar, Space, Table, Button , Row, Col, Card, message, Tag, Modal} from "antd";
 import UpdateUser from "./UpdateUser";
-import {fetchUsers, deleteUser} from "../services/api";
+import {fetchUsers} from "../services/api";
 import { pencil, deletebtn } from "../../../constants/icons";
 import { useHistory } from "react-router-dom";
 
 import useColumnSearch from "../../../constants/tableSearchLogin";
+import { axiosClient } from "../../../api/axios";
 const DisplayUsers = () => {
     const [users, setUsers] = useState([]);
     
     const [updateModalVisible, setUpdateModalVisible] = useState(false);
     const [updateData, setUpdateData] = useState({});
     const { getColumnSearchProps } = useColumnSearch();
+    const [loading, setLoading] = useState(false);
+
     const history = useHistory();
 
     const handleUpdate = async (values) => {
@@ -48,25 +51,6 @@ const DisplayUsers = () => {
         }
     };
     
-    
-    
-    const handleDelete = async (userId) => {
-        try {
-            const response = await deleteUser(userId);
-            if (response.ok) {
-                message.success("User deleted successfully");
-                fetchUsersData(); // Refetch user data after delete
-            } else {
-                message.error("Failed to delete user");
-            }
-        } catch (error) {
-            console.error('Error:', error.response);
-            message.error("Failed to delete user");
-        }
-    };
-    
-
-
 
     const handleButtonClick = () => {
         // Redirect to the desired route
@@ -80,6 +64,8 @@ const DisplayUsers = () => {
 
     const fetchUsersData = async () => {
         try {
+        setLoading(true);
+
             const userData = await fetchUsers();
             console.log('Type of users:', typeof userData.users);
             console.log('Users data:', userData.users)
@@ -88,6 +74,8 @@ const DisplayUsers = () => {
             setUsers(userData.users);
         } catch (error) {
             console.error("Error fetching users:", error);
+        }finally {
+            setLoading(false);
         }
     };
 
@@ -114,6 +102,40 @@ const DisplayUsers = () => {
         3: 'error',
         4: 'warning',
     };
+
+const handleDeleteUser = async (id) => {
+    Modal.confirm({
+        title: "Confirmation de suppression",
+        content: "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
+        okText: "Oui",
+        okType: "danger",
+        cancelText: "Annuler",
+        onOk: async () => {
+            try {
+                // Send a request to delete the user with the specified ID
+                await axiosClient.delete(`/api/users/${id}`);
+                fetchUsersData()
+
+                // Display success message
+                Modal.success({
+                    title: "Suppression réussie",
+                    content: "L'utilisateur a été supprimé avec succès.",
+                });
+            } catch (error) {
+                // Display error message
+                Modal.error({
+                    title: "Erreur de suppression",
+                    content: "Une erreur s'est produite lors de la suppression de l'utilisateur.",
+                });
+                console.error("Error deleting user:", error);
+            }
+        },
+        onCancel() {
+            console.log("Suppression annulée");
+        },
+    });
+};
+
 
     const columns = [
         {
@@ -156,7 +178,7 @@ const DisplayUsers = () => {
                     </Button>
                     <Button
                         type="link"
-                        onConfirm={() => handleDelete(record.id)}
+                        onClick={() => handleDeleteUser(record.id)}
                     >
                         {deletebtn}
                     </Button>
@@ -192,6 +214,7 @@ const DisplayUsers = () => {
             <Card>
             <Table
                 columns={columns}
+                loading={loading}
                 dataSource={users}
                 pagination={{ pageSize: 5}}
                 responsive={{

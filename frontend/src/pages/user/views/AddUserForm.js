@@ -1,7 +1,19 @@
-import React, { useState } from "react";
-import { Form, Input, Button, Col, Row, Upload, message , Card} from "antd";
+import React, { useEffect, useState } from "react";
+import {
+    Form,
+    Input,
+    Button,
+    Col,
+    Row,
+    Upload,
+    message,
+    Card,
+    Select,
+    Modal,
+    Spin,
+} from "antd";
 // import SearchSelect from "../../../constants/SearchSelect";
-import axios from 'axios';
+import axios from "axios";
 import {
     UserOutlined,
     LockOutlined,
@@ -29,14 +41,12 @@ const props = {
     },
 };
 
-
 const roleOptions = [
-    { value: 'Admin', label: 'Admin' },
-    { value: 'Agent', label: 'Agent' },
-    { value: 'Superviseur', label: 'Superviseur' },
-    { value: 'Agent Commercial', label: 'Agent Commercial' },
+    { value: "Admin", label: "Admin" },
+    { value: "Agent", label: "Agent" },
+    { value: "Superviseur", label: "Superviseur" },
+    { value: "Agent Commercial", label: "Agent Commercial" },
 ];
-
 
 // Import statements remain unchanged...
 
@@ -46,13 +56,21 @@ const AddUserForm = () => {
         nom: "",
         prenom: "",
         email: "",
-        role_name: "", 
+        role_name: "",
         password: "",
         confirmPassword: "",
         avatar: null,
     });
+    const [loading, setLoading] = useState(true);
 
-    
+    useEffect(() => {
+        // Simulate loading delay
+        const timeout = setTimeout(() => {
+            setLoading(false); // Set loading to false after a delay
+        }, 1000);
+
+        return () => clearTimeout(timeout);
+    }, []);
 
     const handleChange = (changedValues) => {
         setFormData({
@@ -71,54 +89,66 @@ const AddUserForm = () => {
 
     const handleSubmit = async () => {
         try {
+            
             if (formData.password !== formData.confirmPassword) {
                 throw new Error("The password confirmation does not match.");
-            } else{
-                console.log("The two passwords are matching", formData.confirmPassword, formData.password)
+            } else {
+                console.log(
+                    "The two passwords are matching",
+                    formData.confirmPassword,
+                    formData.password
+                );
             }
-            console.log('Sending data:', formData);
+            console.log("Sending data:", formData);
             const response = await axios.post(
-                'http://localhost:8000/api/users',
+                "http://localhost:8000/api/users",
                 formData,
                 {
                     headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    }
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                    },
                 }
             );
-            message.success(response.data.message);
-            // Optionally, clear the form fields if needed
+            Modal.success({
+                title: "Utilisateur ajouté avec succès",
+                content: "L'utilisateur a été ajouté avec succès.",
+            });
+
             form.resetFields();
         } catch (error) {
-            // Log the error details
-    
+            Modal.error({
+                title: "Erreur lors de l'ajout",
+                content:
+                    "Une erreur s'est produite lors de l'ajout de l'utilisateur.",
+            });
+
             // Display an error message to the user
-            console.error('Error:', error.response);
+            console.error("Error:", error.response);
         }
     };
-    
-    
-
-    
 
     return (
         <div>
             <Card>
+            {loading ? (
+                    // Render the Spin component while loading
+                    <div style={{ textAlign: "center", padding: "20px" }}>
+                        <Spin size="large" />
+                    </div>
+                ) : (
                 <Form
                     form={form}
                     layout="vertical"
                     initialValues={formData}
                     onValuesChange={handleChange}
-                    onFinish ={handleSubmit}
+                    onFinish={handleSubmit}
                     style={{
                         padding: "30px",
                     }}
                 >
                     <Row gutter={[16, 16]}>
                         <Col xs={12} sm={8}>
-                        
-
                             <Form.Item>
                                 <Dragger
                                     {...props}
@@ -214,7 +244,17 @@ const AddUserForm = () => {
                                             },
                                         ]}
                                     >
-                                        {/* <SearchSelect placeholder="Sélectionner un rôle" options={roleOptions} /> */}
+                                        <Select
+                                            placeholder="Sélectionner un rôle"
+                                            options={roleOptions}
+                                            value={formData.role_name}
+                                            onChange={(value) =>
+                                                setFormData({
+                                                    ...formData,
+                                                    role_name: value,
+                                                })
+                                            }
+                                        ></Select>
                                     </Form.Item>
                                 </Col>
                                 <Col xs={24} sm={12}>
@@ -288,6 +328,7 @@ const AddUserForm = () => {
                         </Col>
                     </Row>
                 </Form>
+                )}
             </Card>
         </div>
     );
