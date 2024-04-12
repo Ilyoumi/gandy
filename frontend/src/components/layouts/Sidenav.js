@@ -5,23 +5,24 @@ import AdminAcess from "./accessUser/AdminAccess";
 import AgentCommAccess from "./accessUser/AgentComAccess";
 import SupervisorAccess from "./accessUser/SupervisorAccess";
 import fetchUserData from '../../api/acces';
-
+import { useUser } from "../../GlobalContext";
 
 
 function Sidenav({ color }) {
     const [expanded, setExpanded] = useState(true);
-    const [userRole, setUserRole] = useState("");
+    const userContext = useUser();
 
     useEffect(() => {
         // Initial fetch
-        fetchUserData();
+        fetchUserData(userContext);
 
         // Periodically fetch user data every 5 minutes (5 * 60 * 1000 milliseconds)
         const interval = setInterval(fetchUserData, 5 * 60 * 1000);
 
         // Cleanup interval on unmount
         return () => clearInterval(interval);
-    }, []);
+    }, [userContext]);
+    const { userRole } = userContext;
 
     return (
         <div>

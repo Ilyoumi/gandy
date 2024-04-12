@@ -1,14 +1,13 @@
 import { axiosClient } from "./axios";
-import { useAuth } from "../AuthContext";
 
 // Function to fetch user data
-const fetchUserData = async () => {
+const fetchUserData = async (userContext) => {
     try {
         // Check if the user is logged in
         const authToken = localStorage.getItem("auth_token");
         if (!authToken) {
             // User is not logged in, do nothing
-            console.log("User is not logged in")
+            console.log("User is not logged in");
             return;
         }
 
@@ -18,14 +17,15 @@ const fetchUserData = async () => {
                 Authorization: `Bearer ${authToken}`,
             },
         });
-        // const { role } = response.data;
-        // setUserRole(role);
-        // console.log("User Role", role)
+        const { role, id } = response.data;
 
+        // Update userRole state using setUserRole function
+        userContext.setUserRole(response.data.role);
+        userContext.setUserId(response.data.id);
+        console.log("User info", role, id);
     } catch (error) {
         console.error("Error fetching user data:", error);
     }
 };
 
-// Export the fetchUserData function
 export default fetchUserData;

@@ -106,22 +106,15 @@ const DisplayUsers = () => {
         userData: updateData,
     };
 
-    const roleNames = {
-        1: 'Admin',
-        2: 'Agent',
-        3: 'Superviseur',
-        4: 'Agent Commercial',
-    };
+    
 
     const roleColors = {
-        1: 'success', // Admin
-        2: 'processing', // Agent
-        3: 'error', // Superviseur
-        4: 'warning', // Agent Commercial
-        // Add more colors as needed
+        1: 'success', 
+        2: 'processing',
+        3: 'error',
+        4: 'warning',
     };
 
-    
     const columns = [
         {
             title: "NOM",

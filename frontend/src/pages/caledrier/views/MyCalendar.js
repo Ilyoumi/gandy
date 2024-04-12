@@ -11,6 +11,8 @@ import AddAgendaModal from "./AddAgenda";
 import { axiosClient } from "../../../api/axios";
 import UpdateRdv from "../../rdv/views/UpdateRdv";
 import AppointmentDetails from "../../rdv/views/AppoitmnetDetails";
+import { useUser } from "../../../GlobalContext";
+import fetchUserData from "../../../api/acces";
 
 function MyCalendar() {
     const [showAddModal, setShowAddModal] = useState(false);
@@ -25,56 +27,78 @@ function MyCalendar() {
     const [agendaId, setAgendaId] = useState(null);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
-    const [userRole, setUserRole] = useState("");
-    const [userId, setUserId] = useState("");
     const [detailsModalVisible, setDetailsModalVisible] = useState(false);
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [appointmentDetails, setAppointmentDetails] = useState(null);
+    const userContext = useUser();
+    useEffect(() => {
+        // Fetch agenda for the logged-in agent when component mounts
+        if (userContext.userRole === "Agent") {
+            fetchAgentAgenda();
+        }
+    }, [userContext.userRole]);
+
+    const fetchAgentAgenda = async () => {
+        try {
+            // Fetch agenda for the logged-in user (agent)
+            const response = await axiosClient.get(
+                `/api/users/${userContext.userId}/agenda`
+            );
+            const agenda = response.data.agenda;
+
+            // Set the agenda ID for the logged-in agent
+            setAgendaId(agenda.id);
+
+            // Fetch appointments for the logged-in agent's agenda
+            fetchAppointments(agenda.id);
+        } catch (error) {
+            console.error("Error fetching agent agenda:", error);
+        }
+    };
+
+    const fetchAppointments = async (agendaId) => {
+        try {
+            // Fetch appointments for the specified agenda ID
+            const response = await axiosClient.get(
+                `/api/agendas/${agendaId}/appointments`
+            );
+            const appointmentsData = response.data.rdvs.map((appointment) => ({
+                id: appointment.id,
+                title: `${appointment.nom} ${appointment.prenom}`,
+                start: appointment.start_date
+                    ? new Date(appointment.start_date.replace(" ", "T"))
+                    : null,
+                end: appointment.end_date
+                    ? new Date(appointment.end_date.replace(" ", "T"))
+                    : null,
+                postal: appointment.postal,
+            }));
+
+            // Update appointments state with the fetched appointments
+            setAppointments(appointmentsData);
+        } catch (error) {
+            console.error("Error fetching appointments:", error);
+        }
+    };
 
     useEffect(() => {
-        // Function to fetch user data
-        const fetchUserData = async () => {
-            try {
-                // Check if the user is logged in
-                const authToken = localStorage.getItem("auth_token");
-                if (!authToken) {
-                    // User is not logged in, do nothing
-                    console.log("User is not logged in");
-                    return;
-                }
+        fetchUserData(userContext);
 
-                // User is logged in, fetch user data
-                const response = await axiosClient.get("/api/user", {
-                    headers: {
-                        Authorization: `Bearer ${authToken}`,
-                    },
-                });
-                const { role, id } = response.data;
-                setUserRole(response.data.role);
-                setUserId(response.data.id);
-                console.log("User info", role, id);
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            }
-        };
+        // Periodically fetch user data every 5 minutes (5 * 60 * 1000 milliseconds)
+        const interval = setInterval(fetchUserData, 5 * 60 * 1000);
 
-        // Initial fetch
-        fetchUserData();
-
-        const interval = setInterval(fetchUserData, 1000);
-
-    // Cleanup interval on unmount
-    return () => clearInterval(interval);
-    }, []);
+        // Cleanup interval on unmount
+        return () => clearInterval(interval);
+    }, [userContext]);
 
     useEffect(() => {
         // Fetch users with role "Agent Commercial" when the component mounts
         fetchAgentCommercialUsers();
         fetchAgendasAndAppointments();
-        const interval = setInterval(fetchAgentCommercialUsers, 1000);
+        const interval = setInterval(fetchAgentCommercialUsers, 5 * 60 * 1000);
 
-    // Cleanup interval on unmount
-    return () => clearInterval(interval);
+        // Cleanup interval on unmount
+        return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
@@ -84,29 +108,28 @@ function MyCalendar() {
         }
     }, [agentCommercialUsers]);
 
-    
-
     useEffect(() => {
         // Function to fetch agent commercial users
         const fetchAgentCommercialUsers = async () => {
             try {
-                const response = await axiosClient.get("/api/users/agent-commercial");
+                const response = await axiosClient.get(
+                    "/api/users/agent-commercial"
+                );
                 setAgentCommercialUsers(response.data.users);
             } catch (error) {
                 console.error("Error fetching agent commercial users:", error);
             }
         };
-    
+
         // Initial fetch
         fetchAgentCommercialUsers();
-    
+
         // Periodically fetch agent commercial users every second
         const interval = setInterval(fetchAgentCommercialUsers, 5 * 60 * 1000);
-    
+
         // Cleanup interval on unmount
         return () => clearInterval(interval);
     }, []);
-    
 
     // Function to handle appointment click
 
@@ -368,10 +391,8 @@ function MyCalendar() {
             console.log("Fetched data :", response.data);
 
             // Compare the agent ID with the logged-in user's ID
-            if (agentId === userId) {
-                const response = await axiosClient.get(
-                    `/api/rdvs/${event.id}`
-                );
+            if (agentId === userContext.userId) {
+                const response = await axiosClient.get(`/api/rdvs/${event.id}`);
 
                 // Extract the appointment details from the response data
                 const appointmentDetails = response.data;
@@ -430,7 +451,8 @@ function MyCalendar() {
                 </Checkbox.Group>
             </Card>
             <Card style={{ width: "83%" }}>
-                {(userRole === "Admin" || userRole === "Superviseur") && (
+                {(userContext.userRole === "Admin" ||
+                    userContext.userRole === "Superviseur") && (
                     <NewButton
                         onClick={handleOpenAddAgendaModal}
                         loading={loading}
@@ -569,14 +591,19 @@ function MyCalendar() {
                 width={1000}
             >
                 {appointmentDetails && (
-                    
-                        <UpdateRdv
-                            initialValues={appointmentDetails}
-                            agendaId={agendaId}
-                            onFormSubmit={handleFormSubmit}
-                        />
+                    <UpdateRdv
+                        initialValues={appointmentDetails}
+                        agendaId={agendaId}
+                        onFormSubmit={handleFormSubmit}
+                    />
                 )}
             </Modal>
+            {userContext.userRole === "Agent" && (
+                <>
+                    <h2>Mon Calendrier</h2>
+                    <FullCalendar {...fullCalendarConfig} />
+                </>
+            )}
         </div>
     );
 }
