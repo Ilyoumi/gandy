@@ -36,12 +36,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Routes pour les agendas
 Route::post('/agendas', [AgendaController::class, 'store']);
-Route::get('/agendas/{id}', [AgendaController::class, 'show']);
+Route::get('/agendas/{id}', 'AgendaController@show');
 Route::get('/agendas/{agendaId}/calendar', [CalendarController::class, 'getCalendarEvents']);
 Route::put('/agendas/{id}', [AgendaController::class, 'update']);
+Route::delete('/agendas/{id}', [AgendaController::class, 'destroy']);
 Route::get('/agendas', [AgendaController::class, 'index']);
 Route::get('/agendas/{agendaId}/appointments', [AgendaController::class, 'getAppointments']);
+
 Route::get('/users/{userId}/agendas', 'App\Http\Controllers\AgendaController@getUserAgendas');
+
 // Define the route for creating calendar events
 Route::post('/calendars', [CalendarController::class, 'store']);
 

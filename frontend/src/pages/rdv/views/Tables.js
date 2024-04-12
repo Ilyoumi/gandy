@@ -70,21 +70,31 @@ const DataTable = () => {
         });
     };
 
-    const deleteRecord = async (record) => {
-        try {
-            await axiosClient.delete(`/api/rdvs/${record.id}`);
-            Modal.success({
-                title: "Suppression réussie",
-                content: "Le Rdv a été supprimé avec succès.",
-            });
-            // Refetch data after deletion
-            fetchData();
-        } catch (error) {
-            console.error("Erreur lors de la suppression du Rdv :", error);
-            console.log("Réponse d'erreur :", error.response);
-            message.error("Échec de la suppression du Rdv");
-        }
-    };
+
+const deleteRecord = async (record) => {
+    Modal.confirm({
+        title: "Confirmation",
+        content: "Voulez-vous vraiment supprimer ce Rdv ?",
+        okText: "Oui",
+        cancelText: "Non",
+        onOk: async () => {
+            try {
+                await axiosClient.delete(`/api/rdvs/${record.id}`);
+                Modal.success({
+                    title: "Suppression réussie",
+                    content: "Le Rdv a été supprimé avec succès.",
+                });
+                // Refetch data after deletion
+                fetchData();
+            } catch (error) {
+                console.error("Erreur lors de la suppression du Rdv :", error);
+                console.log("Réponse d'erreur :", error.response);
+                message.error("Échec de la suppression du Rdv");
+            }
+        },
+    });
+};
+
 
     const columns = [
         {
