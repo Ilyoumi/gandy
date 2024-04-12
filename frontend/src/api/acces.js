@@ -17,12 +17,13 @@ const fetchUserData = async (userContext) => {
                 Authorization: `Bearer ${authToken}`,
             },
         });
-        const { role, id } = response.data;
+        const { role, id, nom, prenom } = response.data;
 
-        // Update userRole state using setUserRole function
-        userContext.setUserRole(response.data.role);
-        userContext.setUserId(response.data.id);
-        console.log("User info", role, id);
+        // Update userRole, userId, and userName states
+        userContext.setUserRole(role);
+        userContext.setUserId(id);
+        userContext.setUserName(`${prenom} ${nom}`);
+        console.log("User info", role, id, `${prenom} ${nom}`);
     } catch (error) {
         console.error("Error fetching user data:", error);
     }
