@@ -12,6 +12,8 @@ const DisplayAgenda = () => {
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [addAgendaModalVisible, setAddAgendaModalVisible] = useState(false);
     const [agendas, setAgendas] = useState([]);
+    const [loading, setLoading] = useState(false);
+
     const userContext = useUser();
 
     useEffect(() => {
@@ -27,11 +29,13 @@ const DisplayAgenda = () => {
 
     const fetchAgendas = async () => {
         try {
+            setLoading(true);
+
             const response = await axiosClient.get("/api/agendas");
             const fetchedAgendas = response.data.agendas;
-    
+
             console.log("Fetched agendas:", fetchedAgendas);
-    
+
             // Fetch contact name and number of appointments for each agenda
             const updatedAgendas = await Promise.all(
                 fetchedAgendas.map(async (agenda) => {
@@ -40,72 +44,80 @@ const DisplayAgenda = () => {
                         const contactResponse = await axiosClient.get(
                             `/api/users/${agenda.contact_id}`
                         );
-            
+
                         console.log("Contact response:", contactResponse.data);
-            
+
                         const contactName = `${contactResponse.data.prenom} ${contactResponse.data.nom}`;
-            
+
                         // Fetch appointments for the agenda
                         const appointmentsResponse = await axiosClient.get(
                             `/api/agendas/${agenda.id}/appointments`
                         );
-                        const numAppointments = appointmentsResponse.data.rdvs.length;
-            
+                        const numAppointments =
+                            appointmentsResponse.data.rdvs.length;
+
                         return {
                             ...agenda,
                             contactName,
                             numAppointments,
                         };
                     } catch (error) {
-                        console.error("Error fetching contact or appointments:", error);
+                        console.error(
+                            "Error fetching contact or appointments:",
+                            error
+                        );
                         return null;
                     }
                 })
             );
-            
-    
+
             console.log("Updated agendas:", updatedAgendas);
-    
+
             // Filter out any null values (agendas with errors)
-            const filteredAgendas = updatedAgendas.filter((agenda) => agenda !== null);
-    
+            const filteredAgendas = updatedAgendas.filter(
+                (agenda) => agenda !== null
+            );
+
             console.log("Filtered agendas:", filteredAgendas);
-    
+
             setAgendas(filteredAgendas);
         } catch (error) {
             console.error("Error fetching agendas:", error);
+        }finally {
+            setLoading(false);
         }
     };
 
-
-const deleteRecord = async (record) => {
-    Modal.confirm({
-        title: "Confirmation",
-        content: "Voulez-vous vraiment supprimer cet agenda ?",
-        okText: "Oui",
-        cancelText: "Non",
-        onOk: async () => {
-            try {
-                await axiosClient.delete(`/api/agendas/${record.id}`);
-                Modal.success({
-                    title: "Suppression réussie",
-                    content: "L'agenda a été supprimé avec succès.",
-                });
-                // Refetch data after deletion
-                fetchAgendas();
-            } catch (error) {
-                console.error("Erreur lors de la suppression de l'agenda :", error);
-                console.log("Réponse d'erreur :", error.response);
-                Modal.error({
-                    title: "Échec",
-                    content: "Une erreur s'est produite lors de la suppression de l'agenda.",
-                });
-            }
-        },
-    });
-};
-
-    
+    const deleteRecord = async (record) => {
+        Modal.confirm({
+            title: "Confirmation",
+            content: "Voulez-vous vraiment supprimer cet agenda ?",
+            okText: "Oui",
+            cancelText: "Non",
+            onOk: async () => {
+                try {
+                    await axiosClient.delete(`/api/agendas/${record.id}`);
+                    Modal.success({
+                        title: "Suppression réussie",
+                        content: "L'agenda a été supprimé avec succès.",
+                    });
+                    // Refetch data after deletion
+                    fetchAgendas();
+                } catch (error) {
+                    console.error(
+                        "Erreur lors de la suppression de l'agenda :",
+                        error
+                    );
+                    console.log("Réponse d'erreur :", error.response);
+                    Modal.error({
+                        title: "Échec",
+                        content:
+                            "Une erreur s'est produite lors de la suppression de l'agenda.",
+                    });
+                }
+            },
+        });
+    };
 
     const handleOpenAddAgendaModal = () => {
         setAddAgendaModalVisible(true);
@@ -142,7 +154,13 @@ const deleteRecord = async (record) => {
             key: "action",
             render: (text, record) => (
                 <Space size="middle">
-                    <Button type="link" danger onClick={()=> {deleteRecord(record)}}>
+                    <Button
+                        type="link"
+                        danger
+                        onClick={() => {
+                            deleteRecord(record);
+                        }}
+                    >
                         {deletebtn}
                     </Button>
                     <Button
@@ -189,6 +207,8 @@ const deleteRecord = async (record) => {
             <Table
                 columns={columns}
                 dataSource={agendas}
+                loading={loading}
+
                 pagination={{ pageSize: 5 }}
                 responsive={{ xs: 1, sm: 3 }}
                 style={{ padding: "10px 1px" }}
@@ -203,7 +223,7 @@ const deleteRecord = async (record) => {
                     initialValues={selectedRowData}
                     onSubmit={(values) => console.log(values)}
                     onClose={handleModalCancel}
-                    updateAgendas={fetchAgendas} 
+                    updateAgendas={fetchAgendas}
                 />
             </Modal>
             <AddAgendaModal

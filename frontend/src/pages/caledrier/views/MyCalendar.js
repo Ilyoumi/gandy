@@ -4,7 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import frLocale from "@fullcalendar/core/locales/fr";
-import { Modal, Card, Checkbox } from "antd";
+import { Modal, Card, Checkbox, Spin } from "antd";
 import AddAppointment from "./AddAppoitment";
 import NewButton from "../../../constants/NewButton";
 import AddAgendaModal from "./AddAgenda";
@@ -13,12 +13,13 @@ import UpdateRdv from "../../rdv/views/UpdateRdv";
 import AppointmentDetails from "../../rdv/views/AppoitmnetDetails";
 import { useUser } from "../../../GlobalContext";
 import fetchUserData from "../../../api/acces";
+import ContactList from "../../contacts/views/ContactList";
 
 function MyCalendar() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [appointments, setAppointments] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [addAgendaModalVisible, setAddAgendaModalVisible] = useState(false);
     const [agentCommercialUsers, setAgentCommercialUsers] = useState([]);
     const [agendas, setAgendas] = useState([]);
@@ -31,6 +32,16 @@ function MyCalendar() {
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [appointmentDetails, setAppointmentDetails] = useState(null);
     const userContext = useUser();
+
+    useEffect(() => {
+        // Simulate loading for demonstration purposes
+        const timeout = setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+
+        // Clean up timer
+        return () => clearTimeout(timeout);
+    }, []);
     useEffect(() => {
         // Fetch agenda for the logged-in agent when component mounts
         if (userContext.userRole === "Agent") {
@@ -345,35 +356,7 @@ function MyCalendar() {
         }
     };
 
-    const handleCheckboxClick = async (userId) => {
-        try {
-            let updatedSelectedItems = [...selectedItems];
-            if (selectedItems.includes(userId)) {
-                // Remove the user if already selected
-                updatedSelectedItems = updatedSelectedItems.filter(
-                    (id) => id !== userId
-                );
-                // If there are no selected items, clear the agendaId
-                if (updatedSelectedItems.length === 0) {
-                    setAgendaId(null);
-                }
-            } else {
-                // Add the user if not already selected
-                updatedSelectedItems.push(userId);
-                // Fetch agendas for the selected user
-                const response = await axiosClient.get(
-                    `/api/users/${userId}/agendas`
-                );
-                const userAgendas = response.data.agendas;
-                console.log("agenda id id ", response.data.agendas);
-
-                setAgendaId(userAgendas[0].id);
-            }
-            setSelectedItems(updatedSelectedItems);
-        } catch (error) {
-            console.error("Error fetching agendas:", error);
-        }
-    };
+   
 
     const config = fullCalendarConfig();
 
@@ -403,23 +386,58 @@ function MyCalendar() {
                 // Show the update modal
                 setShowUpdateModal(true);
                 setSelectedAppointment(event);
-            } else {
-                // Show error modal if the appointment doesn't belong to the user
-                <Modal
-                    title="Appointment Details"
-                    visible={detailsModalVisible}
-                    onCancel={() => setDetailsModalVisible(false)}
-                    footer={null}
-                    style={{ marginTop: "-50px" }}
-                    width="80%"
-                    bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }} // Ensure the modal body is scrollable if needed
-                    destroyOnClose
-                >
-                    {selectedRowData && (
-                        <AppointmentDetails selectedRowData={selectedRowData} />
-                    )}
-                </Modal>;
             }
+            const handleAppointmentClick = async (event) => {
+                console.log(event.id);
+                try {
+                    // Make a GET request to fetch the agent ID by appointment ID
+                    const response = await axiosClient.get(
+                        `/api/appointments/${event.id}/agent`
+                    );
+
+                    // Extract the agent ID from the response data
+                    const agentId = response.data.agentId;
+                    console.log("Fetched agent ID:", agentId);
+                    console.log("Fetched data :", response.data);
+
+                    // Compare the agent ID with the logged-in user's ID
+                    if (agentId === userContext.userId) {
+                        const response = await axiosClient.get(
+                            `/api/rdvs/${event.id}`
+                        );
+
+                        // Extract the appointment details from the response data
+                        const appointmentDetails = response.data;
+
+                        // Update the state with the fetched appointment details
+                        setAppointmentDetails(appointmentDetails);
+
+                        // Show the update modal
+                        setShowUpdateModal(true);
+                        setSelectedAppointment(event);
+                    } else {
+                        // Show error modal if the appointment doesn't belong to the user
+                        <Modal
+                            title="Appointment Details"
+                            visible={detailsModalVisible}
+                            onCancel={() => setDetailsModalVisible(false)}
+                            footer={null}
+                            style={{ marginTop: "-50px" }}
+                            width="80%"
+                            bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }} // Ensure the modal body is scrollable if needed
+                            destroyOnClose
+                        >
+                            {selectedRowData && (
+                                <AppointmentDetails
+                                    selectedRowData={selectedRowData}
+                                />
+                            )}
+                        </Modal>;
+                    }
+                } catch (error) {
+                    console.error("Error fetching agent ID:", error);
+                }
+            };
         } catch (error) {
             console.error("Error fetching agent ID:", error);
         }
@@ -433,176 +451,175 @@ function MyCalendar() {
                 marginBottom: "30px",
             }}
         >
-            <Card title="Calendriers des contacts" style={{ width: "15%" }}>
-                <Checkbox.Group
-                    onChange={setSelectedItems}
-                    value={selectedItems}
-                >
-                    {agentCommercialUsers.map((user, index) => (
-                        <Checkbox
-                            key={index}
-                            value={user.id}
-                            checked={selectedItems.includes(user.id)}
-                            onClick={() => handleCheckboxClick(user.id)}
-                        >
-                            {user.prenom} {user.nom}
-                        </Checkbox>
-                    ))}
-                </Checkbox.Group>
-            </Card>
-            <Card style={{ width: "83%" }}>
-                {(userContext.userRole === "Admin" ||
-                    userContext.userRole === "Superviseur") && (
-                    <NewButton
-                        onClick={handleOpenAddAgendaModal}
-                        loading={loading}
-                        buttonText="Nouveau Calendrier"
+            {loading ? ( 
+                <Spin  style={{ textAlign: "center", paddingTop: "50vh", position:"relative", left:"50%" }} size="large" />
+            ) : (
+            <>
+                <ContactList
+                agentCommercialUsers={agentCommercialUsers}
+                selectedItems={selectedItems}
+                setSelectedItems={setSelectedItems}
+                agendas={agendas}
+                agentId={agentId}
+                setAgentId={setAgentId}
+                agendaId={agendaId}
+                setAgendaId={setAgendaId}
+            />
+                <Card style={{ width: "83%" }}>
+                    {(userContext.userRole === "Admin" ||
+                        userContext.userRole === "Superviseur") && (
+                        <NewButton
+                            onClick={handleOpenAddAgendaModal}
+                            loading={loading}
+                            buttonText="Nouveau Calendrier"
+                        />
+                    )}
+                    <AddAgendaModal
+                        visible={addAgendaModalVisible}
+                        onCancel={() => setAddAgendaModalVisible(false)}
+                        onAgendaCreated={handleAgendaCreated}
                     />
-                )}
-                <AddAgendaModal
-                    visible={addAgendaModalVisible}
-                    onCancel={() => setAddAgendaModalVisible(false)}
-                    onAgendaCreated={handleAgendaCreated}
-                />
-                {agendas.length === 0 && (
-                    <div>
-                        <h2>Agenda par défaut</h2>
-                        <Card style={{ marginBottom: "30px" }}>
-                            <FullCalendar
-                                plugins={[
-                                    dayGridPlugin,
-                                    timeGridPlugin,
-                                    interactionPlugin,
-                                ]}
-                                {...config}
-                            />
-                        </Card>
-                    </div>
-                )}
+                    {agendas.length === 0 && (
+                        <div>
+                            <h2>Agenda par défaut</h2>
+                            <Card style={{ marginBottom: "30px" }}>
+                                <FullCalendar
+                                    plugins={[
+                                        dayGridPlugin,
+                                        timeGridPlugin,
+                                        interactionPlugin,
+                                    ]}
+                                    {...config}
+                                />
+                            </Card>
+                        </div>
+                    )}
 
-                {agendas
-                    .filter((agenda) =>
-                        selectedItems.includes(agenda.contact_id)
-                    )
-                    .sort(
-                        (a, b) =>
-                            selectedItems.indexOf(a.contact_id) -
-                            selectedItems.indexOf(b.contact_id)
-                    )
-                    .map((agenda, index) => {
-                        // Find the user corresponding to the contact ID
-                        const user = agentCommercialUsers.find(
-                            (user) => user.id === agenda.contact_id
-                        );
-                        const userName = user
-                            ? `${user.prenom} ${user.nom}`
-                            : "Unknown User";
+                    {agendas
+                        .filter((agenda) =>
+                            selectedItems.includes(agenda.contact_id)
+                        )
+                        .sort(
+                            (a, b) =>
+                                selectedItems.indexOf(a.contact_id) -
+                                selectedItems.indexOf(b.contact_id)
+                        )
+                        .map((agenda, index) => {
+                            // Find the user corresponding to the contact ID
+                            const user = agentCommercialUsers.find(
+                                (user) => user.id === agenda.contact_id
+                            );
+                            const userName = user
+                                ? `${user.prenom} ${user.nom}`
+                                : "Unknown User";
 
-                        return (
-                            <div key={index}>
-                                <h2>{userName}</h2>{" "}
-                                {/* Display user's name as the title */}
-                                <Card style={{ marginBottom: "30px" }}>
-                                    {agenda.fullcalendar_config && (
-                                        <FullCalendar
-                                            plugins={[
-                                                dayGridPlugin,
-                                                timeGridPlugin,
-                                                interactionPlugin,
-                                            ]}
-                                            {...JSON.parse(
-                                                agenda.fullcalendar_config
-                                            )}
-                                            dateClick={(arg) =>
-                                                handleAddAppointment(
-                                                    arg,
-                                                    user.id,
-                                                    agenda.id
-                                                )
-                                            }
-                                            eventClick={(info) =>
-                                                handleAppointmentClick(
-                                                    info.event
-                                                )
-                                            }
-                                            events={appointments
-                                                .filter(
-                                                    (appointment) =>
-                                                        appointment.agendaId ===
+                            return (
+                                <div key={index}>
+                                    <h2>{userName}</h2>{" "}
+                                    {/* Display user's name as the title */}
+                                    <Card style={{ marginBottom: "30px" }}>
+                                        {agenda.fullcalendar_config && (
+                                            <FullCalendar
+                                                plugins={[
+                                                    dayGridPlugin,
+                                                    timeGridPlugin,
+                                                    interactionPlugin,
+                                                ]}
+                                                {...JSON.parse(
+                                                    agenda.fullcalendar_config
+                                                )}
+                                                dateClick={(arg) =>
+                                                    handleAddAppointment(
+                                                        arg,
+                                                        user.id,
                                                         agenda.id
-                                                )
-                                                .map((appointment) => {
-                                                    console.log(
-                                                        "id_agent from cal:",
-                                                        appointment.id_agent,
-                                                        appointment.nom
-                                                    ); // Log the id_agent
-                                                    return {
-                                                        id: appointment.id,
-                                                        title: `${appointment.nom} ${appointment.prenom} - ${appointment.postal}`,
-                                                        start: appointment.start_date
-                                                            ? new Date(
-                                                                  appointment.start_date.replace(
-                                                                      " ",
-                                                                      "T"
-                                                                  )
-                                                              )
-                                                            : null,
-                                                        end: appointment.end_date
-                                                            ? new Date(
-                                                                  appointment.end_date.replace(
-                                                                      " ",
-                                                                      "T"
-                                                                  )
-                                                              )
-                                                            : null,
-                                                        agendaId:
-                                                            appointment.agendaId,
-                                                        id_agent:
+                                                    )
+                                                }
+                                                eventClick={(info) =>
+                                                    handleAppointmentClick(
+                                                        info.event
+                                                    )
+                                                }
+                                                events={appointments
+                                                    .filter(
+                                                        (appointment) =>
+                                                            appointment.agendaId ===
+                                                            agenda.id
+                                                    )
+                                                    .map((appointment) => {
+                                                        console.log(
+                                                            "id_agent from cal:",
                                                             appointment.id_agent,
-                                                    };
-                                                })}
-                                        />
-                                    )}
-                                </Card>
-                            </div>
-                        );
-                    })}
-            </Card>
-            <Modal
-                visible={showAddModal}
-                title="Nouveau rendez-vous"
-                onCancel={handleCloseModal}
-                footer={null}
-                width={1000}
-            >
-                <AddAppointment
-                    selectedDate={selectedDate}
-                    onFormSubmit={handleFormSubmit}
-                    agentId={agentId}
-                    agendaId={agendaId}
-                />
-            </Modal>
-            <Modal
-                visible={showUpdateModal}
-                title="Modifier rendez-vous"
-                onCancel={() => setShowUpdateModal(false)}
-                footer={null}
-                width={1000}
-            >
-                {appointmentDetails && (
-                    <UpdateRdv
-                        initialValues={appointmentDetails}
-                        agendaId={agendaId}
+                                                            appointment.nom
+                                                        ); // Log the id_agent
+                                                        return {
+                                                            id: appointment.id,
+                                                            title: `${appointment.nom} ${appointment.prenom} - ${appointment.postal}`,
+                                                            start: appointment.start_date
+                                                                ? new Date(
+                                                                      appointment.start_date.replace(
+                                                                          " ",
+                                                                          "T"
+                                                                      )
+                                                                  )
+                                                                : null,
+                                                            end: appointment.end_date
+                                                                ? new Date(
+                                                                      appointment.end_date.replace(
+                                                                          " ",
+                                                                          "T"
+                                                                      )
+                                                                  )
+                                                                : null,
+                                                            agendaId:
+                                                                appointment.agendaId,
+                                                            id_agent:
+                                                                appointment.id_agent,
+                                                        };
+                                                    })}
+                                            />
+                                        )}
+                                    </Card>
+                                </div>
+                            );
+                        })}
+                </Card>
+                <Modal
+                    visible={showAddModal}
+                    title="Nouveau rendez-vous"
+                    onCancel={handleCloseModal}
+                    footer={null}
+                    width={1000}
+                >
+                    <AddAppointment
+                        selectedDate={selectedDate}
                         onFormSubmit={handleFormSubmit}
+                        agentId={agentId}
+                        agendaId={agendaId}
                     />
+                </Modal>
+                <Modal
+                    visible={showUpdateModal}
+                    title="Modifier rendez-vous"
+                    onCancel={() => setShowUpdateModal(false)}
+                    footer={null}
+                    width={1000}
+                >
+                    {appointmentDetails && (
+                        <UpdateRdv
+                            initialValues={appointmentDetails}
+                            agendaId={agendaId}
+                            onFormSubmit={handleFormSubmit}
+                        />
+                    )}
+                </Modal>
+                {userContext.userRole === "Agent" && (
+                    <>
+                        <h2>Mon Calendrier</h2>
+                        <FullCalendar {...fullCalendarConfig} />
+                    </>
                 )}
-            </Modal>
-            {userContext.userRole === "Agent" && (
-                <>
-                    <h2>Mon Calendrier</h2>
-                    <FullCalendar {...fullCalendarConfig} />
-                </>
+            </>
             )}
         </div>
     );

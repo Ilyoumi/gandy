@@ -42,12 +42,10 @@ const UpdateAgenda = ({ initialValues, onSubmit, onClose, updateAgendas }) => {
             console.log("Agenda updated :", response.data);
             updateAgendas();
             onClose();
-            Modal.success({
-                title: "Mis à jour réussie",
-                content: "Agenda mis à jour avec succès.",
-            });
+            
                 
             } catch (error) {
+                
                 console.error("Error fetching agendas:", error);
             }
 
