@@ -88,9 +88,10 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        // Fetch the user with the given id along with their associated role
-        $user = User::with('role')->find($id);
+{
+    try {
+        // Fetch the user with the given id
+        $user = User::find($id);
 
         // Check if user exists
         if (!$user) {
@@ -99,7 +100,15 @@ class UserController extends Controller
 
         // Return JSON response with user data
         return response()->json($user);
+    } catch (\Exception $e) {
+        // Log the error
+        Log::error('Failed to fetch user data by ID: ' . $e->getMessage());
+
+        // If an error occurs, return a response with error message
+        return response()->json(['message' => 'Failed to fetch user data by ID: ' . $e->getMessage()], 500);
     }
+}
+
 
     /**
      * Update the specified resource in storage.

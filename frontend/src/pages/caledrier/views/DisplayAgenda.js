@@ -1,15 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Col, Row, Table, Modal, Space } from "antd";
-import data from "../../../constants/data";
 import { pencil, deletebtn } from "../../../constants/icons";
 import AddAgendaModal from "./AddAgenda";
 import UpdateForm from "./UpdateAgenda";
+import { axiosClient } from "../../../api/axios";
+import fetchUserData from "../../../api/acces";
+import { useUser } from "../../../GlobalContext";
 
 const DisplayAgenda = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [addAgendaModalVisible, setAddAgendaModalVisible] = useState(false);
-    // const { getColumnSearchProps } = useColumnSearch();
+    const [agendas, setAgendas] = useState([]);
+    const userContext = useUser();
+
+    useEffect(() => {
+        // Fetch user data when the component mounts
+        fetchUserData(userContext);
+
+        // Fetch agendas
+        fetchAgendas();
+    }, []);
+
+    const fetchAgendas = async () => {
+        try {
+            const response = await axiosClient.get("/api/agendas");
+            const fetchedAgendas = response.data.agendas;
+    
+            console.log("Fetched agendas:", fetchedAgendas);
+    
+            // Fetch contact name and number of appointments for each agenda
+            const updatedAgendas = await Promise.all(
+                fetchedAgendas.map(async (agenda) => {
+                    try {
+                        // Fetch user data for the contact
+                        const contactResponse = await axiosClient.get(
+                            `/api/users/${agenda.contact_id}`
+                        );
+            
+                        console.log("Contact response:", contactResponse.data);
+            
+                        const contactName = `${contactResponse.data.prenom} ${contactResponse.data.nom}`;
+            
+                        // Fetch appointments for the agenda
+                        const appointmentsResponse = await axiosClient.get(
+                            `/api/agendas/${agenda.id}/appointments`
+                        );
+                        const numAppointments = appointmentsResponse.data.rdvs.length;
+            
+                        return {
+                            ...agenda,
+                            contactName,
+                            numAppointments,
+                        };
+                    } catch (error) {
+                        console.error("Error fetching contact or appointments:", error);
+                        return null;
+                    }
+                })
+            );
+            
+    
+            console.log("Updated agendas:", updatedAgendas);
+    
+            // Filter out any null values (agendas with errors)
+            const filteredAgendas = updatedAgendas.filter((agenda) => agenda !== null);
+    
+            console.log("Filtered agendas:", filteredAgendas);
+    
+            setAgendas(filteredAgendas);
+        } catch (error) {
+            console.error("Error fetching agendas:", error);
+        }
+    };
     
 
     const handleOpenAddAgendaModal = () => {
@@ -25,39 +88,42 @@ const DisplayAgenda = () => {
         setIsModalVisible(false);
     };
 
-    // const columns = [
-    //     {
-    //         title: "NOM",
-    //         dataIndex: "name",
-    //         key: "name",
-    //         width: "32%",
-    //         ...getColumnSearchProps("name"),
-    //     },
-    //     {
-    //         title: "AGENT",
-    //         key: "agent",
-    //         dataIndex: "agent",
-    //         ...getColumnSearchProps("agent"),
-    //     },
-    //     {
-    //         title: "ACTION",
-    //         key: "action",
-    //         render: (text, record) => (
-    //             <Space size="middle">
-    //                 <Button type="link" danger>
-    //                     {deletebtn}
-    //                 </Button>
-    //                 <Button
-    //                     type="link"
-    //                     className="darkbtn"
-    //                     onClick={() => handleUpdate(record)}
-    //                 >
-    //                     {pencil}
-    //                 </Button>
-    //             </Space>
-    //         ),
-    //     },
-    // ];
+    const columns = [
+        {
+            title: "NOM",
+            dataIndex: "name",
+            key: "name",
+            width: "25%",
+        },
+        {
+            title: "CONTACT",
+            dataIndex: "contactName",
+            key: "contactName",
+        },
+        {
+            title: "NOMBRE D'APPOINTMENTS",
+            dataIndex: "numAppointments",
+            key: "numAppointments",
+        },
+        {
+            title: "ACTION",
+            key: "action",
+            render: (text, record) => (
+                <Space size="middle">
+                    <Button type="link" danger>
+                        {deletebtn}
+                    </Button>
+                    <Button
+                        type="link"
+                        className="darkbtn"
+                        onClick={() => handleUpdate(record)}
+                    >
+                        {pencil}
+                    </Button>
+                </Space>
+            ),
+        },
+    ];
 
     return (
         <div
@@ -88,14 +154,13 @@ const DisplayAgenda = () => {
                     </Button>
                 </Col>
             </Row>
-            {/* <Table
+            <Table
                 columns={columns}
-                dataSource={data}
+                dataSource={agendas}
                 pagination={{ pageSize: 5 }}
-                scroll={{ x: "max-content" }}
                 responsive={{ xs: 1, sm: 3 }}
                 style={{ padding: "10px 1px" }}
-            /> */}
+            />
             <Modal
                 title="Update Record"
                 visible={isModalVisible}
