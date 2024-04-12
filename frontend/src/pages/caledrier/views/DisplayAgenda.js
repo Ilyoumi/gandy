@@ -21,6 +21,9 @@ const DisplayAgenda = () => {
         // Fetch agendas
         fetchAgendas();
     }, []);
+    const updateAgendas = (updatedAgendas) => {
+        setAgendas(updatedAgendas);
+    };
 
     const fetchAgendas = async () => {
         try {
@@ -73,6 +76,35 @@ const DisplayAgenda = () => {
             console.error("Error fetching agendas:", error);
         }
     };
+
+
+const deleteRecord = async (record) => {
+    Modal.confirm({
+        title: "Confirmation",
+        content: "Voulez-vous vraiment supprimer cet agenda ?",
+        okText: "Oui",
+        cancelText: "Non",
+        onOk: async () => {
+            try {
+                await axiosClient.delete(`/api/agendas/${record.id}`);
+                Modal.success({
+                    title: "Suppression réussie",
+                    content: "L'agenda a été supprimé avec succès.",
+                });
+                // Refetch data after deletion
+                fetchAgendas();
+            } catch (error) {
+                console.error("Erreur lors de la suppression de l'agenda :", error);
+                console.log("Réponse d'erreur :", error.response);
+                Modal.error({
+                    title: "Échec",
+                    content: "Une erreur s'est produite lors de la suppression de l'agenda.",
+                });
+            }
+        },
+    });
+};
+
     
 
     const handleOpenAddAgendaModal = () => {
@@ -96,7 +128,7 @@ const DisplayAgenda = () => {
             width: "25%",
         },
         {
-            title: "CONTACT",
+            title: "AGENT",
             dataIndex: "contactName",
             key: "contactName",
         },
@@ -110,7 +142,7 @@ const DisplayAgenda = () => {
             key: "action",
             render: (text, record) => (
                 <Space size="middle">
-                    <Button type="link" danger>
+                    <Button type="link" danger onClick={()=> {deleteRecord(record)}}>
                         {deletebtn}
                     </Button>
                     <Button
@@ -170,6 +202,8 @@ const DisplayAgenda = () => {
                 <UpdateForm
                     initialValues={selectedRowData}
                     onSubmit={(values) => console.log(values)}
+                    onClose={handleModalCancel}
+                    updateAgendas={fetchAgendas} 
                 />
             </Modal>
             <AddAgendaModal

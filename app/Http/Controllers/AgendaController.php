@@ -83,26 +83,34 @@ public function getUserAgendas($userId)
 public function show($id)
 {
     try {
-        $agenda = Agenda::with('calendar')->findOrFail($id);
+        // Fetch the agenda by its ID
+        $agenda = Agenda::findOrFail($id);
+
+        // Return a JSON response with the agenda data
         return response()->json(['agenda' => $agenda], 200);
     } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 404);
+        // Return a JSON response with an error message if the agenda is not found
+        return response()->json(['error' => 'Agenda not found'], 404);
     }
 }
+
 
 
 public function update(Request $request, $id)
 {
     try {
+        // Find the agenda by its ID
         $agenda = Agenda::findOrFail($id);
-        $agenda->update($request->all());
+        
+        // Update agenda properties
+        $agenda->name = $request->input('name');
+        $agenda->contact_id = $request->input('contact_id');
+        $agenda->description = $request->input('description');
 
-        // Check if 'fullcalendar_config' is present in the request
+        // Optionally, update fullcalendar_config and events if present in the request
         if ($request->has('fullcalendar_config')) {
             $agenda->fullcalendar_config = $request->input('fullcalendar_config');
         }
-
-        // Optionally, you can check if 'events' is present and update it as well
         if ($request->has('events')) {
             $agenda->events = $request->input('events');
         }
@@ -110,20 +118,30 @@ public function update(Request $request, $id)
         // Save the changes to the agenda
         $agenda->save();
 
+        // Return a JSON response with the updated agenda
         return response()->json(['agenda' => $agenda], 200);
     } catch (\Exception $e) {
+        // Return an error response if an exception occurs
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }
 
 
 
-    public function destroy($id)
-    {
+
+public function destroy($id)
+{
+    try {
         $agenda = Agenda::findOrFail($id);
         $agenda->delete();
 
-        return 204; // No content
+        // Return success response
+        return response()->json(['message' => 'Agenda deleted successfully'], 200);
+    } catch (\Exception $e) {
+        // Return error response if agenda is not found or other error occurs
+        return response()->json(['error' => 'Failed to delete agenda'], 500);
     }
+}
+
     
 }
