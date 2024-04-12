@@ -1,9 +1,9 @@
 /* SaveButton.css */
 .save-button {
-    background-color: #1A252F; /* Custom background color */
-    border-color: #1A252F; /* Custom border color */
-    color: #fff; /* Text color */
-    width: 150px;position: absolute; right: 20px
+    background-color: #1A252F!important; /* Custom background color */
+    border-color: #1A252F!important; /* Custom border color */
+    color: #fff!important; /* Text color */
+    width: 150px!important;position: absolute!important; right: 20px!important
   }
   
   .save-button:hover,
@@ -16,18 +16,18 @@
 
   /* newButton.css */
 .new-button {
-  background-color: #1A252F; /* Custom background color */
-  border-color: #1A252F; /* Custom border color */
-  color: #fff; /* Text color */
-  width: 150px;
-  margin-bottom: 20px;
+  background-color: #1A252F!important; /* Custom background color */
+  border-color: #1A252F!important; /* Custom border color */
+  color: #fff!important; /* Text color */
+  width: 150px!important;
+  margin-bottom: 20px!important;
 }
 
 .new-button:hover,
 .new-button:focus {
-  background-color: #2c3e50; /* Custom hover color */
-  border-color: #2c3e50; /* Custom hover border color */
-  color: #fff; /* Text color */
+  background-color: #2c3e50!important; /* Custom hover color */
+  border-color: #2c3e50!important; /* Custom hover border color */
+  color: #fff!important; /* Text color */
 
 }
   
