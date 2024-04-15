@@ -67,6 +67,21 @@ function MyCalendar() {
         }
     };
 
+    const [userRole, setUserRole] = useState("");
+    const [userId, setUserId] = useState("");
+    const [agent, setAgent] = useState("");
+    let userName = "Unknown User";
+// Find the user corresponding to the first agenda item
+        const firstAgenda = agendas.find(
+            (agenda) => selectedItems.includes(agenda.contact_id)
+        );
+        if (firstAgenda) {
+            const user = agentCommercialUsers.find(
+                (user) => user.id === firstAgenda.contact_id
+            );
+            userName = user ? `${user.prenom} ${user.nom}` : "Unknown User";
+        }
+
     const fetchAppointments = async (agendaId) => {
         try {
             // Fetch appointments for the specified agenda ID
@@ -103,6 +118,7 @@ function MyCalendar() {
     }, [userContext]);
 
     useEffect(() => {
+        
         // Fetch users with role "Agent Commercial" when the component mounts
         fetchAgentCommercialUsers();
         fetchAgendasAndAppointments();
@@ -111,6 +127,7 @@ function MyCalendar() {
         // Cleanup interval on unmount
         return () => clearInterval(interval);
     }, []);
+    
 
     useEffect(() => {
         // Set the first user as selected when component mounts

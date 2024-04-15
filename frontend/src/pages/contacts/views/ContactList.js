@@ -58,17 +58,20 @@ function ContactList({
 
     return (
         <Card title="Contacts" style={{ width: "15%" }}>
-            <Checkbox.Group onChange={setSelectedItems} value={selectedItems}>
+            <Checkbox.Group
+                onChange={setSelectedItems}
+                value={selectedItems}
+            >
                 {agentCommercialUsers.map((user, index) => (
-                    <div key={index} style={{ marginBottom: "8px" }}>
-                        <Checkbox
-                            value={user.id}
-                            checked={selectedItems.includes(user.id)}
-                            onChange={() => handleCheckboxClick(user.id)}
-                        >
-                            {user.prenom} {user.nom}
-                        </Checkbox>
-                    </div>
+                    <Checkbox
+                        key={index}
+                        value={user.id}
+                        checked={selectedItems.includes(user.id)}
+                        onClick={() => handleCheckboxClick(user.id)}
+                        style={{ margin: 0 }} // Apply custom style to remove margin
+                    >
+                        {user.prenom} {user.nom}
+                    </Checkbox>
                 ))}
             </Checkbox.Group>
         </Card>
