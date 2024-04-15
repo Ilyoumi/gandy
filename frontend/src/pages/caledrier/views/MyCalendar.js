@@ -4,7 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import frLocale from "@fullcalendar/core/locales/fr";
-import { Modal, Card, Checkbox, Spin } from "antd";
+import { Modal, Card, Spin } from "antd";
 import AddAppointment from "./AddAppoitment";
 import NewButton from "../../../constants/NewButton";
 import AddAgendaModal from "./AddAgenda";
