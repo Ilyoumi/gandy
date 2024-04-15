@@ -362,7 +362,11 @@ function MyCalendar() {
 
     const handleAppointmentClick = async (event) => {
         console.log(event.id);
+        console.log("agenda id ------",agendaId)
+        console.log("agent id ------",agentId)
+
         try {
+            
             // Make a GET request to fetch the agent ID by appointment ID
             const response = await axiosClient.get(
                 `/api/appointments/${event.id}/agent`

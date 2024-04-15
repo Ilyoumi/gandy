@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Form,
     Input,
@@ -55,26 +55,25 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
             const authToken = localStorage.getItem("auth_token");
             if (!authToken) {
                 // User is not logged in, do nothing
-                console.log("User is not logged in")
+                console.log("User is not logged in");
                 return;
             }
-    
+
             // User is logged in, fetch user data
             const response = await axiosClient.get("/api/user", {
                 headers: {
                     Authorization: `Bearer ${authToken}`,
                 },
             });
-            const { id } = response.data; 
+            const { id } = response.data;
             setUserId(id);
-
         } catch (error) {
             console.error("Error fetching user data:", error);
         }
     };
 
     useEffect(() => {
-        fetchUserData(); 
+        fetchUserData();
     }, []);
 
     const handleFormSubmit = async () => {
@@ -88,13 +87,18 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
         try {
             formDataToSend = {
                 ...formData,
-                start_date: formData.appointment_date[0],
-                end_date: formData.appointment_date[1],
+                start_date: formData.appointment_date[0].format(
+                    "YYYY-MM-DD HH:mm:ss"
+                ),
+                end_date: formData.appointment_date[1].format(
+                    "YYYY-MM-DD HH:mm:ss"
+                ),
                 id_agent: userId,
                 id_agenda: agendaId,
                 tarification: formData.tarification.toString(),
             };
-            console.log("Form submission with:", formDataToSend);
+            console.log("agendaIdh:", agendaId);
+            console.log("id_agent:", userId);
 
             const response = await axiosClient.post(
                 "/api/rdvs",
