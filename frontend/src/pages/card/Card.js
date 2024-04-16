@@ -1,8 +1,8 @@
 import React from "react";
-import ParallaxTilt from "react-parallax-tilt";
 import "./Card.css"; // Import your CSS file for styling
 import logo from "../../assets/images/gy.png";
 import { Link } from "react-router-dom";
+import { Row, Col, Button } from "antd";
 
 const CardComponent = () => {
   return (
@@ -10,67 +10,27 @@ const CardComponent = () => {
       <header className="header">
         <img src={logo} alt="Logo" className="logo" />
       </header>
-      
-      <div className="container2">
-        <Link to="/login" className="card-link2">
-          <div class="card2">
-            <div class="content2">
-              <h2>01</h2>
-              <h3>Sunlight PRDV</h3>
-            </div>
-            <div class="content2-back">
-              <h2>01</h2>
-              <h3>Sunlight PRDV</h3>
-              <button class="flip-button">Connexion</button>
-            </div>
-            <div class="glow2"></div>
-          </div>
-        </Link>
-        <Link to="/login" className="card-link2">
-          <div class="card2">
-            <div class="content2">
-              <h2>02</h2>
-              <h3>Sunlight PRDV</h3>
-            </div>
-            <div class="content2-back">
-              <h2>02</h2>
-              <h3>Sunlight PRDV</h3>
-              <button class="flip-button">Connexion</button>
-            </div>
-            <div class="glow2"></div>
-          </div>
-        </Link>
-        <Link to="/login" className="card-link2">
-          <div class="card2">
-            <div class="content2">
-              <h2>03</h2>
-              <h3>Sunlight PRDV</h3>
-            </div>
-            <div class="content2-back">
-              <h2>03</h2>
-              <h3>Sunlight PRDV</h3>
-              <button class="flip-button">Connexion</button>
-            </div>
-            <div class="glow2"></div>
-          </div>
-        </Link>
-        <Link to="/login" className="card-link2">
-          <div class="card2">
-            <div class="content2">
-              <h2>04</h2>
-              <h3>Sunlight PRDV</h3>
-            </div>
-            <div class="content2-back">
-              <h2>04</h2>
-              <h3>Sunlight PRDV</h3>
-              <button class="flip-button">Connexion</button>
-            </div>
-            <div class="glow2"></div>
-          </div>
-        </Link>
-      </div>
 
-      
+      <Row gutter={[0, 0]} justify="center" style={{margin:"0 80px"}}>
+        {[...Array(6).keys()].map((index) => (
+          <Col key={index} xs={24} sm={12} md={8} lg={6}>
+            <Link to="/login" className="card-link2">
+              <div className="card2 ">
+                <div className="content2">
+                  <h2>{`0${index + 1}`}</h2>
+                  <h3>Sunlight PRDV</h3>
+                </div>
+                <div className="content2-back">
+                  <h2>{`0${index + 1}`}</h2>
+                  <h3>Sunlight PRDV</h3>
+                  <Button className="flip-button">Connexion</Button>
+                </div>
+                <div className="glow2"></div>
+              </div>
+            </Link>
+          </Col>
+        ))}
+      </Row>
     </div>
   );
 };

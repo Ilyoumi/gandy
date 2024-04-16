@@ -16,7 +16,7 @@
 }
 
 .logo {
-  width: 300px; /* Adjust size as needed */
+  width: 200px; /* Adjust size as needed */
   height: auto; /* Maintain aspect ratio */
 }
 
@@ -36,8 +36,8 @@
   padding: 1em;
   text-align: right;
   color: #181a1a;
-  width: 300px;
-  height: 400px;
+  width: 220px;
+  height: 280px;
   box-shadow: 0 1px 5px #00000099;
   border-radius: 10px;
   position: relative;
@@ -75,7 +75,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  
 }
+
 .content2-back {
   transform: rotateY(180deg);
 }
@@ -99,7 +101,7 @@
   font-weight: 500;
   text-decoration: none;
   display: inline-block;
-  padding: 8px 20px;
+  padding: 0 22px;
   margin-top: 15px;
   background-color: #fff;
   border-radius: 20px;
@@ -107,41 +109,32 @@
   cursor: pointer;
   border: none;
   position: relative;
-  top: 20px;
-  left:80px
+  left:50px
 
 }
 
 .content2 h2 {
   color: rgba(255, 255, 255, 0.6);
-  font-size: 100px;
+  font-size: 80px;
   position: relative;
   top: -20%;
   left:25%
 }
-.content2 h3 {
+.content2 h3, .content2-back h3 {
   color: white;
-  font-size: 28px;
+  font-size: 22px;
   position: relative;
-  top: 50px;
-  left:40px
+  top: 30px;
+  left:20px
 }
 
-.content2-back h3 {
-  color: white;
-  font-size: 28px;
-  position: relative;
-  top: 50px;
-  left:40px
-
-}
 
 .content2-back h2 {
   color: rgba(255, 255, 255, 0.6);
-  font-size: 100px;
+  font-size: 80px;
   position: relative;
-  top: -13%;
-  left:30%
+  top: -10%;
+  left:27%
 }
 
 .link2 {

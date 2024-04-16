@@ -187,6 +187,12 @@ const handleDeleteUser = async (id) => {
         },
     ];
 
+    const modifiedUsers = users.map(user => {
+        return {
+            ...user,
+            name: `${user.nom} ${user.prenom}` // Concatenate nom and prenom
+        };
+    });
     return (
         <div
             style={{
@@ -215,7 +221,7 @@ const handleDeleteUser = async (id) => {
             <Table
                 columns={columns}
                 loading={loading}
-                dataSource={users}
+                dataSource={modifiedUsers} 
                 pagination={{ pageSize: 5}}
                 responsive={{
                     xs: 1, // 1 column for extra small screens (mobile)

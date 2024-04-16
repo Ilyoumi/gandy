@@ -18,7 +18,7 @@ import Agenda from "./pages/caledrier/views/DisplayAgenda";
 import Card from "./pages/card/Card";
 import DisplayUsers from "./pages/user/views/DisplayUsers";
 import MyCalendar from "./pages/caledrier/views/MyCalendar";
-import axios from "axios";
+import axios from "axios"; 
 import { UserProvider } from "./GlobalContext";
 
 axios.defaults.baseURL = "http://localhost:8000";
