@@ -259,7 +259,7 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
                                         <Form.Item
-                                            defaultValue="BE"
+                                            defaultValue="BEs"
                                             label="TVA"
                                             name="tva"
                                             rules={[
