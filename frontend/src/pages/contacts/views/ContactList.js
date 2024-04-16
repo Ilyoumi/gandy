@@ -17,6 +17,12 @@ function ContactList({
     useEffect(() => {
         fetchAgentCommercialUsers();
     }, []);
+    useEffect(() => {
+        // Set the agendaId to the ID of the first agenda when agendas are available
+        if (agendas.length > 0) {
+            setAgendaId(agendas[0].id);
+        }
+    }, [agendas]);
 
     const fetchAgentCommercialUsers = async () => {
         try {
@@ -47,6 +53,10 @@ function ContactList({
                 );
                 const userAgendas = response.data.agendas;
                 console.log("agenda id id ", response.data.agendas);
+                // Set the agendaId to the ID of the first agenda for the selected user
+                if (userAgendas.length > 0) {
+                    setAgendaId(userAgendas[0].id);
+                }
 
                 setAgendaId(userAgendas[0].id);
             }

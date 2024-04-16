@@ -14,6 +14,7 @@ const DataTable = () => {
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [tableData, setTableData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [agentName, setAgentNAme] = useState("");
     const { getColumnSearchProps } = useColumnSearch();
 
     useEffect(() => {
@@ -24,14 +25,26 @@ const DataTable = () => {
         setLoading(true);
         try {
             const response = await axiosClient.get("/api/rdvs");
-            setTableData(response.data);
-            console.log(response.data);
+            // Fetch the agent's name for each record
+            const updatedTableData = await Promise.all(response.data.map(async (record) => {
+                // Fetch the agent's name based on the agent's ID
+                const agentResponse = await axiosClient.get(`/api/users/${record.id_agent}`);
+                setAgentNAme(`${agentResponse.data.nom} ${agentResponse.data.prenom}`)
+                console.log("agent name from table", agentName)
+                // Return the updated record with the agent's name
+                return {
+                    ...record,
+                    agentName: agentName,
+                };
+            }));
+            setTableData(updatedTableData);
         } catch (error) {
             console.error("Error fetching RDV data:", error);
         } finally {
             setLoading(false);
         }
     };
+    
 
     const handleUpdateClick = (record) => {
         setSelectedRowData(record);
@@ -198,7 +211,7 @@ const deleteRecord = async (record) => {
                 />
             </Modal>
             <Modal
-                title="Appointment Details"
+                title="Modifier rendez-vous"
                 visible={detailsModalVisible}
                 onCancel={() => setDetailsModalVisible(false)}
                 footer={null}
@@ -208,7 +221,7 @@ const deleteRecord = async (record) => {
                 destroyOnClose
             >
                 {selectedRowData && (
-                    <AppointmentDetails selectedRowData={selectedRowData} />
+                    <AppointmentDetails selectedRowData={selectedRowData} agentName={agentName} />
                 )}
             </Modal>
         </div>

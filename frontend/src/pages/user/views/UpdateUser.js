@@ -32,7 +32,7 @@ const UpdateUserModal = ({ visible, onCancel, onUpdate, userData }) => {
 
     return (
         <Modal
-            visible={visible}
+            visible={visible} 
             title="Modifier Utilisateur"
             okText="Modifier"
             onCancel={onCancel}

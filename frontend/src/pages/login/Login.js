@@ -16,6 +16,8 @@ import signinbg from "../../assets/images/loginbg.png";
 import logo from "../../assets/images/gy.png";
 import { axiosClient } from "../../api/axios";
 import { useAuth } from "../../AuthContext";
+import { useHistory } from "react-router-dom";
+
 const { Title } = Typography;
 const { Content } = Layout;
 
@@ -31,6 +33,8 @@ const Login = () => {
 
     const [form] = Form.useForm();
     const [loadings, setLoadings] = useState([]);
+    const history = useHistory();
+
     const enterLoading = (index) => {
         setLoadings((prevLoadings) => {
             const newLoadings = [...prevLoadings];
@@ -61,6 +65,9 @@ const Login = () => {
                             .post(`api/login`, data)
                             .then((res) => {
                                 if (res.data.status === 200) {
+                                    if (res.data.role === "Admin") {
+                                        history.push("/dashboard");
+                                    }
                                     console.log("res:", res.data);
                                     localStorage.setItem(
                                         "auth_token",
@@ -88,7 +95,8 @@ const Login = () => {
                                     );
 
                                     handleLoginSuccess(
-                                        res.data.id,res.data.nom + " " + res.data.prenom
+                                        res.data.id,
+                                        res.data.nom + " " + res.data.prenom
                                     );
                                     console.log("local Storage", localStorage);
                                     setSuccessModalVisible(true);
@@ -96,11 +104,18 @@ const Login = () => {
                                         name: localStorage.getItem("auth_name"),
                                         role: localStorage.getItem("user_role"),
                                     });
-                                    console.log("successModalVisible", successModalVisible)
+                                    console.log(
+                                        "successModalVisible",
+                                        successModalVisible
+                                    );
                                     console.log(
                                         "user info from login: ",
                                         localStorage.getItem("auth_name"),
                                         localStorage.getItem("user_role")
+                                    );
+                                    // Display success message using message.success
+                                    message.success(
+                                        `Bienvenue, ${res.data.nom},${res.data.role} `
                                     );
                                 } else if (res.data.status === 401) {
                                     console.log(res.data);
@@ -144,8 +159,6 @@ const Login = () => {
                 // You can also handle the validation error or display an error message to the user if needed
             });
     };
-
-    
 
     const onFinishFailed = (errorInfo) => {
         setAlertVisible(true);
