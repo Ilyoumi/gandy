@@ -27,6 +27,7 @@ const AddAgendaModal = ({ visible, onCancel, onAgendaCreated }) => {
         }
     };
     
+    
 
     const handleSubmit = async (values) => {
         try {

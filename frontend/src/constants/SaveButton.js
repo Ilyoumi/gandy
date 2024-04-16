@@ -1,12 +1,12 @@
 import React from 'react';
 import { Button } from 'antd';
-import './SaveButton.css';
+import './ButtonStyle.css';
 
 
-const SaveButton = ({ loading }) => {
+const SaveButton = ({ onClick, loading, buttonText  }) => {
   return (
-    <Button className="save-button" htmlType="submit" loading={loading}>
-        Enregistrer
+    <Button className="save-button" onClick={onClick} loading={loading} htmlType='submit' guost>
+        {buttonText}
     </Button>
 
   );

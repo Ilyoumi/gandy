@@ -539,7 +539,7 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                     ]}
                                 >
                                     <Select
-                                        placeholder="sélectionner votre fournisseur"
+                                        placeholder="Sélectionner votre fournisseur"
                                         onChange={(value) =>
                                             setFormData({
                                                 ...formData,
@@ -547,15 +547,32 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                             })
                                         }
                                     >
-                                        <Option value="fournisseur1">
-                                            Fournisseur 1
-                                        </Option>
-                                        <Option value="fournisseur2">
-                                            Fournisseur 2
-                                        </Option>
-                                        <Option value="fournisseur3">
-                                            Fournisseur 3
-                                        </Option>
+                                        {[
+                                            "Aspiravi Energy",
+                                            "Bolt",
+                                            "COCITER",
+                                            "DATS 24",
+                                            "EBEM",
+                                            "Ecopower",
+                                            "Elegant",
+                                            "Eneco",
+                                            "Energie.be",
+                                            "ENGIE",
+                                            "Frank Energie",
+                                            "Luminus",
+                                            "Mega",
+                                            "OCTA+",
+                                            "TotalEnergies",
+                                            "Trevion",
+                                            "Wind voor A",
+                                        ].map((fournisseur, index) => (
+                                            <Option
+                                                key={index}
+                                                value={fournisseur}
+                                            >
+                                                {fournisseur}
+                                            </Option>
+                                        ))}
                                     </Select>
                                 </Form.Item>
                             </Col>
