@@ -5,7 +5,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import frLocale from "@fullcalendar/core/locales/fr";
 import { Modal, Card, Spin, Button, Col, Row } from "antd";
-import AddAppointment from "./AddAppoitment";
+import AddAppointment from "./AddRdv";
 import NewButton from "../../../constants/NewButton";
 import AddAgendaModal from "./AddAgenda";
 import { axiosClient } from "../../../api/axios";
