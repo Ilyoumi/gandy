@@ -30,7 +30,7 @@ const DataTable = () => {
                 // Fetch the agent's name based on the agent's ID
                 const agentResponse = await axiosClient.get(`/api/users/${record.id_agent}`);
                 setAgentNAme(`${agentResponse.data.nom} ${agentResponse.data.prenom}`)
-                console.log("agent name from table", agentName)
+                console.log("agent name from table", agentResponse.data)
                 // Return the updated record with the agent's name
                 return {
                     ...record,
