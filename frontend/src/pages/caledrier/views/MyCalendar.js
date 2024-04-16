@@ -343,7 +343,8 @@ function MyCalendar() {
         };
     }
 
-    const handleAgendaCreated = async (agendaId, agendaName) => {
+    const handleAgendaCreated = async (agendaId, agendaName, userContext) => {
+        console.log("userContext.userId", userContext.userId)
         try {
             // Combine the default event with existing events from the database
             const updatedEvents = [...appointments];
@@ -352,7 +353,9 @@ function MyCalendar() {
 
             // Update existing agenda with FullCalendar data
             const response = await axiosClient.put(`/api/agendas/${agendaId}`, {
+                name: agendaName,
                 fullcalendar_config: config,
+                contact_id: userContext.userId,
             });
 
             console.log(
@@ -434,9 +437,6 @@ function MyCalendar() {
         // Handle delete logic here
     };
 
-    console.log("userRole m:", userContext.userRole);
-    console.log("agentId m:", agentId);
-    console.log("userId m:", userContext.userId);
 
     return (
         <div

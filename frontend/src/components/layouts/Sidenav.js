@@ -1,28 +1,42 @@
 import React, { useEffect, useState } from "react";
-import AgentAccess from "./accessUser/AgentAcess"
+import AgentAccess from "./accessUser/AgentAcess";
 import logo from "../../assets/images/gy-noir.png";
 import AdminAcess from "./accessUser/AdminAccess";
 import AgentCommAccess from "./accessUser/AgentComAccess";
 import SupervisorAccess from "./accessUser/SupervisorAccess";
-import fetchUserData from '../../api/acces';
 import { useUser } from "../../GlobalContext";
-
+import { axiosClient } from "../../api/axios";
 
 function Sidenav({ color }) {
-    const [expanded, setExpanded] = useState(true);
+    const [role, setRole] = useState("");
     const userContext = useUser();
 
     useEffect(() => {
-        // Initial fetch
-        fetchUserData(userContext);
+        const fetchUserData = async () => {
+            try {
+                const authToken = localStorage.getItem("auth_token");
+                if (!authToken) {
+                    console.log("User is not logged in");
+                    return;
+                }
+        
+                const response = await axiosClient.get("/api/user", {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`,
+                    },
+                });
+                const { role } = response.data;
+                setRole(role);
+                console.log("User role:", role);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
 
-        // Periodically fetch user data every 5 minutes (5 * 60 * 1000 milliseconds)
-        const interval = setInterval(fetchUserData, 5 * 60 * 1000);
+        fetchUserData(); // Call the function immediately on mount
 
-        // Cleanup interval on unmount
-        return () => clearInterval(interval);
-    }, [userContext]);
-    const { userRole } = userContext;
+        // Clean-up function not needed here
+    }, []); // No dependencies, as we only need to fetch user data once on mount
 
     return (
         <div>
@@ -31,18 +45,16 @@ function Sidenav({ color }) {
                     src={logo}
                     alt=""
                     style={{
-                        width: expanded ? "70px" : "0",
-                        height: expanded ? "auto" : "0",
-                        overflow: "hidden",
-                        transition: "all",
+                        width: "70px",
+                        height: "auto",
                         marginTop: "-10px",
                     }}
                 />
             </div>
-            {userRole === "Admin" && <AdminAcess color={color} />}
-            {userRole === "Agent Commercial" && <AgentCommAccess color={color} />}
-            {userRole === "Superviseur" && <SupervisorAccess color={color} />}
-            {userRole === "Agent" && <AgentAccess color={color} />}
+            {role === "Admin" && <AdminAcess color={color} />}
+            {role === "Agent Commercial" && <AgentCommAccess color={color} />}
+            {role === "Superviseur" && <SupervisorAccess color={color} />}
+            {role === "Agent" && <AgentAccess color={color} />}
         </div>
     );
 }

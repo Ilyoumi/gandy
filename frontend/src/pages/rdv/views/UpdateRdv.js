@@ -14,6 +14,9 @@ import frFR from "antd/lib/locale/fr_FR";
 import SaveButton from "../../../constants/SaveButton";
 import moment from "moment";
 import { axiosClient } from "../../../api/axios";
+import NewButton from "../../../constants/NewButton";
+import SupprimerButton from "../../../constants/SupprimerButton";
+import ModifierButton from "../../../constants/ModifierButton";
 const { Option } = Select;
 
 const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
@@ -49,11 +52,11 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             endTime: moment(initialValues.end_date),
         };
         form.setFieldsValue(formattedInitialValues);
-        setFormData(formattedInitialValues); 
+        setFormData(formattedInitialValues);
     }, [initialValues, form]);
-    
+
     useEffect(() => {
-        fetchUserData(); 
+        fetchUserData();
     }, []);
 
     const handleClick = () => {
@@ -69,19 +72,18 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             const authToken = localStorage.getItem("auth_token");
             if (!authToken) {
                 // User is not logged in, do nothing
-                console.log("User is not logged in")
+                console.log("User is not logged in");
                 return;
             }
-    
+
             // User is logged in, fetch user data
             const response = await axiosClient.get("/api/user", {
                 headers: {
                     Authorization: `Bearer ${authToken}`,
                 },
             });
-            const { id } = response.data; 
+            const { id } = response.data;
             setUserId(id);
-
         } catch (error) {
             console.error("Error fetching user data:", error);
         }
@@ -89,9 +91,9 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
 
     const handleFormSubmit = async () => {
         setLoading(true);
-    
+
         console.log("Form data before submission:", formData);
-    
+
         // Merge updated fields from formData with initialValues
         const formDataToSend = {
             ...initialValues,
@@ -100,9 +102,9 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             id_agenda: agendaId,
             tarification: formData.tarification.toString(),
         };
-    
+
         console.log("Form data to send:", formDataToSend);
-    
+
         try {
             const response = await axiosClient.put(
                 `/api/rdvs/${initialValues.id}`,
@@ -116,12 +118,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             console.error("Error updating appointment:", error);
         }
     };
-    
-    
-    
-    
-    
-    
 
     const prefixSelector = (
         <Form.Item name="prefix" noStyle>
@@ -142,7 +138,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                 name="appointment_date"
                                 value={[
                                     moment(initialValues.start_date),
-                                    moment(initialValues.end_date)
+                                    moment(initialValues.end_date),
                                 ]}
                                 onChange={(dates) => {
                                     setFormData({
@@ -152,12 +148,12 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                 }}
                                 showTime={true}
                                 defaultValue={[moment(), moment()]}
-                                
                             />
                         </ConfigProvider>
                     </Col>
-                    <Col span={12}>
-                        <SaveButton onClick={handleClick} loading={loading} />
+                    
+                    <Col span={4}>
+                        <SaveButton loading={loading} buttonText="Enregistrer" />
                     </Col>
                 </Row>
             </Card>
@@ -181,7 +177,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             ]}
                                         >
                                             <Input
-                                            
                                                 onChange={(e) =>
                                                     setFormData({
                                                         ...formData,
@@ -196,7 +191,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             label="Prénom"
                                             name="prenom"
                                             initialValue={initialValues.prenom}
-
                                             rules={[
                                                 {
                                                     required: true,
@@ -224,7 +218,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             label="Nom de Société"
                                             name="nom_ste"
                                             initialValue={initialValues.nom_ste}
-
                                         >
                                             <Input
                                                 onChange={(e) =>
@@ -237,8 +230,11 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
-                                            
-                                        <Form.Item label="TVA" name="tva" initialValue={initialValues.tva}  >
+                                        <Form.Item
+                                            label="TVA"
+                                            name="tva"
+                                            initialValue={initialValues.tva}
+                                        >
                                             <Input
                                                 onChange={(e) =>
                                                     setFormData({
@@ -315,7 +311,11 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
-                                        <Form.Item label="GSM" name="gsm" initialValue={initialValues.gsm}>
+                                        <Form.Item
+                                            label="GSM"
+                                            name="gsm"
+                                            initialValue={initialValues.gsm}
+                                        >
                                             <Input
                                                 addonBefore={prefixSelector}
                                                 style={{ width: "100%" }}
@@ -336,7 +336,9 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                         <Form.Item
                                             label="Nombre de Compteurs Électriques"
                                             name="nbr_comp_elect"
-                                            initialValue={initialValues.nbr_comp_elect}
+                                            initialValue={
+                                                initialValues.nbr_comp_elect
+                                            }
                                             rules={[
                                                 {
                                                     required: true,
@@ -346,7 +348,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             ]}
                                         >
                                             <Select
-                                            
                                                 onChange={(value) =>
                                                     setFormData({
                                                         ...formData,
@@ -377,7 +378,9 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                         <Form.Item
                                             label="Nombre de Compteurs Gaz"
                                             name="nbr_comp_gaz"
-                                            initialValue={initialValues.nbr_comp_gaz}
+                                            initialValue={
+                                                initialValues.nbr_comp_gaz
+                                            }
                                             rules={[
                                                 {
                                                     required: true,
@@ -571,7 +574,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                 <Form.Item
                                     label="Commentaire"
                                     name="commentaire"
-
                                 >
                                     <Input.TextArea rows={5} />
                                 </Form.Item>

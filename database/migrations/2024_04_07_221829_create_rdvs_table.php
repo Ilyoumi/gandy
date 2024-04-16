@@ -30,6 +30,8 @@ return new class extends Migration
             $table->boolean('tarif');
             $table->boolean('haute_tension');
             $table->text('commentaire')->nullable();
+            $table->text('note')->nullable();
+            $table->string('status')->default("encours");
             $table->unsignedBigInteger('id_agent'); 
             $table->unsignedBigInteger('id_agenda');
             $table->foreign('id_agent')->references('id')->on('users');
