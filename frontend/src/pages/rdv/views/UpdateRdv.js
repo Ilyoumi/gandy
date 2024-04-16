@@ -151,7 +151,13 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                             />
                         </ConfigProvider>
                     </Col>
-                    
+                    <Col span={4}>
+                        <ModifierButton loading={loading} buttonText="Modifier" />
+                    </Col>
+
+                    <Col span={4}> 
+                        <SupprimerButton loading={loading} buttonText="Annuler" danger />
+                    </Col>
                     <Col span={4}>
                         <SaveButton loading={loading} buttonText="Enregistrer" />
                     </Col>
