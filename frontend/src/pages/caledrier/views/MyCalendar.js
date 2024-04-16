@@ -72,16 +72,16 @@ function MyCalendar() {
     const [userId, setUserId] = useState("");
     const [agent, setAgent] = useState("");
     let userName = "Unknown User";
-// Find the user corresponding to the first agenda item
-        const firstAgenda = agendas.find(
-            (agenda) => selectedItems.includes(agenda.contact_id)
+    // Find the user corresponding to the first agenda item
+    const firstAgenda = agendas.find((agenda) =>
+        selectedItems.includes(agenda.contact_id)
+    );
+    if (firstAgenda) {
+        const user = agentCommercialUsers.find(
+            (user) => user.id === firstAgenda.contact_id
         );
-        if (firstAgenda) {
-            const user = agentCommercialUsers.find(
-                (user) => user.id === firstAgenda.contact_id
-            );
-            userName = user ? `${user.prenom} ${user.nom}` : "Unknown User";
-        }
+        userName = user ? `${user.prenom} ${user.nom}` : "Unknown User";
+    }
 
     const fetchAppointments = async (agendaId) => {
         try {
@@ -119,7 +119,6 @@ function MyCalendar() {
     }, [userContext]);
 
     useEffect(() => {
-        
         // Fetch users with role "Agent Commercial" when the component mounts
         fetchAgentCommercialUsers();
         fetchAgendasAndAppointments();
@@ -128,7 +127,6 @@ function MyCalendar() {
         // Cleanup interval on unmount
         return () => clearInterval(interval);
     }, []);
-    
 
     useEffect(() => {
         // Set the first user as selected when component mounts
@@ -178,6 +176,7 @@ function MyCalendar() {
     };
 
     const handleAddAppointment = (arg, agentId, agendaId) => {
+        console.log("app id", arg.id)
         console.log("Agent ID....:", userContext.userId);
         console.log("userContext...:", userContext);
         console.log("Agenda ID:", agendaId);
@@ -388,7 +387,7 @@ function MyCalendar() {
 
             // Extract the agent ID from the response data
             const agentId = response.data.agentId;
-            setAgentId(agentId)
+            setAgentId(agentId);
             console.log("Fetched agent ID:", agentId);
             console.log("Fetched data :", response.data);
             console.log("agenda id ------", agendaId);
@@ -644,7 +643,7 @@ function MyCalendar() {
                                 </Col>
                                 {/* Buttons column */}
                                 <Col style={{ marginRight: "40px" }}>
-                                    {(userContext.userRole === "Superviseur" ||
+                                    {(userContext.userRole === "Admin" ||
                                         agentId === userContext.userId) && (
                                         <Button
                                             onClick={handleUpdateClick}
@@ -653,7 +652,7 @@ function MyCalendar() {
                                             Modifier
                                         </Button>
                                     )}
-                                    {userContext.userRole === "Superviseur" && (
+                                    {userContext.userRole === "Admin" && (
                                         <Button
                                             onClick={handleDeleteClick}
                                             danger

@@ -9,6 +9,8 @@ import {
     Card,
     ConfigProvider,
     Select,
+    Radio,
+    message,
 } from "antd";
 import moment from "moment";
 import frFR from "antd/lib/locale/fr_FR";
@@ -79,10 +81,13 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
     const handleFormSubmit = async () => {
         setLoading(true);
         let formDataToSend;
-        // Validate appointment date
         if (!formData.appointment_date) {
-            console.log("The appointment date field is required.");
+            message.warning("Veuillez sélectionner une date de rendez-vous !");
+            setLoading(false);
+            return;
         }
+
+        // Validate appointment date
 
         try {
             formDataToSend = {
@@ -95,7 +100,7 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                 ),
                 id_agent: userId,
                 id_agenda: agendaId,
-                tarification: formData.tarification.toString(),
+                tarification: formData.tarif ? "Variable" : "Fixe",
             };
             console.log("agendaIdh:", agendaId);
             console.log("id_agent:", userId);
@@ -108,6 +113,7 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
             setLoading(false);
             console.log("Form submission successful. Response:", response.data);
             onFormSubmit({ ...response.data, newAppointment });
+            message.success("Rendez-vous ajouté avec succès !");
         } catch (error) {
             setLoading(false);
 
@@ -115,26 +121,52 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
             console.error("Error adding appointment:", error);
         }
     };
-
-    const prefixSelector = (
-        <Form.Item name="prefix" noStyle>
-            <Select style={{ width: 70 }}>
-                <Option value="86">+86</Option>
-                <Option value="87">+87</Option>
-            </Select>
-        </Form.Item>
-    );
+    const onFinishFailed = (errorInfo) => {
+        console.log("Failed:", errorInfo);
+        // Display a warning alert
+        // You can also store errorInfo in state and display it in the alert if needed
+        alert("Form validation failed. Please check your input.");
+    };
 
     return (
-        <Form layout="vertical" onFinish={handleFormSubmit}>
+        <Form
+            layout="vertical"
+            onFinish={handleFormSubmit}
+            onFinishFailed={onFinishFailed}
+        >
             <Card style={{ marginBottom: "10px" }}>
                 <Row gutter={[16, 16]}>
                     <Col span={12}>
                         <ConfigProvider locale={frFR}>
                             <DatePicker.RangePicker
-                                name="appointment_date"
-                                showTime={true}
-                                defaultValue={[moment(), moment()]}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:
+                                            "Veuillez sélectionner une date de rendez-vous !",
+                                    },
+                                ]}
+                                defaultValue={[
+                                    moment().startOf("day").hour(9),
+                                    moment().startOf("day").hour(10),
+                                ]}
+                                showTime={{
+                                    format: "HH:mm",
+                                    minuteStep: 15,
+                                    disabledHours: () => {
+                                        const disabledHours = [];
+                                        // Hours before 9 AM
+                                        for (let i = 0; i < 9; i++) {
+                                            disabledHours.push(i);
+                                        }
+                                        // Hours after 6 PM
+                                        for (let i = 18; i < 24; i++) {
+                                            disabledHours.push(i);
+                                        }
+                                        return disabledHours;
+                                    },
+                                }}
+                                format="YYYY-MM-DD HH:mm"
                                 onChange={(dates) =>
                                     setFormData({
                                         ...formData,
@@ -207,6 +239,13 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                         <Form.Item
                                             label="Nom de Société"
                                             name="nom_ste"
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez entrer le nom de votre société !",
+                                                },
+                                            ]}
                                         >
                                             <Input
                                                 onChange={(e) =>
@@ -219,7 +258,33 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
-                                        <Form.Item label="TVA" name="tva">
+                                        <Form.Item
+                                            defaultValue="BE"
+                                            label="TVA"
+                                            name="tva"
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez entrer votre numéro de TVA !",
+                                                },
+                                                {
+                                                    validator: (_, value) => {
+                                                        const regex =
+                                                            /^[B][E]\d+$/; // Regular expression for validating TVA number format (starts with "BE" followed by one or more digits)
+                                                        if (
+                                                            value &&
+                                                            !regex.test(value)
+                                                        ) {
+                                                            return Promise.reject(
+                                                                'Le numéro de TVA doit commencer par "BE" suivi de chiffres.'
+                                                            );
+                                                        }
+                                                        return Promise.resolve();
+                                                    },
+                                                },
+                                            ]}
+                                        >
                                             <Input
                                                 onChange={(e) =>
                                                     setFormData({
@@ -238,6 +303,13 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                         <Form.Item
                                             label="Adresse"
                                             name="adresse"
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez entrer votre adresse !",
+                                                },
+                                            ]}
                                         >
                                             <Input
                                                 onChange={(e) =>
@@ -253,6 +325,18 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                         <Form.Item
                                             label="Code Postal"
                                             name="postal"
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez entrer votre code postal !",
+                                                },
+                                                {
+                                                    pattern: /^\d{4}$/, // Regex pattern to match exactly 4 digits
+                                                    message:
+                                                        "Veuillez entrer un code postal valide (4 chiffres).",
+                                                },
+                                            ]}
                                         >
                                             <Input
                                                 onChange={(e) =>
@@ -278,11 +362,25 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                                     message:
                                                         "Veuillez saisir votre numéro de téléphone!",
                                                 },
+                                                {
+                                                    pattern: /^\d{8}$/, // Regex pattern to match +32 followed by 8 digits
+                                                    message:
+                                                        "Veuillez saisir un numéro de téléphone valide de 8 chiffres (ex: +32123456789).",
+                                                },
                                             ]}
                                         >
                                             <Input
-                                                addonBefore={prefixSelector}
+                                                addonBefore={
+                                                    <span
+                                                        style={{
+                                                            padding: "0 8px",
+                                                        }}
+                                                    >
+                                                        +32
+                                                    </span>
+                                                }
                                                 style={{ width: "100%" }}
+                                                defaultValue=""
                                                 onChange={(e) =>
                                                     setFormData({
                                                         ...formData,
@@ -293,10 +391,34 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                         </Form.Item>
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
-                                        <Form.Item label="GSM" name="gsm">
+                                        <Form.Item
+                                            label="GSM"
+                                            name="gsm"
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez entrer votre gsm !",
+                                                },
+                                                {
+                                                    pattern: /^\d{8}$/, // Regex pattern to match +324 followed by 8 digits
+                                                    message:
+                                                        "Veuillez saisir un numéro de GSM valide de 8 chiffres(ex: +32412345678).",
+                                                },
+                                            ]}
+                                        >
                                             <Input
-                                                addonBefore={prefixSelector}
+                                                addonBefore={
+                                                    <span
+                                                        style={{
+                                                            padding: "0 8px",
+                                                        }}
+                                                    >
+                                                        +324
+                                                    </span>
+                                                }
                                                 style={{ width: "100%" }}
+                                                defaultValue=""
                                                 onChange={(e) =>
                                                     setFormData({
                                                         ...formData,
@@ -318,7 +440,7 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                                 {
                                                     required: true,
                                                     message:
-                                                        "Veuillez sélectionner le nombre de compteurs de gaz !",
+                                                        "Veuillez sélectionner le nombre de compteurs Électriques !",
                                                 },
                                             ]}
                                         >
@@ -388,6 +510,14 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                             </Select>
                                         </Form.Item>
                                     </Col>
+                                    <Col span={24}>
+                                        <Form.Item
+                                            label="Commentaire"
+                                            name="commentaire"
+                                        >
+                                            <Input.TextArea rows={3} />
+                                        </Form.Item>
+                                    </Col>
                                 </Row>
                             </Col>
                         </Row>
@@ -429,22 +559,29 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                     </Select>
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <Form.Item
                                     label="PPV"
                                     name="ppv"
-                                    rules={[{ required: true }]}
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                "Veuillez sélectionner Oui ou Non pour PPV !",
+                                        },
+                                    ]}
                                 >
-                                    <Switch
-                                        checkedChildren="Oui"
-                                        unCheckedChildren="Non"
-                                        onChange={(value) =>
+                                    <Radio.Group
+                                        onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                ppv: value,
+                                                tarif: e.target.value,
                                             })
                                         }
-                                    />
+                                    >
+                                        <Radio value={true}>Oui</Radio>
+                                        <Radio value={false}>Non</Radio>
+                                    </Radio.Group>
                                 </Form.Item>
 
                                 {showAdditionalInput && (
@@ -461,7 +598,7 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                     </Row>
                                 )}
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <Form.Item
                                     label="Tarif Social"
                                     name="tarif"
@@ -473,19 +610,20 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                         },
                                     ]}
                                 >
-                                    <Switch
-                                        checkedChildren="Oui"
-                                        unCheckedChildren="Non"
-                                        onChange={(value) =>
+                                    <Radio.Group
+                                        onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                tarif: value,
+                                                tarif: e.target.value,
                                             })
                                         }
-                                    />
+                                    >
+                                        <Radio value={true}>Oui</Radio>
+                                        <Radio value={false}>Non</Radio>
+                                    </Radio.Group>
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <Form.Item
                                     label="Haute Tension"
                                     name="haute_tension"
@@ -497,19 +635,20 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                         },
                                     ]}
                                 >
-                                    <Switch
-                                        checkedChildren="Oui"
-                                        unCheckedChildren="Non"
-                                        onChange={(value) =>
+                                    <Radio.Group
+                                        onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                haute_tension: value,
+                                                tarif: e.target.value,
                                             })
                                         }
-                                    />
+                                    >
+                                        <Radio value={true}>Oui</Radio>
+                                        <Radio value={false}>Non</Radio>
+                                    </Radio.Group>
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <Form.Item
                                     label="Tarification"
                                     name="tarification"
@@ -521,24 +660,22 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                         },
                                     ]}
                                 >
-                                    <Switch
-                                        checkedChildren="Fixe"
-                                        unCheckedChildren="Variable"
-                                        onChange={(value) =>
+                                    <Radio.Group
+                                        onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                tarification: value,
+                                                tarif: e.target.value,
                                             })
                                         }
-                                    />
+                                    >
+                                        <Radio value={true}>Variable</Radio>
+                                        <Radio value={false}>Fixe</Radio>
+                                    </Radio.Group>
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                                <Form.Item
-                                    label="Commentaire"
-                                    name="commentaire"
-                                >
-                                    <Input.TextArea rows={5} />
+                                <Form.Item label="Note" name="note">
+                                    <Input.TextArea rows={3} />
                                 </Form.Item>
                             </Col>
                         </Row>
