@@ -9,12 +9,14 @@ import {
     Card,
     ConfigProvider,
     Select,
+    Radio,
+    message,
+    Alert,
 } from "antd";
 import frFR from "antd/lib/locale/fr_FR";
 import SaveButton from "../../../constants/SaveButton";
 import moment from "moment";
 import { axiosClient } from "../../../api/axios";
-import NewButton from "../../../constants/NewButton";
 import SupprimerButton from "../../../constants/SupprimerButton";
 import ModifierButton from "../../../constants/ModifierButton";
 const { Option } = Select;
@@ -24,6 +26,8 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
     const [loading, setLoading] = useState(false);
     const [showAdditionalInput, setShowAdditionalInput] = useState(false);
     const [userId, setUserId] = useState(null);
+    const [showAlert, setShowAlert] = useState(false);
+
     const [formData, setFormData] = useState({
         title: "",
         nom: "",
@@ -94,16 +98,18 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
 
         console.log("Form data before submission:", formData);
 
-        // Merge updated fields from formData with initialValues
+        const startDate = new Date(formData.appointment_date[0]);
+        const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Add 1 hour
         const formDataToSend = {
-            ...initialValues,
             ...formData,
+            start_date: startDate.toISOString().slice(0, 19).replace('T', ' '), // Convert to YYYY-MM-DD HH:mm:ss format
+            end_date: endDate.toISOString().slice(0, 19).replace('T', ' '), // Convert to YYYY-MM-DD HH:mm:ss format
             id_agent: userId,
             id_agenda: agendaId,
-            tarification: formData.tarification.toString(),
+            tarification: formData.tarif ? "Variable" : "Fixe",
         };
+        console.log("sending data =", formDataToSend);
 
-        console.log("Form data to send:", formDataToSend);
 
         try {
             const response = await axiosClient.put(
@@ -113,41 +119,77 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             setLoading(false);
             console.log("Form submission successful. Response:", response.data);
             onFormSubmit({ ...response.data, id: response.data.id });
+            message.success("Rendez-vous modifié avec succès !");
+
         } catch (error) {
+            if (error.response && error.response.status === 409) {
+                setShowAlert(true);
+                setLoading(false);
+                return;
+            }
             setLoading(false);
             console.error("Error updating appointment:", error);
         }
     };
 
-    const prefixSelector = (
-        <Form.Item name="prefix" noStyle>
-            <Select style={{ width: 70 }}>
-                <Option value="86">+86</Option>
-                <Option value="87">+87</Option>
-            </Select>
-        </Form.Item>
-    );
 
     return (
         <Form layout="vertical" onFinish={handleFormSubmit}>
+            {showAlert && (
+                <Alert
+                    message="La date sélectionnée est déjà réservée."
+                    type="warning"
+                    showIcon
+                    closable
+                    onClose={() => setShowAlert(false)}
+                />
+            )}
             <Card style={{ marginBottom: "10px" }}>
                 <Row gutter={[16, 16]}>
                     <Col span={12}>
                         <ConfigProvider locale={frFR}>
                             <DatePicker.RangePicker
                                 name="appointment_date"
-                                value={[
-                                    moment(initialValues.start_date),
-                                    moment(initialValues.end_date),
-                                ]}
+                                value={
+                                    formData.appointment_date && [
+                                        moment(formData.appointment_date[0]),
+                                        moment(formData.appointment_date[1]),
+                                    ]
+                                }
                                 onChange={(dates) => {
-                                    setFormData({
-                                        ...formData,
-                                        appointment_date: dates,
-                                    });
+                                    console.log("new date", dates);
+                                    // Check if dates array is not empty and contains valid start and end dates
+                                    if (dates && dates.length === 2) {
+                                        setFormData(prevState => ({
+                                            ...prevState,
+                                            appointment_date: dates,
+                                        }));
+                                        
+                                    } else {
+                                        setFormData({
+                                            ...formData,
+                                            appointment_date: null, // Reset appointment_date if no valid dates selected
+                                        });
+                                    }
                                 }}
-                                showTime={true}
-                                defaultValue={[moment(), moment()]}
+                                showTime={{
+                                    format: "HH:mm",
+                                    minuteStep: 15,
+                                    disabledHours: () => {
+                                        const disabledHours = [];
+                                        // Hours before 9 AM
+                                        for (let i = 0; i < 9; i++) {
+                                            disabledHours.push(i);
+                                        }
+                                        // Hours after 6 PM
+                                        for (let i = 18; i < 24; i++) {
+                                            disabledHours.push(i);
+                                        }
+                                        return disabledHours;
+                                    },
+                                }}
+                                format="YYYY-MM-DD HH:mm"
+                                
                             />
                         </ConfigProvider>
                     </Col>
@@ -240,6 +282,28 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             label="TVA"
                                             name="tva"
                                             initialValue={initialValues.tva}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez entrer votre numéro de TVA !",
+                                                },
+                                                {
+                                                    validator: (_, value) => {
+                                                        const regex =
+                                                            /^[B][E]\d+$/; // Regular expression for validating TVA number format (starts with "BE" followed by one or more digits)
+                                                        if (
+                                                            value &&
+                                                            !regex.test(value)
+                                                        ) {
+                                                            return Promise.reject(
+                                                                'Le numéro de TVA doit commencer par "BE" suivi de chiffres.'
+                                                            );
+                                                        }
+                                                        return Promise.resolve();
+                                                    },
+                                                },
+                                            ]}
                                         >
                                             <Input
                                                 onChange={(e) =>
@@ -260,6 +324,13 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             label="Adresse"
                                             name="adresse"
                                             initialValue={initialValues.adresse}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez entrer votre adresse !",
+                                                },
+                                            ]}
                                         >
                                             <Input
                                                 onChange={(e) =>
@@ -276,6 +347,18 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             label="Code Postal"
                                             name="postal"
                                             initialValue={initialValues.postal}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez entrer votre code postal !",
+                                                },
+                                                {
+                                                    pattern: /^\d{4}$/, // Regex pattern to match exactly 4 digits
+                                                    message:
+                                                        "Veuillez entrer un code postal valide (4 chiffres).",
+                                                },
+                                            ]}
                                         >
                                             <Input
                                                 onChange={(e) =>
@@ -302,10 +385,23 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                                     message:
                                                         "Veuillez saisir votre numéro de téléphone!",
                                                 },
+                                                {
+                                                    pattern: /^\d{8}$/, // Regex pattern to match +32 followed by 8 digits
+                                                    message:
+                                                        "Veuillez saisir un numéro de téléphone valide de 8 chiffres (ex: +32123456789).",
+                                                },
                                             ]}
                                         >
                                             <Input
-                                                addonBefore={prefixSelector}
+                                            addonBefore={
+                                                <span
+                                                    style={{
+                                                        padding: "0 8px",
+                                                    }}
+                                                >
+                                                    +32
+                                                </span>
+                                            }
                                                 style={{ width: "100%" }}
                                                 onChange={(e) =>
                                                     setFormData({
@@ -321,9 +417,29 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             label="GSM"
                                             name="gsm"
                                             initialValue={initialValues.gsm}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message:
+                                                        "Veuillez entrer votre gsm !",
+                                                },
+                                                {
+                                                    pattern: /^\d{8}$/, // Regex pattern to match +324 followed by 8 digits
+                                                    message:
+                                                        "Veuillez saisir un numéro de GSM valide de 8 chiffres(ex: +32412345678).",
+                                                },
+                                            ]}
                                         >
                                             <Input
-                                                addonBefore={prefixSelector}
+                                                addonBefore={
+                                                    <span
+                                                        style={{
+                                                            padding: "0 8px",
+                                                        }}
+                                                    >
+                                                        +324
+                                                    </span>
+                                                }
                                                 style={{ width: "100%" }}
                                                 onChange={(e) =>
                                                     setFormData({
@@ -422,6 +538,14 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             </Select>
                                         </Form.Item>
                                     </Col>
+                                    <Col span={24}>
+                                        <Form.Item
+                                            label="Commentaire"
+                                            name="commentaire"
+                                        >
+                                            <Input.TextArea rows={3} />
+                                        </Form.Item>
+                                    </Col>
                                 </Row>
                             </Col>
                         </Row>
@@ -444,7 +568,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                     ]}
                                 >
                                     <Select
-                                        placeholder="sélectionner votre fournisseur"
+                                        placeholder="Sélectionner votre fournisseur"
                                         onChange={(value) =>
                                             setFormData({
                                                 ...formData,
@@ -452,15 +576,32 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             })
                                         }
                                     >
-                                        <Option value="fournisseur1">
-                                            Fournisseur 1
-                                        </Option>
-                                        <Option value="fournisseur2">
-                                            Fournisseur 2
-                                        </Option>
-                                        <Option value="fournisseur3">
-                                            Fournisseur 3
-                                        </Option>
+                                        {[
+                                            "Aspiravi Energy",
+                                            "Bolt",
+                                            "COCITER",
+                                            "DATS 24",
+                                            "EBEM",
+                                            "Ecopower",
+                                            "Elegant",
+                                            "Eneco",
+                                            "Energie.be",
+                                            "ENGIE",
+                                            "Frank Energie",
+                                            "Luminus",
+                                            "Mega",
+                                            "OCTA+",
+                                            "TotalEnergies",
+                                            "Trevion",
+                                            "Wind voor A",
+                                        ].map((fournisseur, index) => (
+                                            <Option
+                                                key={index}
+                                                value={fournisseur}
+                                            >
+                                                {fournisseur}
+                                            </Option>
+                                        ))}
                                     </Select>
                                 </Form.Item>
                             </Col>
@@ -469,19 +610,25 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                     label="PPV"
                                     name="ppv"
                                     initialValue={initialValues.ppv}
-                                    rules={[{ required: true }]}
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message:
+                                                "Veuillez sélectionner Oui ou Non pour PPV !",
+                                        },
+                                    ]}
                                 >
-                                    <Switch
-                                        checkedChildren="Oui"
-                                        unCheckedChildren="Non"
-                                        checked={initialValues.ppv}
-                                        onChange={(value) =>
+                                    <Radio.Group
+                                        onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                ppv: value,
+                                                tarif: e.target.value,
                                             })
                                         }
-                                    />
+                                    >
+                                        <Radio value={true}>Oui</Radio>
+                                        <Radio value={false}>Non</Radio>
+                                    </Radio.Group>
                                 </Form.Item>
 
                                 {showAdditionalInput && (
@@ -511,17 +658,17 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                         },
                                     ]}
                                 >
-                                    <Switch
-                                        checkedChildren="Oui"
-                                        unCheckedChildren="Non"
-                                        checked={initialValues.tarif}
-                                        onChange={(value) =>
+                                    <Radio.Group
+                                        onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                tarif: value,
+                                                tarif: e.target.value,
                                             })
                                         }
-                                    />
+                                    >
+                                        <Radio value={true}>Oui</Radio>
+                                        <Radio value={false}>Non</Radio>
+                                    </Radio.Group>
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
@@ -537,17 +684,17 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                         },
                                     ]}
                                 >
-                                    <Switch
-                                        checkedChildren="Oui"
-                                        unCheckedChildren="Non"
-                                        checked={initialValues.haute_tension}
-                                        onChange={(value) =>
+                                    <Radio.Group
+                                        onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                haute_tension: value,
+                                                tarif: e.target.value,
                                             })
                                         }
-                                    />
+                                    >
+                                        <Radio value={true}>Oui</Radio>
+                                        <Radio value={false}>Non</Radio>
+                                    </Radio.Group>
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
@@ -563,25 +710,22 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                         },
                                     ]}
                                 >
-                                    <Switch
-                                        checkedChildren="Fixe"
-                                        unCheckedChildren="Variable"
-                                        checked={initialValues.tarification}
-                                        onChange={(value) =>
+                                    <Radio.Group
+                                        onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                tarification: value,
+                                                tarif: e.target.value,
                                             })
                                         }
-                                    />
+                                    >
+                                        <Radio value={true}>Variable</Radio>
+                                        <Radio value={false}>Fixe</Radio>
+                                    </Radio.Group>
                                 </Form.Item>
                             </Col>
                             <Col span={24}>
-                                <Form.Item
-                                    label="Commentaire"
-                                    name="commentaire"
-                                >
-                                    <Input.TextArea rows={5} />
+                                <Form.Item label="Note" name="note">
+                                    <Input.TextArea rows={3} />
                                 </Form.Item>
                             </Col>
                         </Row>

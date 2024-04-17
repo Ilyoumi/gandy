@@ -158,7 +158,7 @@ export const handleAppointmentClick = async (
     agendaId,
     selectedRowData
 ) => {
-    console.log(event.id);
+    console.log("event", event);
 
     try {
         // Make a GET request to fetch the agent ID by appointment ID
@@ -209,10 +209,6 @@ export const handleAddAppointment = (
     setSelectedDate,
     setShowAddModal
 ) => {
-    console.log("app id", arg.id);
-    console.log("Agent ID....:", userContext.userId);
-    console.log("userContext...:", userContext);
-    console.log("Agenda ID:", agendaId);
     setSelectedDate({ date: arg.date, agentId, agendaId });
     setShowAddModal(true);
 };
@@ -225,7 +221,8 @@ export const handleFormSubmit = async (
     setAgendas,
     handleCloseModal,
     setShowUpdateModal,
-    appointments
+    appointments,
+    setSelectedDate
 ) => {
     try {
         console.log("New appointment:", newAppointment);
@@ -242,6 +239,7 @@ export const handleFormSubmit = async (
         console.log("setAppointments:", appointments);
         handleCloseModal();
         setShowUpdateModal(false);
+        setSelectedDate(null )
     } catch (error) {
         console.error("Error handling form submission:", error);
     }

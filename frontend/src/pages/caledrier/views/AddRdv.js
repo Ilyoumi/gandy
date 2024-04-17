@@ -10,6 +10,7 @@ import {
     Select,
     Radio,
     message,
+    Alert,
 } from "antd";
 import moment from "moment";
 import frFR from "antd/lib/locale/fr_FR";
@@ -18,10 +19,9 @@ import SaveButton from "../../../constants/SaveButton";
 
 const { Option } = Select;
 
-const AddAppointment = ({ onFormSubmit, agendaId }) => {
+const AddAppointment = ({ onFormSubmit, agendaId,selectedDate  }) => {
     const [showAdditionalInput, setShowAdditionalInput] = useState(false);
     const [userId, setUserId] = useState(null);
-
     const [formData, setFormData] = useState({
         title: "",
         nom: "",
@@ -40,10 +40,12 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
         haute_tension: false,
         tarification: "",
         commentaire: "",
-        appointment_date: null,
+        appointment_date: selectedDate ? [new Date(selectedDate.date), new Date(selectedDate.date.getTime() + 3600000)] : null,
+        
     });
 
     const [loading, setLoading] = useState(false);
+    const [showAlert, setShowAlert] = useState(false);
 
     const handleClick = () => {
         setLoading(true);
@@ -80,47 +82,71 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
 
     const handleFormSubmit = async () => {
         setLoading(true);
-        let formDataToSend;
+    
+        // Check if an appointment date is selected
         if (!formData.appointment_date) {
             message.warning("Veuillez sélectionner une date de rendez-vous !");
             setLoading(false);
             return;
         }
-
-        // Validate appointment date
-
+    
         try {
-            formDataToSend = {
+            const startDate = new Date(formData.appointment_date[0]);
+            const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Add 1 hour
+            const formDataToSend = {
                 ...formData,
-                start_date: formData.appointment_date[0].format(
-                    "YYYY-MM-DD HH:mm:ss"
-                ),
-                end_date: formData.appointment_date[1].format(
-                    "YYYY-MM-DD HH:mm:ss"
-                ),
+                start_date: startDate.toISOString().slice(0, 19).replace('T', ' '), // Convert to YYYY-MM-DD HH:mm:ss format
+                end_date: endDate.toISOString().slice(0, 19).replace('T', ' '), // Convert to YYYY-MM-DD HH:mm:ss format
                 id_agent: userId,
                 id_agenda: agendaId,
                 tarification: formData.tarif ? "Variable" : "Fixe",
             };
-            console.log("agendaIdh:", agendaId);
-            console.log("id_agent:", userId);
-
-            const response = await axiosClient.post(
-                "/api/rdvs",
-                formDataToSend
-            );
-            const newAppointment = { ...response.data, id: response.data.id };
+            console.log("sending data =", formDataToSend);
+    
+            // If the selected date is not already booked, proceed to submit the form
+            const submissionResponse = await axiosClient.post("/api/rdvs", formDataToSend);
+            const newAppointment = {
+                ...submissionResponse.data,
+                id: submissionResponse.data.id,
+            };
             setLoading(false);
-            console.log("Form submission successful. Response:", response.data);
-            onFormSubmit({ ...response.data, newAppointment });
+            onFormSubmit({ ...submissionResponse.data, newAppointment });
             message.success("Rendez-vous ajouté avec succès !");
+            setFormData({
+                title: "",
+                nom: "",
+                prenom: "",
+                nom_ste: "",
+                postal: "",
+                adresse: "",
+                tva: "",
+                tel: "",
+                gsm: "",
+                fournisseur: "",
+                nbr_comp_elect: "",
+                nbr_comp_gaz: "",
+                ppv: false,
+                tarif: false,
+                haute_tension: false,
+                tarification: "",
+                commentaire: "",
+                appointment_date: null,
+            });
+            setShowAlert(false);
+    
         } catch (error) {
+            if (error.response && error.response.status === 409) {
+                setShowAlert(true);
+                setLoading(false);
+                return;
+            }
             setLoading(false);
-
-            console.error("Response data:", error.response.data);
             console.error("Error adding appointment:", error);
+            message.error("Erreur lors de l'ajout du rendez-vous. Veuillez réessayer plus tard.");
         }
     };
+    
+
     const onFinishFailed = (errorInfo) => {
         console.log("Failed:", errorInfo);
         // Display a warning alert
@@ -134,6 +160,15 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
             onFinish={handleFormSubmit}
             onFinishFailed={onFinishFailed}
         >
+            {showAlert && (
+                <Alert
+                    message="La date sélectionnée est déjà réservée."
+                    type="warning"
+                    showIcon
+                    closable
+                    onClose={() => setShowAlert(false)}
+                />
+            )}
             <Card style={{ marginBottom: "10px" }}>
                 <Row gutter={[16, 16]}>
                     <Col span={12}>
@@ -146,10 +181,17 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                             "Veuillez sélectionner une date de rendez-vous !",
                                     },
                                 ]}
-                                defaultValue={[
-                                    moment().startOf("day").hour(9),
-                                    moment().startOf("day").hour(10),
-                                ]}
+                                value={
+                                    selectedDate
+                                        ? [
+                                            moment(selectedDate.date), // Start date
+                                            moment(selectedDate.date).add(1, 'hour') // End date
+                                          ]
+                                        : null
+                                }
+                                
+                                
+                                
                                 showTime={{
                                     format: "HH:mm",
                                     minuteStep: 15,
@@ -167,19 +209,31 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                                     },
                                 }}
                                 format="YYYY-MM-DD HH:mm"
-                                onChange={(dates) =>
-                                    setFormData({
-                                        ...formData,
-                                        appointment_date: dates,
-                                    })
-                                }
+                                onChange={(dates) => {
+                                    console.log("dates", dates);
+                                    // Check if dates array is not empty and contains valid start and end dates
+                                    if (dates && dates.length === 2) {
+                                        setFormData({
+                                            ...formData,
+                                            appointment_date: dates,
+                                        });
+                                    } else {
+                                        setFormData({
+                                            ...formData,
+                                            appointment_date: null, // Reset appointment_date if no valid dates selected
+                                        });
+                                    }
+                                }}
+                                
                             />
                         </ConfigProvider>
                     </Col>
                     <Col span={12}>
-                    <SaveButton onClick={handleClick} loading={loading} buttonText="Enregistrer" />
-
-                        
+                        <SaveButton
+                            onClick={handleClick}
+                            loading={loading}
+                            buttonText="Enregistrer"
+                        />
                     </Col>
                 </Row>
             </Card>

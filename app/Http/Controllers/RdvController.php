@@ -45,61 +45,80 @@ class RdvController extends Controller
 
 
     public function store(Request $request)
-{
-    try {
-        // Log the incoming request data
-        Log::info('Incoming request data:', $request->all());
+    {
+        try {
+            // Log the incoming request data
+            Log::info('Incoming request data:', $request->all());
 
-        // Validate incoming request
-        $validatedData = $request->validate([
-            'nom' => 'required|string',
-            'prenom' => 'required|string',
-            'nom_ste' => 'required|string',
-            'tva' => 'required|string',
-            'tel' => 'required|string',
-            'gsm' => 'required|string',
-            'postal' => 'required|string',
-            'adresse' => 'required|string',
-            'fournisseur' => 'required|string',
-            'tarification' => 'required|string',
-            'nbr_comp_elect' => 'required|integer',
-            'nbr_comp_gaz' => 'required|integer',
-            'ppv' => 'required|boolean',
-            'tarif' => 'required|boolean',
-            'haute_tension' => 'required|boolean',
-            'id_agent' => 'required|exists:users,id',
-            'id_agenda' => 'required|exists:agendas,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'commentaire' => 'nullable|string', // Add commentaire validation rule
-            'note' => 'nullable|string', // Add note validation rule
-            'status' => 'nullable|string' // Add status validation rule
-        ]);
+            // Validate incoming request
+            $validatedData = $request->validate([
+                'nom' => 'required|string',
+                'prenom' => 'required|string',
+                'nom_ste' => 'required|string',
+                'tva' => 'required|string',
+                'tel' => 'required|string',
+                'gsm' => 'required|string',
+                'postal' => 'required|string',
+                'adresse' => 'required|string',
+                'fournisseur' => 'required|string',
+                'tarification' => 'required|string',
+                'nbr_comp_elect' => 'required|integer',
+                'nbr_comp_gaz' => 'required|integer',
+                'ppv' => 'required|boolean',
+                'tarif' => 'required|boolean',
+                'haute_tension' => 'required|boolean',
+                'id_agent' => 'required|exists:users,id',
+                'id_agenda' => 'required|exists:agendas,id',
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after:start_date',
+                'commentaire' => 'nullable|string', // Add commentaire validation rule
+                'note' => 'nullable|string', // Add note validation rule
+                'status' => 'nullable|string' // Add status validation rule
+            ]);
 
-        // Convert dates to MySQL compatible format
-        $validatedData['start_date'] = date('Y-m-d H:i:s', strtotime($validatedData['start_date']));
-        $validatedData['end_date'] = date('Y-m-d H:i:s', strtotime($validatedData['end_date']));
+            // Convert dates to MySQL compatible format
+            $startDate = date('Y-m-d H:i:s', strtotime($validatedData['start_date']));
+            $endDate = date('Y-m-d H:i:s', strtotime($validatedData['end_date']));
 
-        // Create the Rdv
-        $rdv = Rdv::create($validatedData);
+            // Check if the appointment with the same date range already exists
+            $existingAppointment = Rdv::where(function ($query) use ($startDate, $endDate) {
+                $query->where('start_date', '>=', $startDate)
+                    ->where('end_date', '<=', $endDate)
+                    ->orWhere(function ($query) use ($startDate, $endDate) {
+                        $query->where('start_date', '<=', $startDate)
+                            ->where('end_date', '>=', $endDate);
+                    });
+            })->exists();
 
-        // Return a response indicating success
-        return response()->json([
-            'message' => 'Rdv created successfully',
-            'rdv' => $rdv,
-            'received_data' => $validatedData // Include received data in the response
-        ], 201);
-    } catch (\Exception $e) {
-        // Log the error message
-        Log::error('Failed to create Rdv: ' . $e->getMessage());
+            // If the appointment already exists, return an error response
+            if ($existingAppointment) {
+                return response()->json([
+                    'message' => 'An appointment with the same date range already exists.',
+                    'received_data' => $validatedData // Include received data in the response
+                ], 409); // 409 Conflict status code indicates a conflict with the current state of the resource
+            }
 
-        // Return a response with error message if an exception occurs
-        return response()->json([
-            'message' => 'Failed to create Rdv: ' . $e->getMessage(),
-            'received_data' => $request->all() // Include received data in the response
-        ], 500);
+            // Create the Rdv
+            $rdv = Rdv::create($validatedData);
+
+            // Return a response indicating success
+            return response()->json([
+                'message' => 'Rdv created successfully',
+                'rdv' => $rdv,
+                'received_data' => $validatedData // Include received data in the response
+            ], 201);
+        } catch (\Exception $e) {
+            // Log the error message
+            Log::error('Failed to create Rdv: ' . $e->getMessage());
+
+            // Return a response with error message if an exception occurs
+            return response()->json([
+                'message' => 'Failed to create Rdv: ' . $e->getMessage(),
+                'received_data' => $request->all() // Include received data in the response
+            ], 500);
+        }
     }
-}
+
 
 
 
@@ -166,19 +185,45 @@ class RdvController extends Controller
             'haute_tension' => 'required|boolean',
             'id_agent' => 'required|exists:users,id',
             'id_agenda' => 'required|exists:agendas,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
+            'start_date' => 'required|date_format:Y-m-d H:i:s',
+            'end_date' => 'required|date_format:Y-m-d H:i:s|after:start_date',
         ]);
 
         try {
             // Find the Rdv by ID
             $rdv = Rdv::findOrFail($id);
+            // Convert dates to MySQL compatible format
+            $startDate = date('Y-m-d H:i:s', strtotime($validatedData['start_date']));
+            $endDate = date('Y-m-d H:i:s', strtotime($validatedData['end_date']));
+
+            // Check if the appointment with the same date range already exists
+            $existingAppointment = Rdv::where(function ($query) use ($startDate, $endDate, $rdv) {
+                $query->where('start_date', '>=', $startDate)
+                    ->where('end_date', '<=', $endDate)
+                    ->orWhere(function ($query) use ($startDate, $endDate, $rdv) {
+                        $query->where('start_date', '<=', $startDate)
+                            ->where('end_date', '>=', $endDate);
+                    });
+            })->where('id', '!=', $rdv->id) // Exclude the current appointment
+                ->exists();
+
+            // If the appointment already exists, return an error response
+            if ($existingAppointment) {
+                return response()->json([
+                    'message' => 'An appointment with the same date range already exists.',
+                    'received_data' => $validatedData // Include received data in the response
+                ], 409); // 409 Conflict status code indicates a conflict with the current state of the resource
+            }
 
             // Update the Rdv with the validated data
             $rdv->update($validatedData);
 
             // Return a success response
-            return response()->json(['message' => 'Rdv updated successfully'], 200);
+            return response()->json([
+                'message' => 'Rdv updated successfully',
+                'rdv' => $rdv, // Include the updated Rdv object
+                'received_data' => $validatedData // Include the received data
+            ], 200);
         } catch (\Exception $e) {
             // Return an error response if something goes wrong
             return response()->json(['error' => $e->getMessage()], 500);
