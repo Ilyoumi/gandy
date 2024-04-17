@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Table, Space, Button, Row, Col, Modal } from "antd";
+import { Table, Space, Button, Row, Col, Modal, Avatar } from "antd";
 import { useHistory } from "react-router-dom";
 import UpdateContactModal from "./UpdateContact";
 import { axiosClient } from "../../../api/axios";
 import { pencil, deletebtn } from "../../../constants/icons";
 import useColumnSearch from "../../../constants/tableSearchLogin";
+import { EyeOutlined } from "@ant-design/icons";
 
 const Contacts = () => {
     const [visible, setVisible] = useState(false);
     const [agentCommercialUsers, setAgentCommercialUsers] = useState([]);
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [detailsModalVisible, setDetailsModalVisible] = useState(false);
 
     const history = useHistory();
     const { getColumnSearchProps } = useColumnSearch();
@@ -18,6 +20,10 @@ const Contacts = () => {
     useEffect(() => {
         fetchAgentCommercialUsers();
     }, []);
+    const handleDetailsClick = (record) => {
+        setSelectedRowData(record);
+        setDetailsModalVisible(true);
+    };
 
     const fetchAgentCommercialUsers = async () => {
         try {
@@ -83,12 +89,17 @@ const Contacts = () => {
 
     const columns = [
         {
-            title: "NOM",
+            title: "Agent Commercial",
             dataIndex: "name",
             key: "name",
             width: "32%",
-            render: (_, record) => `${record.prenom} ${record.nom}`,
             ...getColumnSearchProps("name"),
+            render: (_, record) => (
+                <div>
+                    <Avatar src={record.image} />
+                    <span style={{ marginLeft: 8 }}>{record.prenom} {record.nom}</span>
+                </div>
+            ),
         },
         {
             title: "EMAIL",
@@ -103,6 +114,12 @@ const Contacts = () => {
             dataIndex: "action",
             render: (_, record) => (
                 <Space size="middle">
+                    <Button
+                        type="link"
+                        onClick={() => handleDetailsClick(record)}
+                    >
+                        <EyeOutlined />
+                    </Button>
                     <Button
                         type="link"
                         className="darkbtn"
@@ -169,7 +186,7 @@ const Contacts = () => {
                     visible={visible}
                     onCancel={() => setVisible(false)}
                     onUpdate={fetchAgentCommercialUsers}
-                    initialValues={selectedRowData}
+                    initialValues={{ ...selectedRowData, password: selectedRowData.password }}
                 />
             </div>
         </>

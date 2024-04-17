@@ -36,7 +36,7 @@ const UpdateContactModal = ({ visible, onCancel, onUpdate, initialValues }) => {
                 console.log("Validate Failed:", info);
             });
     };
-    
+
     return (
         <Modal
             visible={visible}
@@ -48,6 +48,7 @@ const UpdateContactModal = ({ visible, onCancel, onUpdate, initialValues }) => {
             <Form
                 form={form}
                 initialValues={initialValues}
+                layout="vertical" // Change form layout to vertical
             >
                 <Form.Item
                     name="image"
@@ -67,7 +68,7 @@ const UpdateContactModal = ({ visible, onCancel, onUpdate, initialValues }) => {
                         listType="picture"
                         maxCount={1}
                         onChange={handleImageChange}
-                        style={{ width: "100%" }}
+                        style={{ width: "100%" }} 
                     >
                         <Button icon={<UploadOutlined />}>Uploader</Button>
                     </Upload>
@@ -87,6 +88,15 @@ const UpdateContactModal = ({ visible, onCancel, onUpdate, initialValues }) => {
                 >
                     <Input />
                 </Form.Item>
+                
+                <Form.Item
+                    name="password"
+                    label="Password"
+                    rules={[{ required: true, message: "Veuillez entrer le mod de pass!" }]}
+                >
+                    <Input />
+                </Form.Item>
+
                 
             </Form>
         </Modal>

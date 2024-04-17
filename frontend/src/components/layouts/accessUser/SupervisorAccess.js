@@ -84,29 +84,7 @@ function AdminAcess({ color }) {
                 }}
                 className=""
             >
-                <Menu.Item
-                    key="1"
-                    style={{ width: expanded ? "200px" : "40px" }}
-                >
-                    <NavLink
-                        to="/dashboard"
-                        className={` overflow-hidden transition-all ${
-                            expanded ? "w-48" : "w-16"
-                        }`}
-                    >
-                        <span
-                            className="icon"
-                            style={{
-                                background: page === "dashboard" ? color : "",
-                            }}
-                        >
-                            {dashboard}
-                        </span>
-                        <span>Dashboard</span>
-                    </NavLink>
-                </Menu.Item>
                 
-
                 {expanded && (
                     <Menu.Item
                         className="menu-item-header"

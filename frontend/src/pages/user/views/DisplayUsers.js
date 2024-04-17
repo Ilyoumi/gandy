@@ -163,11 +163,14 @@ const handleDeleteUser = async (id) => {
             key: "role",
             ...getColumnSearchProps("role"),
             render: (text, record) => (
-                <Tag color={roleColors[record.role_id]}>
-            {text}
-        </Tag>
+                <Tag color={record.role === "Agent Commercial" ? "yellow" : (record.role === "Superviseur" ? "blue" : roleColors[record.role_id])}>
+                    {record.role} 
+                </Tag>
             ),
         },
+        
+        
+        
         {
             title: "ACTION",
             key: "action",
@@ -190,7 +193,7 @@ const handleDeleteUser = async (id) => {
     const modifiedUsers = users.map(user => {
         return {
             ...user,
-            name: `${user.nom} ${user.prenom}` // Concatenate nom and prenom
+            name: `${user.nom} ${user.prenom}` 
         };
     });
     return (
