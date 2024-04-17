@@ -186,7 +186,7 @@ const Contacts = () => {
                     visible={visible}
                     onCancel={() => setVisible(false)}
                     onUpdate={fetchAgentCommercialUsers}
-                    initialValues={{ ...selectedRowData, password: selectedRowData.password }}
+                    initialValues={selectedRowData}
                 />
             </div>
         </>

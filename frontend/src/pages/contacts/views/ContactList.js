@@ -78,7 +78,7 @@ function ContactList({
                         value={user.id}
                         checked={selectedItems.includes(user.id)}
                         onClick={() => handleCheckboxClick(user.id)}
-                        style={{ margin: 0 }} // Apply custom style to remove margin
+                        style={{ margin: 0 }} 
                     >
                         {user.prenom} {user.nom}
                     </Checkbox>

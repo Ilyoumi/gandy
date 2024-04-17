@@ -22,7 +22,7 @@ class AgendaController extends Controller
         Log::error('Failed to fetch agendas: ' . $e->getMessage());
 
         // Return a response with error message if an exception occurs
-        return response()->json(['message' => 'Failed to fetch agendas'], 500);
+        return response()->json(['error' => $e->getMessage()], 500);
     }
 }
 
