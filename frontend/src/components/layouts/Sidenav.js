@@ -4,12 +4,10 @@ import logo from "../../assets/images/gy-noir.png";
 import AdminAcess from "./accessUser/AdminAccess";
 import AgentCommAccess from "./accessUser/AgentComAccess";
 import SupervisorAccess from "./accessUser/SupervisorAccess";
-import { useUser } from "../../GlobalContext";
 import { axiosClient } from "../../api/axios";
 
 function Sidenav({ color }) {
     const [role, setRole] = useState("");
-    const userContext = useUser();
 
     useEffect(() => {
         const fetchUserData = async () => {

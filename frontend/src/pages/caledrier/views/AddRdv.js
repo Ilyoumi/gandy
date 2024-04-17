@@ -3,7 +3,6 @@ import {
     Form,
     Input,
     DatePicker,
-    Switch,
     Row,
     Col,
     Card,
@@ -14,10 +13,11 @@ import {
 } from "antd";
 import moment from "moment";
 import frFR from "antd/lib/locale/fr_FR";
-import SaveButton from "../../../constants/SaveButton";
 import { axiosClient } from "../../../api/axios";
+import SaveButton from "../../../constants/SaveButton";
 
 const { Option } = Select;
+
 const AddAppointment = ({ onFormSubmit, agendaId }) => {
     const [showAdditionalInput, setShowAdditionalInput] = useState(false);
     const [userId, setUserId] = useState(null);
@@ -177,7 +177,9 @@ const AddAppointment = ({ onFormSubmit, agendaId }) => {
                         </ConfigProvider>
                     </Col>
                     <Col span={12}>
-                        <SaveButton onClick={handleClick} loading={loading} />
+                    <SaveButton onClick={handleClick} loading={loading} buttonText="Enregistrer" />
+
+                        
                     </Col>
                 </Row>
             </Card>

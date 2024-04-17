@@ -19,6 +19,7 @@ import Card from "./pages/card/Card";
 import DisplayUsers from "./pages/user/views/DisplayUsers";
 import MyCalendar from "./pages/caledrier/views/MyCalendar";
 import axios from "axios"; 
+import { CalendarProvider } from "./CalendarContext";
 import { UserProvider } from "./GlobalContext";
 
 axios.defaults.baseURL = "http://localhost:8000";
@@ -49,6 +50,7 @@ function App() {
     return (
         <Router>
             <UserProvider>
+            <CalendarProvider>
                 <AuthProvider>
                     <SidebarProvider>
                         <div className="App">
@@ -78,6 +80,7 @@ function App() {
                         </div>
                     </SidebarProvider>
                 </AuthProvider>
+            </CalendarProvider>
             </UserProvider>
         </Router>
     );
