@@ -1,31 +1,42 @@
-import { axiosClient } from "./axios";
+import axios from "axios";
 
-// Function to fetch user data
 const fetchUserData = async (userContext) => {
     try {
-        // Check if the user is logged in
+        // Obtain CSRF token first
+        await obtainCSRFToken();
+
         const authToken = localStorage.getItem("auth_token");
         if (!authToken) {
-            // User is not logged in, do nothing
-            console.log("User is not logged in");
+            console.log("User is not logged in. No auth token found.");
             return;
         }
 
-        // User is logged in, fetch user data
-        const response = await axiosClient.get("/api/user", {
+        const response = await axios.get("http://localhost:8000/api/user", {
             headers: {
                 Authorization: `Bearer ${authToken}`,
             },
         });
+
         const { role, id, nom, prenom } = response.data;
 
-        // Update userRole, userId, and userName states
         userContext.setUserRole(role);
         userContext.setUserId(id);
         userContext.setUserName(`${prenom} ${nom}`);
-        console.log("User info", role, id, `${prenom} ${nom}`);
+        
+        console.log("User info fetched successfully:", { role, id, name: `${prenom} ${nom}` });
     } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error("Error fetching user data:", error.message);
+    }
+};
+
+const obtainCSRFToken = async () => {
+    try {
+        // Make a request to obtain CSRF token
+        await axios.get("http://localhost:8000/sanctum/csrf-cookie");
+        console.log("CSRF token obtained successfully.");
+    } catch (error) {
+        console.error("Error obtaining CSRF token:", error.message);
+        throw new Error("Failed to obtain CSRF token.");
     }
 };
 

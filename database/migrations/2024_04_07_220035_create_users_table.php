@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('image')->nullable();
-            $table->string('role')->default('Agent Commercial'); 
+            $table->string('role'); 
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
