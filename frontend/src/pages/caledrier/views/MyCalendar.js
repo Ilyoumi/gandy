@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -59,6 +59,8 @@ function MyCalendar() {
         setAgendas,
     } = useCalendar();
     const userContext = useUser();
+    const [selectedAppointmentDate, setSelectedAppointmentDate] =
+        useState(null);
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -126,6 +128,9 @@ function MyCalendar() {
             axiosClient,
             agendaId
         );
+        setSelectedAppointmentDate(event.start);
+        console.log("event.start", event.start);
+        console.log("SelectedAppointmentDate", selectedAppointmentDate);
     };
 
     const handleAddAppointmentCallback = (arg, userContext) => {
@@ -153,7 +158,8 @@ function MyCalendar() {
                 setAgendas,
                 handleCloseModal,
                 setShowUpdateModal,
-                appointments
+                appointments,
+                setSelectedDate
             );
 
             // Fetch agendas and appointments after successful form submission
@@ -264,47 +270,25 @@ function MyCalendar() {
                                                             agenda.id
                                                     )
                                                     .map((appointment) => {
-                                                        console.log(
-                                                            "id_agent from cal:",
-                                                            appointment.id_agent,
-                                                            appointment.nom
-                                                        ); // Log the id_agent
                                                         return {
                                                             id: appointment.id,
                                                             title: `${appointment.nom} ${appointment.prenom} - ${appointment.postal}`,
-                                                            start: appointment.start_date
-                                                                ? new Date(
-                                                                      appointment.start_date.replace(
-                                                                          " ",
-                                                                          "T"
-                                                                      )
-                                                                  )
-                                                                : null,
-                                                            end: appointment.end_date
-                                                                ? new Date(
-                                                                      appointment.end_date.replace(
-                                                                          " ",
-                                                                          "T"
-                                                                      )
-                                                                  )
-                                                                : null,
-                                                            agendaId:
-                                                                appointment.agendaId,
-                                                            id_agent:
-                                                                appointment.id_agent,
+                                                            start: appointment.start_date,
+                                                            end: appointment.end_date,
                                                         };
                                                     })}
                                                 views={{
                                                     week: {
-                                                        type: "timeGridWeek", // Change the type to timeGridWeek for weekly view
+                                                        type: "timeGridWeek",
                                                         duration: {
                                                             weeks: 1,
-                                                        }, // Show one week at a time
+                                                        },
                                                     },
                                                 }}
                                                 initialView="week"
-                                                slotMinTime="08:00" // Set minimum time to 8 AM
-                                                slotMaxTime="19:00" // Set maximum time to 7 PM
+                                                slotMinTime="08:00" // Set the earliest time to 08:00
+                                                slotMaxTime="19:00" // Set the latest time to 19:00
+                                                weekends={false}
                                             />
                                         )}
                                     </Card>
@@ -324,6 +308,7 @@ function MyCalendar() {
                             onFormSubmit={handleFormSubmitCallback}
                             agentId={agentId}
                             agendaId={agendaId}
+                            selectedAppointmentDate={selectedAppointmentDate}
                         />
                     </Modal>
                     <Modal
