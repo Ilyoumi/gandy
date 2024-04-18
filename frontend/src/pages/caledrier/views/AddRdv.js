@@ -220,7 +220,7 @@ const AddAppointment = ({ onFormSubmit, agendaId,selectedDate  }) => {
                                     } else {
                                         setFormData({
                                             ...formData,
-                                            appointment_date: null, // Reset appointment_date if no valid dates selected
+                                            appointment_date: null, 
                                         });
                                     }
                                 }}
