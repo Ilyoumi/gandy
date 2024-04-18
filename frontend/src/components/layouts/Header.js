@@ -373,7 +373,7 @@ function Header({
                         width={360}
                         onClose={hideDrawer}
                         placement={placement}
-                        visible={visible}
+                        open={visible}
                     >
                         <div layout="vertical">
                             <div className="header-top">
