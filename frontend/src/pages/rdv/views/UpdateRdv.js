@@ -58,7 +58,10 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             ppv: Boolean(initialValues.ppv), 
             tarif: Boolean(initialValues.tarif), 
             haute_tension: Boolean(initialValues.haute_tension),
-            tarification: initialValues.tarification === "Variable" ? true : false
+            tarification: initialValues.tarification === "Variable" ? true : false,
+            commentaire: initialValues.commentaire, 
+            note: initialValues.note, 
+
         };
         form.setFieldsValue(formattedInitialValues);
         setFormData(formattedInitialValues);
@@ -69,12 +72,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         fetchUserData();
     }, []);
 
-    const handleClick = () => {
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-        }, 2000);
-    };
     console.log("initila", initialValues.tarif, initialValues.ppv, initialValues.haute_tension, initialValues.tarification)
 
     const fetchUserData = async () => {
@@ -137,6 +134,51 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         }
     };
 
+    const handleValidation = async () => {
+        setLoading(true);
+        let startDate, endDate;
+    
+        // Check if formData and formData.appointment_date are defined
+        if (formData && formData.appointment_date && formData.appointment_date.length === 2) {
+            // If new dates are selected, use them
+            startDate = new Date(formData.appointment_date[0]);
+            endDate = new Date(formData.appointment_date[1]);
+        } else {
+            // Otherwise, use initial values
+            startDate = new Date(initialValues.start_date);
+            endDate = new Date(initialValues.end_date);
+        }
+    
+        const formDataToSend = {
+            ...formData,
+            start_date: startDate.toISOString().slice(0, 19).replace("T", " "), 
+            end_date: endDate.toISOString().slice(0, 19).replace("T", " "), 
+            id_agent: userId,
+            id_agenda: agendaId,
+            tarification: formData.tarif ? "Variable" : "Fixe",
+            status: "valider",
+        };
+    
+        try {
+            const response = await axiosClient.put(
+                `/api/rdvs/${initialValues.id}`,
+                formDataToSend
+            );
+            setLoading(false);
+            console.log("Validation successful. Response:", response.data);
+            onFormSubmit({ ...response.data, id: response.data.id });
+            // You may add any further action you want after validation
+            message.success("Rendez-vous validé avec succès !");
+            
+        } catch (error) {
+            setLoading(false);
+            console.error("Error validating appointment:", error);
+            // Handle error if needed
+        }
+    };
+    
+    
+
     return (
         <Form layout="vertical" form={form} onFinish={handleFormSubmit}>
             {showAlert && (
@@ -198,7 +240,8 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                     <Col span={4}>
                         <ModifierButton
                             loading={loading}
-                            buttonText="Modifier"
+                            buttonText="Valider"
+                            onClick={handleValidation} 
                         />
                     </Col>
 

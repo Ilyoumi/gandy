@@ -187,6 +187,9 @@ class RdvController extends Controller
             'id_agenda' => 'required|exists:agendas,id',
             'start_date' => 'required|date_format:Y-m-d H:i:s',
             'end_date' => 'required|date_format:Y-m-d H:i:s|after:start_date',
+            'commentaire' => 'nullable|string',
+            'note' => 'nullable|string', 
+            'status' => 'nullable|string'
         ]);
 
         try {

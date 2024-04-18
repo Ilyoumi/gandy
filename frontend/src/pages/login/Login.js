@@ -313,7 +313,7 @@ const Login = () => {
                     </Row>
                     <Modal
                         title="Connexion réussie"
-                        visible={successModalVisible}
+                        open={successModalVisible}
                         onCancel={() => setSuccessModalVisible(false)}
                         footer={null}
                     >

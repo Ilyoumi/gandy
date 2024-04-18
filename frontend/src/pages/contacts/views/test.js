@@ -467,7 +467,7 @@ const Contacts = () => {
 
             />
             <UpdateContactModal
-                visible={visible}
+                open={visible}
                 onCancel={() => setVisible(false)}
                 onUpdate={handleUpdate}
             />

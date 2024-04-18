@@ -39,7 +39,7 @@ const UpdateContactModal = ({ visible, onCancel, onUpdate, initialValues }) => {
 
     return (
         <Modal
-            visible={visible}
+        open={visible}
             title="Modifier Utilisateur"
             okText="Modifier"
             onCancel={onCancel}

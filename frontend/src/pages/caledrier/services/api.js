@@ -37,6 +37,7 @@ export const fetchAppointments = async (agendaId, setAppointments) => {
                 ? new Date(appointment.end_date.replace(" ", "T"))
                 : null,
             postal: appointment.postal,
+            status: appointment.status,
         }));
         setAppointments(appointmentsData);
     } catch (error) {
@@ -75,16 +76,25 @@ export const fetchAgendasAndAppointments = async (
                 const appointmentsResponse = await axiosClient.get(
                     `/api/agendas/${agenda.id}/appointments`
                 );
-                const appointmentsForAgenda = appointmentsResponse.data.rdvs.map((appointment) => ({
-                    ...appointment,
-                    start: appointment.start_date ? new Date(appointment.start_date.replace(" ", "T")) : null,
-                    end: appointment.end_date ? new Date(appointment.end_date.replace(" ", "T")) : null,
-                    agendaId: agenda.id,
-                    id_agent: appointment.id_agent,
-                }));
+                const appointmentsForAgenda =
+                    appointmentsResponse.data.rdvs.map((appointment) => ({
+                        ...appointment,
+                        start: appointment.start_date
+                            ? new Date(appointment.start_date.replace(" ", "T"))
+                            : null,
+                        end: appointment.end_date
+                            ? new Date(appointment.end_date.replace(" ", "T"))
+                            : null,
+                        agendaId: agenda.id,
+                        id_agent: appointment.id_agent,
+                        status: appointment.status,
+                    }));
                 allAppointments.push(...appointmentsForAgenda);
-            } catch(error) {
-                console.error("Error fetching appointments:", error.response.data.error);
+            } catch (error) {
+                console.error(
+                    "Error fetching appointments:",
+                    error.response.data.error
+                );
             }
         }
 
@@ -93,12 +103,14 @@ export const fetchAgendasAndAppointments = async (
         // Update state with agendas and appointments
         setAgendas(agendas);
         setAppointments(allAppointments);
-        console.log("Appointments fetchAgendasAndAppointments", allAppointments);
+        console.log(
+            "Appointments fetchAgendasAndAppointments",
+            allAppointments
+        );
     } catch (error) {
         console.error("Error fetching agendas:", error.message);
     }
 };
-
 
 // Handles agenda creation, updates state with FullCalendar data
 export const handleAgendaCreated = async (
@@ -190,10 +202,15 @@ export const handleAppointmentClick = async (
             // Show the update modal
             setShowDetailModal(true);
             setSelectedAppointment(event);
-            console.log("user is either a superviseur or teh owner");
+            console.log(
+                `User (${userContext.userId}) is either a supervisor or the owner. Agent ID: ${agentId}, User Role: ${userContext.userRole}`
+            );
+
             console.log("selectedRowData", selectedRowData, setShowDetailModal);
         } else {
-            console.log("user is not either a superviseur or teh owner");
+            console.log(
+                `User (${userContext.userId}) is neither a supervisor nor the owner. Agent ID: ${agentId}, User Role: ${userContext.userRole}`
+            );
         }
     } catch (error) {
         console.error("Error fetching agent ID:", error);
@@ -234,12 +251,12 @@ export const handleFormSubmit = async (
         ]);
 
         // Fetch agendas and appointments after updating appointments state
-        fetchAgendasAndAppointments(setAgendas, setAppointments,agendaId);
+        fetchAgendasAndAppointments(setAgendas, setAppointments, agendaId);
 
         console.log("setAppointments:", appointments);
         handleCloseModal();
         setShowUpdateModal(false);
-        setSelectedDate(null )
+        setSelectedDate(null);
     } catch (error) {
         console.error("Error handling form submission:", error);
     }
