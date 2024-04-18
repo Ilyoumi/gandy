@@ -48,15 +48,21 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         commentaire: "",
         appointment_date: null,
     });
+    console.log("initialValues", initialValues);
 
     useEffect(() => {
         const formattedInitialValues = {
             ...initialValues,
             startTime: moment(initialValues.start_date),
             endTime: moment(initialValues.end_date),
+            ppv: Boolean(initialValues.ppv), 
+            tarif: Boolean(initialValues.tarif), 
+            haute_tension: Boolean(initialValues.haute_tension),
+            tarification: initialValues.tarification === "Variable" ? true : false
         };
         form.setFieldsValue(formattedInitialValues);
         setFormData(formattedInitialValues);
+        console.log("Formatted initial values:", formattedInitialValues);
     }, [initialValues, form]);
 
     useEffect(() => {
@@ -69,6 +75,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             setLoading(false);
         }, 2000);
     };
+    console.log("initila", initialValues.tarif, initialValues.ppv, initialValues.haute_tension, initialValues.tarification)
 
     const fetchUserData = async () => {
         try {
@@ -99,17 +106,16 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         console.log("Form data before submission:", formData);
 
         const startDate = new Date(formData.appointment_date[0]);
-        const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Add 1 hour
+        const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); 
         const formDataToSend = {
             ...formData,
-            start_date: startDate.toISOString().slice(0, 19).replace('T', ' '), // Convert to YYYY-MM-DD HH:mm:ss format
-            end_date: endDate.toISOString().slice(0, 19).replace('T', ' '), // Convert to YYYY-MM-DD HH:mm:ss format
+            start_date: startDate.toISOString().slice(0, 19).replace("T", " "), 
+            end_date: endDate.toISOString().slice(0, 19).replace("T", " "), 
             id_agent: userId,
             id_agenda: agendaId,
             tarification: formData.tarif ? "Variable" : "Fixe",
         };
         console.log("sending data =", formDataToSend);
-
 
         try {
             const response = await axiosClient.put(
@@ -120,7 +126,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             console.log("Form submission successful. Response:", response.data);
             onFormSubmit({ ...response.data, id: response.data.id });
             message.success("Rendez-vous modifié avec succès !");
-
         } catch (error) {
             if (error.response && error.response.status === 409) {
                 setShowAlert(true);
@@ -132,9 +137,8 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         }
     };
 
-
     return (
-        <Form layout="vertical" onFinish={handleFormSubmit}>
+        <Form layout="vertical" form={form} onFinish={handleFormSubmit}>
             {showAlert && (
                 <Alert
                     message="La date sélectionnée est déjà réservée."
@@ -149,39 +153,38 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                     <Col span={12}>
                         <ConfigProvider locale={frFR}>
                             <DatePicker.RangePicker
-                                name="appointment_date"
-                                value={
-                                    formData.appointment_date && [
-                                        moment(formData.appointment_date[0]),
-                                        moment(formData.appointment_date[1]),
-                                    ]
-                                }
+                            defaultValue={[
+                                moment(initialValues.start_date, "YYYY-MM-DD HH:mm:ss"),
+                                moment(initialValues.end_date, "YYYY-MM-DD HH:mm:ss")
+                            ]}
                                 onChange={(dates) => {
-                                    console.log("new date", dates);
-                                    // Check if dates array is not empty and contains valid start and end dates
+                                    console.log("New dates:", dates);
                                     if (dates && dates.length === 2) {
-                                        setFormData(prevState => ({
+                                        setFormData((prevState) => ({
                                             ...prevState,
-                                            appointment_date: dates,
+                                            appointment_date: [
+                                                dates[0].toDate(), 
+                                                dates[1].toDate(), 
+                                            ],
                                         }));
-                                        
                                     } else {
                                         setFormData({
                                             ...formData,
-                                            appointment_date: null, // Reset appointment_date if no valid dates selected
+                                            appointment_date: null,
                                         });
                                     }
                                 }}
+                                onCalendarChange={(value) =>
+                                    console.log("Calendar value:", value)
+                                }
                                 showTime={{
                                     format: "HH:mm",
                                     minuteStep: 15,
                                     disabledHours: () => {
                                         const disabledHours = [];
-                                        // Hours before 9 AM
                                         for (let i = 0; i < 9; i++) {
                                             disabledHours.push(i);
                                         }
-                                        // Hours after 6 PM
                                         for (let i = 18; i < 24; i++) {
                                             disabledHours.push(i);
                                         }
@@ -189,19 +192,28 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                     },
                                 }}
                                 format="YYYY-MM-DD HH:mm"
-                                
                             />
                         </ConfigProvider>
                     </Col>
                     <Col span={4}>
-                        <ModifierButton loading={loading} buttonText="Modifier" />
+                        <ModifierButton
+                            loading={loading}
+                            buttonText="Modifier"
+                        />
                     </Col>
 
-                    <Col span={4}> 
-                        <SupprimerButton loading={loading} buttonText="Annuler" danger />
+                    <Col span={4}>
+                        <SupprimerButton
+                            loading={loading}
+                            buttonText="Annuler"
+                            danger
+                        />
                     </Col>
                     <Col span={4}>
-                        <SaveButton loading={loading} buttonText="Enregistrer" />
+                        <SaveButton
+                            loading={loading}
+                            buttonText="Enregistrer"
+                        />
                     </Col>
                 </Row>
             </Card>
@@ -291,7 +303,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                                 {
                                                     validator: (_, value) => {
                                                         const regex =
-                                                            /^[B][E]\d+$/; // Regular expression for validating TVA number format (starts with "BE" followed by one or more digits)
+                                                            /^[B][E]\d+$/; 
                                                         if (
                                                             value &&
                                                             !regex.test(value)
@@ -393,15 +405,15 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             ]}
                                         >
                                             <Input
-                                            addonBefore={
-                                                <span
-                                                    style={{
-                                                        padding: "0 8px",
-                                                    }}
-                                                >
-                                                    +32
-                                                </span>
-                                            }
+                                                addonBefore={
+                                                    <span
+                                                        style={{
+                                                            padding: "0 8px",
+                                                        }}
+                                                    >
+                                                        +32
+                                                    </span>
+                                                }
                                                 style={{ width: "100%" }}
                                                 onChange={(e) =>
                                                     setFormData({
@@ -605,11 +617,10 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                     </Select>
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <Form.Item
                                     label="PPV"
                                     name="ppv"
-                                    initialValue={initialValues.ppv}
                                     rules={[
                                         {
                                             required: true,
@@ -622,9 +633,10 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                         onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                tarif: e.target.value,
+                                                ppv: e.target.value === "true",
                                             })
                                         }
+                                        
                                     >
                                         <Radio value={true}>Oui</Radio>
                                         <Radio value={false}>Non</Radio>
@@ -645,11 +657,10 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                     </Row>
                                 )}
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <Form.Item
                                     label="Tarif Social"
                                     name="tarif"
-                                    initialValue={initialValues.tarif}
                                     rules={[
                                         {
                                             required: true,
@@ -662,20 +673,22 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                         onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                tarif: e.target.value,
+                                                tarif:
+                                                    e.target.value === "true",
                                             })
                                         }
+                                        
+                                        
                                     >
-                                        <Radio value={true}>Oui</Radio>
+                                        <Radio value={true} >Oui</Radio>
                                         <Radio value={false}>Non</Radio>
                                     </Radio.Group>
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <Form.Item
                                     label="Haute Tension"
                                     name="haute_tension"
-                                    initialValue={initialValues.haute_tension}
                                     rules={[
                                         {
                                             required: true,
@@ -688,20 +701,20 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                         onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                tarif: e.target.value,
+                                                haute_tension: e.target.value,
                                             })
                                         }
+                                    
                                     >
                                         <Radio value={true}>Oui</Radio>
                                         <Radio value={false}>Non</Radio>
                                     </Radio.Group>
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <Form.Item
                                     label="Tarification"
                                     name="tarification"
-                                    initialValue={initialValues.tarification}
                                     rules={[
                                         {
                                             required: true,
@@ -714,7 +727,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                         onChange={(e) =>
                                             setFormData({
                                                 ...formData,
-                                                tarif: e.target.value,
+                                                tarification: e.target.value,
                                             })
                                         }
                                     >
