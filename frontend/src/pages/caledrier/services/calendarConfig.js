@@ -40,6 +40,7 @@ export function fullCalendarConfig(appointments, handleAddAppointment, agentId, 
                 ? new Date(appointment.end_date.replace(" ", "T"))
                 : null,
             postal: appointment.postal,
+            status: appointment.status,
         })),
     };
 }

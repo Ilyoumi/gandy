@@ -183,6 +183,8 @@ function MyCalendar() {
         // Handle delete logic here
     };
 
+    
+
     return (
         <div
             style={{
@@ -251,6 +253,23 @@ function MyCalendar() {
                                                 {...JSON.parse(
                                                     agenda.fullcalendar_config
                                                 )}
+                                                eventDidMount={(arg) => {
+                                                    const status = arg.event.extendedProps.status;
+                                                    console.log("Event name:", arg.event.title, "Status:", status);
+                                                    console.log("Event:", arg.event);
+                                                    let backgroundColor;
+                                                    if (status === "annuler") {
+                                                        backgroundColor = "#E72929"; 
+                                                    } else if (status === "valider") {
+                                                        backgroundColor = "#74E291"; 
+                                                    } else {
+                                                        backgroundColor = "#B4B4B8"; 
+                                                    }
+                                                    arg.el.style.backgroundColor = backgroundColor;
+                                                }}
+                                                
+                                                
+                                                
                                                 dateClick={(arg) =>
                                                     handleAddAppointmentCallback(
                                                         arg,
@@ -270,11 +289,13 @@ function MyCalendar() {
                                                             agenda.id
                                                     )
                                                     .map((appointment) => {
+                                                        
                                                         return {
                                                             id: appointment.id,
                                                             title: `${appointment.nom} ${appointment.prenom} - ${appointment.postal}`,
                                                             start: appointment.start_date,
                                                             end: appointment.end_date,
+                                                            status: appointment.status,
                                                         };
                                                     })}
                                                 views={{

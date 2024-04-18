@@ -215,7 +215,7 @@ const DisplayAgenda = () => {
             />
             <Modal
                 title="Update Record"
-                visible={isModalVisible}
+                open={isModalVisible}
                 onCancel={handleModalCancel}
                 footer={null}
             >
@@ -227,7 +227,7 @@ const DisplayAgenda = () => {
                 />
             </Modal>
             <AddAgendaModal
-                visible={addAgendaModalVisible}
+                open={addAgendaModalVisible}
                 onCancel={() => setAddAgendaModalVisible(false)}
             />
         </div>

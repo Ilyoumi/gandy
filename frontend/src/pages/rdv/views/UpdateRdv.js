@@ -62,6 +62,10 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             commentaire: initialValues.commentaire, 
             note: initialValues.note, 
 
+            tarification: initialValues.tarification === "Variable" ? true : false,
+            commentaire: initialValues.commentaire, 
+            note: initialValues.note, 
+
         };
         form.setFieldsValue(formattedInitialValues);
         setFormData(formattedInitialValues);
@@ -278,6 +282,8 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                     <Col span={4}>
                         <ModifierButton
                             loading={loading}
+                            buttonText="Valider"
+                            onClick={handleValidation} 
                             buttonText="Valider"
                             onClick={handleValidation} 
                         />

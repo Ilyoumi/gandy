@@ -183,7 +183,7 @@ const Contacts = () => {
                     responsive={{ xs: 1, sm: 3 }}
                 />
                 <UpdateContactModal
-                    visible={visible}
+                    open={visible}
                     onCancel={() => setVisible(false)}
                     onUpdate={fetchAgentCommercialUsers}
                     initialValues={selectedRowData}
