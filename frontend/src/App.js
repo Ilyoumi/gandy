@@ -15,7 +15,7 @@ import History from "./pages/rdv/views/History";
 import Contacts from "./pages/contacts/views/Contacts";
 import { SidebarProvider } from "./SidebarContext";
 import Agenda from "./pages/caledrier/views/DisplayAgenda";
-import Card from "./pages/card/Card";
+import HomeCompanies from "./pages/home/HomeCompanies";
 import DisplayUsers from "./pages/user/views/DisplayUsers";
 import MyCalendar from "./pages/caledrier/views/MyCalendar";
 import axios from "axios"; 
@@ -62,7 +62,7 @@ function App() {
                             ) : (
                                 <Switch>
                                     <Route path="/login" exact component={SignIn} />
-                                    <Route path="/" exact component={Card} />
+                                    <Route path="/" exact component={HomeCompanies} />
                                     <Main>
                                         <Route exact path="/dashboard" component={Home} />
                                         <Route exact path="/calendrier" component={MyCalendar} />
