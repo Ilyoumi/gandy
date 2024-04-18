@@ -170,7 +170,7 @@ export const handleAppointmentClick = async (
     agendaId,
     selectedRowData
 ) => {
-    console.log("event", event);
+    console.log("event date", event.start )
 
     try {
         // Make a GET request to fetch the agent ID by appointment ID

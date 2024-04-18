@@ -129,8 +129,7 @@ function MyCalendar() {
             agendaId
         );
         setSelectedAppointmentDate(event.start);
-        console.log("event.start", event.start);
-        console.log("SelectedAppointmentDate", selectedAppointmentDate);
+        
     };
 
     const handleAddAppointmentCallback = (arg, userContext) => {
@@ -183,8 +182,6 @@ function MyCalendar() {
         // Handle delete logic here
     };
 
-    
-
     return (
         <div
             style={{
@@ -215,6 +212,7 @@ function MyCalendar() {
                         agendaId={agendaId}
                         setAgendaId={setAgendaId}
                     />
+
                     <Card style={{ width: "83%" }}>
                         {(userContext.userRole === "Admin" ||
                             userContext.userRole === "Superviseur") && (
@@ -242,77 +240,98 @@ function MyCalendar() {
                             return (
                                 <div key={agenda.id}>
                                     <h2>{userName}</h2>{" "}
-                                    <Card style={{ marginBottom: "30px" }}>
-                                        {agenda.fullcalendar_config && (
-                                            <FullCalendar
-                                                plugins={[
-                                                    dayGridPlugin,
-                                                    timeGridPlugin,
-                                                    interactionPlugin,
-                                                ]}
-                                                {...JSON.parse(
-                                                    agenda.fullcalendar_config
-                                                )}
-                                                eventDidMount={(arg) => {
-                                                    const status = arg.event.extendedProps.status;
-                                                    console.log("Event name:", arg.event.title, "Status:", status);
-                                                    console.log("Event:", arg.event);
-                                                    let backgroundColor;
-                                                    if (status === "annuler") {
-                                                        backgroundColor = "#E72929"; 
-                                                    } else if (status === "valider") {
-                                                        backgroundColor = "#74E291"; 
-                                                    } else {
-                                                        backgroundColor = "#B4B4B8"; 
-                                                    }
-                                                    arg.el.style.backgroundColor = backgroundColor;
-                                                }}
+                                    {/* <Card style={{ marginBottom: "30px" }}> */}
+                                    {agenda.fullcalendar_config && (
+                                        <FullCalendar
+                                            plugins={[
+                                                dayGridPlugin,
+                                                timeGridPlugin,
+                                                interactionPlugin,
+                                            ]}
+                                            {...JSON.parse(
+                                                agenda.fullcalendar_config
+                                            )}
+                                            eventContent={(arg) => {
+                                                return (
+                                                    <div>
+                                                        <div>
+                                                            {arg.timeText} -{" "}
+                                                            {
+                                                                arg.event
+                                                                    .extendedProps
+                                                                    .status
+                                                            }
+                                                        </div>
+                                                        <div>
+                                                            {arg.event.title}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }}
+                                            eventDidMount={(arg) => {
+                                                const status =
+                                                    arg.event.extendedProps
+                                                        .status;
                                                 
-                                                
-                                                
-                                                dateClick={(arg) =>
-                                                    handleAddAppointmentCallback(
-                                                        arg,
-                                                        user.id,
+                                                let backgroundColor;
+                                                if (status === "annuler") {
+                                                    backgroundColor = "#E72929";
+                                                } else if (
+                                                    status === "valider"
+                                                ) {
+                                                    backgroundColor = "#74E291";
+                                                } else {
+                                                    backgroundColor = "#B4B4B8";
+                                                }
+                                                arg.el.style.backgroundColor =
+                                                    backgroundColor;
+                                            }}
+                                            dateClick={(arg) =>
+                                                handleAddAppointmentCallback(
+                                                    arg,
+                                                    user.id,
+                                                    agenda.id
+                                                )
+                                            }
+                                            eventClick={(info) =>
+                                                handleAppointmentClickCallback(
+                                                    info.event
+                                                )
+                                            }
+                                            events={appointments
+                                                .filter(
+                                                    (appointment) =>
+                                                        appointment.agendaId ===
                                                         agenda.id
-                                                    )
-                                                }
-                                                eventClick={(info) =>
-                                                    handleAppointmentClickCallback(
-                                                        info.event
-                                                    )
-                                                }
-                                                events={appointments
-                                                    .filter(
-                                                        (appointment) =>
-                                                            appointment.agendaId ===
-                                                            agenda.id
-                                                    )
-                                                    .map((appointment) => {
-                                                        
-                                                        return {
-                                                            id: appointment.id,
-                                                            title: `${appointment.nom} ${appointment.prenom} - ${appointment.postal}`,
-                                                            start: appointment.start_date,
-                                                            end: appointment.end_date,
-                                                            status: appointment.status,
-                                                        };
-                                                    })}
-                                                views={{
-                                                    week: {
-                                                        type: "timeGridWeek",
-                                                        duration: {
-                                                            weeks: 1,
-                                                        },
-                                                    },
+                                                )
+                                                .map((appointment) => {
+                                                    return {
+                                                        id: appointment.id,
+                                                        title: `${appointment.nom} ${appointment.prenom} - ${appointment.postal}`,
+                                                        start: appointment.start_date,
+                                                        end: appointment.end_date,
+                                                        status: appointment.status,
+                                                    };
+                                                })}
+                                                timeZone="UTC+1"
+                                                validRange={{
+                                                    start: new Date(), // Set the start date to today
                                                 }}
-                                                initialView="week"
-                                                slotMinTime="08:00" // Set the earliest time to 08:00
-                                                slotMaxTime="19:00" // Set the latest time to 19:00
-                                                weekends={false}
-                                            />
-                                        )}
-                                    </Card>
+                                            views={{
+                                                week: {
+                                                    type: "timeGridWeek",
+                                                    duration: {
+                                                        weeks: 1,
+                                                    },
+                                                },
+                                            }}
+                                            initialView="week"
+                                            slotMinTime="08:00" // Set the earliest time to 08:00
+                                            slotMaxTime="19:00" // Set the latest time to 19:00
+                                            weekends={false}
+                                        />
+                                    )}
+                                    {/* </Card> */}
                                 </div>
                             );
                         })}
@@ -343,7 +362,8 @@ function MyCalendar() {
                             <UpdateRdv
                                 initialValues={appointmentDetails}
                                 agendaId={agendaId}
-                                onFormSubmit={handleFormSubmit}
+                                onFormSubmit={handleFormSubmitCallback}
+                                
                             />
                         )}
                     </Modal>
