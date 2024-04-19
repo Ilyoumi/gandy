@@ -14,23 +14,19 @@ const DataTable = () => {
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [tableData, setTableData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [agentName, setAgentNAme] = useState("");
     const { getColumnSearchProps } = useColumnSearch();
 
     useEffect(() => {
         fetchData();
     }, []);
-
+    let agentName
     const fetchData = async () => {
         setLoading(true);
         try {
             const response = await axiosClient.get("/api/rdvs");
-            // Fetch the agent's name for each record
             const updatedTableData = await Promise.all(response.data.map(async (record) => {
-                // Fetch the agent's name based on the agent's ID
                 const agentResponse = await axiosClient.get(`/api/users/${record.id_agent}`);
-                setAgentNAme(`${agentResponse.data.nom} ${agentResponse.data.prenom}`)
-                console.log("agent name from table", agentResponse.data)
+                agentName = `${agentResponse.data.nom} ${agentResponse.data.prenom}`;
                 // Return the updated record with the agent's name
                 return {
                     ...record,
@@ -44,6 +40,7 @@ const DataTable = () => {
             setLoading(false);
         }
     };
+    
     
 
     const handleUpdateClick = (record) => {
@@ -202,8 +199,8 @@ const deleteRecord = async (record) => {
                 footer={null}
                 style={{ marginTop: "-50px" }}
                 width="80%"
-                bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }} // Ensure the modal body is scrollable if needed
-                destroyOnClose // Destroy modal content on close to reset form fields
+                bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }} 
+                destroyOnClose 
             >
                 <UpdateRdv
                     initialValues={selectedRowData}
@@ -217,7 +214,7 @@ const deleteRecord = async (record) => {
                 footer={null}
                 style={{ marginTop: "-50px" }}
                 width="80%"
-                bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }} // Ensure the modal body is scrollable if needed
+                bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }} 
                 destroyOnClose
             >
                 {selectedRowData && (
