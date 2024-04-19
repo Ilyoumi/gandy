@@ -129,10 +129,20 @@ function MyCalendar() {
             agendaId
         );
         setSelectedAppointmentDate(event.start);
-        
     };
 
     const handleAddAppointmentCallback = (arg, userContext) => {
+        const currentDate = new Date();
+        const selectedDate = new Date(arg.date);
+
+        if (selectedDate < currentDate) {
+            Modal.warning({
+                title: "Impossible d'ajouter un rendez-vous",
+                content:
+                    "Vous ne pouvez pas ajouter de rendez-vous à des dates passées.",
+            });
+            return;
+        }
         handleAddAppointment(
             agentId,
             agendaId,
@@ -272,7 +282,7 @@ function MyCalendar() {
                                                 const status =
                                                     arg.event.extendedProps
                                                         .status;
-                                                
+
                                                 let backgroundColor;
                                                 if (status === "annuler") {
                                                     backgroundColor = "#E72929";
@@ -313,10 +323,7 @@ function MyCalendar() {
                                                         status: appointment.status,
                                                     };
                                                 })}
-                                                timeZone="UTC+1"
-                                                validRange={{
-                                                    start: new Date(), // Set the start date to today
-                                                }}
+                                            timeZone="UTC+1"
                                             views={{
                                                 week: {
                                                     type: "timeGridWeek",
@@ -326,8 +333,8 @@ function MyCalendar() {
                                                 },
                                             }}
                                             initialView="week"
-                                            slotMinTime="08:00" // Set the earliest time to 08:00
-                                            slotMaxTime="19:00" // Set the latest time to 19:00
+                                            slotMinTime="09:00"
+                                            slotMaxTime="20:00"
                                             weekends={false}
                                         />
                                     )}
@@ -363,7 +370,6 @@ function MyCalendar() {
                                 initialValues={appointmentDetails}
                                 agendaId={agendaId}
                                 onFormSubmit={handleFormSubmitCallback}
-                                
                             />
                         )}
                     </Modal>

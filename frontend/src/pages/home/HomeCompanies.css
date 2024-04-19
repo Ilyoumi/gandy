@@ -171,7 +171,7 @@
 }
 
 
-.ant-btn {
+.custom-btn {
   background-color: rgb(7,49,73);
   border-color: rgb(7,49,73);
   color: white;
@@ -179,12 +179,12 @@
   bottom: 20px;
 }
 
-.ant-btn:hover,
-.ant-btn:focus {
-  background-color: #003366; /* Darker shade for hover and focus */
-  border-color: #003366; /* Darker shade for border */
+.custom-btn:hover,
+.custom-btn:focus {
+  background-color: #003366; 
+  border-color: #003366; 
 }
-/* HomeCompanies.css */
+
 
 
 /* Add border to the card and define its width */

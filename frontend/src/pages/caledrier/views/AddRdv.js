@@ -111,7 +111,6 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
         console.log("Sending start Date:", convertToISOWithTimeZone(startDate));
         console.log("Sending end Date:", convertToISOWithTimeZone(endDate));
 
-
         try {
             const formDataToSend = {
                 ...formData,
@@ -185,13 +184,13 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                                 value={
                                     selectedDate
                                         ? [
-                                              moment(
-                                                  selectedDate.date
-                                              ).utcOffset("+0100"),
-                                              moment(selectedDate.date)
-                                                  .add(1, "hour")
-                                                  .utcOffset("+0100"),
-                                          ]
+                                                moment(
+                                                    selectedDate.date
+                                                ).utcOffset("+0100"),
+                                                moment(selectedDate.date)
+                                                    .add(1, "hour")
+                                                    .utcOffset("+0100"),
+                                            ]
                                         : null
                                 }
                                 showTime={{
@@ -204,7 +203,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                                             disabledHours.push(i);
                                         }
                                         // Hours after 6 PM
-                                        for (let i = 18; i < 24; i++) {
+                                        for (let i = 20; i < 24; i++) {
                                             disabledHours.push(i);
                                         }
                                         return disabledHours;

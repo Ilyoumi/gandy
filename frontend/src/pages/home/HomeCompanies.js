@@ -4,7 +4,7 @@ import logo from "../../assets/images/lg.png";
 import gy from "../../assets/images/gy.png"
 import expert from "../../assets/images/expert.png";
 import servihome from "../../assets/images/servihome.png";
-import sunlogo from "../../assets/images/LOGO_sunlightcall.png"; // Corrected import statement
+import sunlogo from "../../assets/images/sunlogo.png"; // Corrected import statement
 import { Link } from "react-router-dom";
 import { Row, Col, Button } from "antd";
 
