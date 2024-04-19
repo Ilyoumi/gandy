@@ -117,6 +117,7 @@ function MyCalendar() {
     };
 
     const handleAppointmentClickCallback = (event) => {
+
         handleAppointmentClick(
             event,
             userContext,
@@ -129,10 +130,19 @@ function MyCalendar() {
             agendaId
         );
         setSelectedAppointmentDate(event.start);
-        
+
     };
 
     const handleAddAppointmentCallback = (arg, userContext) => {
+        const currentDate = new Date();
+        const selectedDate = new Date(arg.date);
+        if (selectedDate < currentDate) {
+            Modal.warning({
+                title: "Impossible d'ajouter un rendez-vous",
+                content: "Vous ne pouvez pas ajouter de rendez-vous à des dates passées.",
+            });
+            return; 
+        }
         handleAddAppointment(
             agentId,
             agendaId,
@@ -212,16 +222,15 @@ function MyCalendar() {
                         agendaId={agendaId}
                         setAgendaId={setAgendaId}
                     />
-
                     <Card style={{ width: "83%" }}>
                         {(userContext.userRole === "Admin" ||
                             userContext.userRole === "Superviseur") && (
-                            <NewButton
-                                onClick={handleOpenAddAgendaModal}
-                                loading={loading}
-                                buttonText="Nouveau Calendrier"
-                            />
-                        )}
+                                <NewButton
+                                    onClick={handleOpenAddAgendaModal}
+                                    loading={loading}
+                                    buttonText="Nouveau Calendrier"
+                                />
+                            )}
                         <AddAgendaModal
                             open={addAgendaModalVisible}
                             onCancel={() => setAddAgendaModalVisible(false)}
@@ -261,23 +270,16 @@ function MyCalendar() {
                                                                     .status
                                                             }
                                                         </div>
-                                                        
+
                                                     </div>
                                                 );
                                             }}
                                             eventDidMount={(arg) => {
-                                                const status =
-                                                    arg.event.extendedProps
-                                                        .status;
-                                                
-                                                
                                                 arg.el.style.backgroundColor =
                                                     "#F6995C";
                                             }}
                                             dateClick={(arg) => {
-                                                console.log("Clicked date in calendar:", arg.dateStr)
-                                                console.log("selected date in calendar:", selectedDate)
-                                                console.log("selectedAppointmentDate date in calendar:", selectedAppointmentDate)
+
                                                 handleAddAppointmentCallback(
                                                     arg,
                                                     user.id,
@@ -285,7 +287,7 @@ function MyCalendar() {
                                                 )
 
                                             }
-                                                
+
                                             }
                                             eventClick={(info) =>
                                                 handleAppointmentClickCallback(
@@ -307,9 +309,7 @@ function MyCalendar() {
                                                         status: appointment.status,
                                                     };
                                                 })}
-                                                validRange={{
-                                                    start: new Date(),
-                                                }}
+                                            
                                             views={{
                                                 week: {
                                                     type: "timeGridWeek",
@@ -320,7 +320,7 @@ function MyCalendar() {
                                             }}
                                             initialView="week"
                                             slotMinTime="09:00"
-                                            slotMaxTime="20:00" 
+                                            slotMaxTime="20:00"
                                             weekends={false}
                                         />
                                     )}
@@ -356,7 +356,7 @@ function MyCalendar() {
                                 initialValues={appointmentDetails}
                                 agendaId={agendaId}
                                 onFormSubmit={handleFormSubmitCallback}
-                                
+
                             />
                         )}
                     </Modal>
@@ -376,13 +376,13 @@ function MyCalendar() {
                                 <Col style={{ marginRight: "40px" }}>
                                     {(userContext.userRole === "Admin" ||
                                         agentId === userContext.userId) && (
-                                        <Button
-                                            onClick={handleUpdateClick}
-                                            style={{ marginRight: "10px" }}
-                                        >
-                                            Modifier
-                                        </Button>
-                                    )}
+                                            <Button
+                                                onClick={handleUpdateClick}
+                                                style={{ marginRight: "10px" }}
+                                            >
+                                                Modifier
+                                            </Button>
+                                        )}
                                     {userContext.userRole === "Admin" && (
                                         <Button
                                             onClick={handleDeleteClick}
