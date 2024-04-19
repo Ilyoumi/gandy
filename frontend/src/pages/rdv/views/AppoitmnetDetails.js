@@ -8,25 +8,28 @@ const AppointmentDetails = ({ selectedRowData }) => {
     const data = [
         { title: "Date de début", content: start_date },
         { title: "Nom", content: `${nom} ${prenom}`},
-        { title: "Pro", content: pro ? "Yes" : "No" },
 
         { title: "Adresse", content: adresse },
         { title: "Code Postal", content: postal },
         { title: "Société", content: nom_ste },
-        { title: "Date de fin", content: end_date },
 
         { title: "TVA", content: tva },
+        { title: "Date de fin", content: end_date },
+
         { title: "Téléphone", content: tel },
+        { title: "Pro", content: pro ? "Yes" : "No" },
+
         { title: "GSM", content: gsm },
         
         { title: "Fournisseur", content: fournisseur },
         { title: "Nombre de compteur électronique", content: nbr_comp_elect },
         { title: "Nombre de compteur gaz", content: nbr_comp_gaz },
         { title: "PPV", content: ppv ? "Yes" : "No" },
+        { title: "Agent", content: agentName  },
+
         { title: "Tarif", content: tarif ? "Yes" : "No" },
         { title: "Tarification", content: tarification },
         { title: "Haute Tension", content: haute_tension ? "Yes" : "No" },
-        { title: "Agent", content: agentName  },
         { title: "Commentaire", content: commentaire },
         { title: "Note", content: note  },
         
