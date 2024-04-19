@@ -71,12 +71,12 @@ class RdvController extends Controller
                 'id_agenda' => 'required|exists:agendas,id',
                 'start_date' => 'required|date',
                 'end_date' => 'required|date|after:start_date',
-                'commentaire' => 'nullable|string', // Add commentaire validation rule
-                'note' => 'nullable|string', // Add note validation rule
-                'status' => 'nullable|string' // Add status validation rule
+                'commentaire' => 'nullable|string',
+                'note' => 'nullable|string',
+                'status' => 'nullable|string' ,
+                'pro' => 'required|boolean',
             ]);
 
-            // Convert dates to MySQL compatible format
             $startDate = date('Y-m-d H:i:s', strtotime($validatedData['start_date']));
             $endDate = date('Y-m-d H:i:s', strtotime($validatedData['end_date']));
 
@@ -189,7 +189,9 @@ class RdvController extends Controller
             'end_date' => 'required|date_format:Y-m-d H:i:s|after:start_date',
             'commentaire' => 'nullable|string',
             'note' => 'nullable|string', 
-            'status' => 'nullable|string'
+            'status' => 'nullable|string',
+            'pro' => 'required|boolean',
+
         ]);
 
         try {

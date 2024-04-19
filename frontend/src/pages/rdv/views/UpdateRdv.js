@@ -42,6 +42,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         nbr_comp_gaz: "",
         ppv: false,
         tarif: false,
+        pro: false,
         haute_tension: false,
         tarification: "",
         commentaire: "",
@@ -54,6 +55,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             startTime: moment(initialValues.start_date),
             endTime: moment(initialValues.end_date),
             ppv: Boolean(initialValues.ppv),
+            pro: Boolean(initialValues.pro),
             tarif: Boolean(initialValues.tarif),
             haute_tension: Boolean(initialValues.haute_tension),
             tarification: initialValues.tarification === "Variable" ? true : false,
@@ -96,7 +98,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
     const handleFormSubmit = async () => {
         setLoading(true);
         let startDate, endDate;
-
+    
         // Check if formData and formData.appointment_date are defined
         if (formData && formData.appointment_date && formData.appointment_date.length === 2) {
             // If new dates are selected, use them
@@ -107,15 +109,17 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             startDate = new Date(initialValues.start_date);
             endDate = new Date(initialValues.end_date);
         }
-
+    
         console.log("Start Date selected:", startDate);
         console.log("End Date selected:", endDate);
-        console.log("Start Date initial value:", formData.appointment_date[0]);
-        console.log("End Date initial value:", formData.appointment_date[1]);
-
+    
+        // Add a check to ensure formData.appointment_date is defined
+        console.log("Start Date initial value:", formData.appointment_date ? formData.appointment_date[0] : 'Not provided');
+        console.log("End Date initial value:", formData.appointment_date ? formData.appointment_date[1] : 'Not provided');
+    
         const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
         const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
-
+    
         // Convert dates to UTC format before sending
         const formDataToSend = {
             ...formData,
@@ -125,9 +129,9 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             id_agenda: agendaId,
             tarification: formData.tarif ? "Variable" : "Fixe",
         };
-
+    
         console.log("sending data =", formDataToSend);
-
+    
         try {
             const response = await axiosClient.put(
                 `/api/rdvs/${initialValues.id}`,
@@ -151,6 +155,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             console.error("Error updating appointment:", error);
         }
     };
+    
 
 
     const handleValidation = async () => {
@@ -182,7 +187,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             id_agent: userId,
             id_agenda: agendaId,
             tarification: formData.tarif ? "Variable" : "Fixe",
-            status: "valider",
+            status: "confirmer",
         };
 
         try {
@@ -348,112 +353,115 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                         <Row gutter={[16, 16]}>
                             <Col span={24}>
                                 <Row gutter={[16, 16]}>
-                                    <Col xs={24} sm={12} lg={12}>
+                                    <Col span={12}>
                                         <Form.Item
-                                            label="Nom"
-                                            name="nom"
-                                            initialValue={initialValues.nom}
+                                            label="Êtes-vous un professionnel ?"
+                                            name="pro"
                                             rules={[
                                                 {
                                                     required: true,
-                                                    message:
-                                                        "Veuillez entrer votre nom !",
+                                                    message: "Veuillez sélectionner votre statut professionnel !",
                                                 },
                                             ]}
                                         >
-                                            <Input
+                                            <Radio.Group
                                                 onChange={(e) =>
                                                     setFormData({
                                                         ...formData,
-                                                        nom: e.target.value,
+                                                        isPro: e.target.value,
                                                     })
                                                 }
-                                            />
+                                            >
+                                                <Radio value={true}>Oui</Radio>
+                                                <Radio value={false}>Non</Radio>
+                                            </Radio.Group>
                                         </Form.Item>
                                     </Col>
-                                    <Col xs={24} sm={12} lg={12}>
+                                    <Col span={12}>
                                         <Form.Item
-                                            label="Prénom"
-                                            name="prenom"
-                                            initialValue={initialValues.prenom}
+                                            label="Nom et Prénom"
+                                            name="nom_prenom"
+                                            initialValue={`${initialValues.nom} ${initialValues.prenom}`}
                                             rules={[
                                                 {
                                                     required: true,
-                                                    message:
-                                                        "Veuillez entrer votre prénom !",
+                                                    message: "Veuillez entrer votre nom et prénom !",
                                                 },
                                             ]}
                                         >
                                             <Input
-                                                onChange={(e) =>
+                                                onChange={(e) => {
+                                                    const values = e.target.value.split(' ');
+                                                    const nom = values.shift();
+                                                    const prenom = values.join(' ');
                                                     setFormData({
                                                         ...formData,
-                                                        prenom: e.target.value,
-                                                    })
-                                                }
+                                                        nom: nom,
+                                                        prenom: prenom,
+                                                    });
+                                                }}
                                             />
                                         </Form.Item>
                                     </Col>
                                 </Row>
                             </Col>
+
                             <Col span={24}>
                                 <Row gutter={[16, 16]}>
                                     <Col xs={24} sm={12} lg={12}>
-                                        <Form.Item
-                                            label="Nom de Société"
-                                            name="nom_ste"
-                                            initialValue={initialValues.nom_ste}
-                                        >
-                                            <Input
-                                                onChange={(e) =>
-                                                    setFormData({
-                                                        ...formData,
-                                                        nom_ste: e.target.value,
-                                                    })
-                                                }
-                                            />
-                                        </Form.Item>
+                                        {initialValues.pro && (
+                                            <Form.Item
+                                                label="Nom de Société"
+                                                name="nom_ste"
+                                                initialValue={initialValues.nom_ste}
+                                            >
+                                                <Input
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            nom_ste: e.target.value,
+                                                        })
+                                                    }
+                                                />
+                                            </Form.Item>
+                                        )}
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
-                                        <Form.Item
-                                            label="TVA"
-                                            name="tva"
-                                            initialValue={initialValues.tva}
-                                            rules={[
-                                                {
-                                                    required: true,
-                                                    message:
-                                                        "Veuillez entrer votre numéro de TVA !",
-                                                },
-                                                {
-                                                    validator: (_, value) => {
-                                                        const regex =
-                                                            /^[B][E]\d+$/;
-                                                        if (
-                                                            value &&
-                                                            !regex.test(value)
-                                                        ) {
-                                                            return Promise.reject(
-                                                                'Le numéro de TVA doit commencer par "BE" suivi de chiffres.'
-                                                            );
+                                        {initialValues.pro && ( 
+                                            <Form.Item
+                                                label="TVA"
+                                                name="tva"
+                                                value={initialValues.tva ? initialValues.tva.replace(/^BE0/, '') : ''}
+                                                rules={[
+                                
+                                                    {
+                                                      validator: (_, value) => {
+                                                        const regex = /^\d{9}$/;
+                                                        if (value && !regex.test(value)) {
+                                                          return Promise.reject(
+                                                            'Le numéro de TVA doit commencer par "BE0" suivi de 9 chiffres.'
+                                                          );
                                                         }
                                                         return Promise.resolve();
+                                                      },
                                                     },
-                                                },
-                                            ]}
-                                        >
-                                            <Input
-                                                onChange={(e) =>
-                                                    setFormData({
-                                                        ...formData,
-                                                        tva: e.target.value,
-                                                    })
-                                                }
-                                            />
-                                        </Form.Item>
+                                                  ]}
+                                            >
+                                                <Input
+                                                    addonBefore="BE0"
+                                                    onChange={(e) =>
+                                                        setFormData({
+                                                            ...formData,
+                                                            tva: e.target.value,
+                                                        })
+                                                    }
+                                                />
+                                            </Form.Item>
+                                        )}
                                     </Col>
                                 </Row>
                             </Col>
+
                             <Col span={24}>
                                 <Row gutter={[16, 16]}>
                                     <Col xs={24} sm={12} lg={12}>
@@ -555,11 +563,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             name="gsm"
                                             initialValue={initialValues.gsm}
                                             rules={[
-                                                {
-                                                    required: true,
-                                                    message:
-                                                        "Veuillez entrer votre gsm !",
-                                                },
+
                                                 {
                                                     pattern: /^\d{8}$/, // Regex pattern to match +324 followed by 8 digits
                                                     message:
