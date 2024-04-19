@@ -33,6 +33,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
     tel: "",
     gsm: "",
     fournisseur: "",
+    pro: false,
     nbr_comp_elect: "",
     nbr_comp_gaz: "",
     ppv: false,
@@ -116,7 +117,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
       const [nom, prenom] = formData.nom_prenom ? formData.nom_prenom.split(' ') : ['', ''];
       console.log("nom", nom)
       console.log("prenom", prenom)
-      const tvaValue = `BE0${formData.tva}`;
+      const tvaValue = formData.tva ? `BE0${formData.tva}` : '';
       const formDataToSend = {
         ...formData,
         tva: tvaValue,
@@ -254,7 +255,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                   <Col span={12}>
                     <Form.Item
                       label="Êtes-vous un professionnel ?"
-                      name="isPro"
+                      name="pro"
                       rules={[
                         {
                           required: true,
@@ -266,7 +267,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            isPro: e.target.value,
+                            pro: e.target.value,
                           })
                         }
                       >
@@ -301,7 +302,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
               </Col>
               <Col span={24}>
                 <Row gutter={[16, 16]}>
-                  {formData.isPro && ( 
+                  {formData.pro && ( 
                     <>
                       <Col span={24}>
                         <Row gutter={[16, 16]}>

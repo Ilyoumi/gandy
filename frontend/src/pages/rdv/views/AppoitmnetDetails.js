@@ -2,13 +2,14 @@ import React from "react";
 import {  List } from "antd";
 
 const AppointmentDetails = ({ selectedRowData }) => {
-    const { nom, prenom, nom_ste, tva, tel, gsm, adresse, postal, fournisseur, nbr_comp_elect, nbr_comp_gaz, ppv, tarif,tarification, haute_tension, agentName , start_date, end_date, note, commentaire } = selectedRowData;
+    const { nom, prenom,pro, nom_ste, tva, tel, gsm, adresse, postal, fournisseur, nbr_comp_elect, nbr_comp_gaz, ppv, tarif,tarification, haute_tension, agentName , start_date, end_date, note, commentaire } = selectedRowData;
     console.log("agentName", agentName)
 
     const data = [
         { title: "Date de début", content: start_date },
-        { title: "Nom", content: nom },
-        { title: "Prénom", content: prenom },
+        { title: "Nom", content: `${nom} ${prenom}`},
+        { title: "Pro", content: pro ? "Yes" : "No" },
+
         { title: "Adresse", content: adresse },
         { title: "Code Postal", content: postal },
         { title: "Société", content: nom_ste },
