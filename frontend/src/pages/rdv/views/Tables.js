@@ -197,7 +197,7 @@ const deleteRecord = async (record) => {
             />
             <Modal
                 title="Update Data"
-                visible={updateModalVisible}
+                open={updateModalVisible}
                 onCancel={() => setUpdateModalVisible(false)}
                 footer={null}
                 style={{ marginTop: "-50px" }}
@@ -212,7 +212,7 @@ const deleteRecord = async (record) => {
             </Modal>
             <Modal
                 title="Modifier rendez-vous"
-                visible={detailsModalVisible}
+                open={detailsModalVisible}
                 onCancel={() => setDetailsModalVisible(false)}
                 footer={null}
                 style={{ marginTop: "-50px" }}

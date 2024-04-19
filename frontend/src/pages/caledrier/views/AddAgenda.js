@@ -67,7 +67,7 @@ const AddAgendaModal = ({ visible, onCancel, onAgendaCreated }) => {
     return (
         <Modal
             title="Ajouter Agenda"
-            visible={visible}
+            open={visible}
             onCancel={onCancel}
             footer={null}
         >

@@ -19,7 +19,7 @@ import SaveButton from "../../../constants/SaveButton";
 
 const { Option } = Select;
 
-const AddAppointment = ({ onFormSubmit, agendaId,selectedDate  }) => {
+const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
     const [showAdditionalInput, setShowAdditionalInput] = useState(false);
     const [userId, setUserId] = useState(null);
     const [formData, setFormData] = useState({
@@ -40,8 +40,12 @@ const AddAppointment = ({ onFormSubmit, agendaId,selectedDate  }) => {
         haute_tension: false,
         tarification: "",
         commentaire: "",
-        appointment_date: selectedDate ? [new Date(selectedDate.date), new Date(selectedDate.date.getTime() + 3600000)] : null,
-        
+        appointment_date: selectedDate
+            ? [
+                  new Date(selectedDate.date),
+                  new Date(selectedDate.date.getTime() + 3600000),
+              ]
+            : null,
     });
 
     const [loading, setLoading] = useState(false);
@@ -82,29 +86,47 @@ const AddAppointment = ({ onFormSubmit, agendaId,selectedDate  }) => {
 
     const handleFormSubmit = async () => {
         setLoading(true);
-    
+
         // Check if an appointment date is selected
+        let startDate, endDate;
         if (!formData.appointment_date) {
-            message.warning("Veuillez sélectionner une date de rendez-vous !");
-            setLoading(false);
-            return;
+            // Use the default selected date from the calendar
+            startDate = new Date(selectedDate.date);
+            endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Add 1 hour
+        } else {
+            startDate = new Date(formData.appointment_date[0]);
+            endDate = new Date(formData.appointment_date[1]);
         }
-    
+
+        // Convert dates to ISO string format with UTC+1 time zone
+        const convertToISOWithTimeZone = (date) => {
+            const offset = -60; // Offset for UTC+1
+            const utcTime = date.getTime() + date.getTimezoneOffset() * 60000;
+            const localTime = utcTime + offset * 60000;
+            return new Date(localTime)
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " ");
+        };
+        console.log("Sending start Date:", convertToISOWithTimeZone(startDate));
+        console.log("Sending end Date:", convertToISOWithTimeZone(endDate));
+
         try {
-            const startDate = new Date(formData.appointment_date[0]);
-            const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Add 1 hour
             const formDataToSend = {
                 ...formData,
-                start_date: startDate.toISOString().slice(0, 19).replace('T', ' '), // Convert to YYYY-MM-DD HH:mm:ss format
-                end_date: endDate.toISOString().slice(0, 19).replace('T', ' '), // Convert to YYYY-MM-DD HH:mm:ss format
+                start_date: convertToISOWithTimeZone(startDate),
+                end_date: convertToISOWithTimeZone(endDate),
                 id_agent: userId,
                 id_agenda: agendaId,
                 tarification: formData.tarif ? "Variable" : "Fixe",
             };
             console.log("sending data =", formDataToSend);
-    
+
             // If the selected date is not already booked, proceed to submit the form
-            const submissionResponse = await axiosClient.post("/api/rdvs", formDataToSend);
+            const submissionResponse = await axiosClient.post(
+                "/api/rdvs",
+                formDataToSend
+            );
             const newAppointment = {
                 ...submissionResponse.data,
                 id: submissionResponse.data.id,
@@ -112,28 +134,7 @@ const AddAppointment = ({ onFormSubmit, agendaId,selectedDate  }) => {
             setLoading(false);
             onFormSubmit({ ...submissionResponse.data, newAppointment });
             message.success("Rendez-vous ajouté avec succès !");
-            setFormData({
-                title: "",
-                nom: "",
-                prenom: "",
-                nom_ste: "",
-                postal: "",
-                adresse: "",
-                tva: "",
-                tel: "",
-                gsm: "",
-                fournisseur: "",
-                nbr_comp_elect: "",
-                nbr_comp_gaz: "",
-                ppv: false,
-                tarif: false,
-                haute_tension: false,
-                tarification: "",
-                commentaire: "",
-                appointment_date: null,
-            });
             setShowAlert(false);
-    
         } catch (error) {
             if (error.response && error.response.status === 409) {
                 setShowAlert(true);
@@ -142,15 +143,14 @@ const AddAppointment = ({ onFormSubmit, agendaId,selectedDate  }) => {
             }
             setLoading(false);
             console.error("Error adding appointment:", error);
-            message.error("Erreur lors de l'ajout du rendez-vous. Veuillez réessayer plus tard.");
+            message.error(
+                "Erreur lors de l'ajout du rendez-vous. Veuillez réessayer plus tard."
+            );
         }
     };
-    
 
     const onFinishFailed = (errorInfo) => {
         console.log("Failed:", errorInfo);
-        // Display a warning alert
-        // You can also store errorInfo in state and display it in the alert if needed
         alert("Form validation failed. Please check your input.");
     };
 
@@ -184,14 +184,15 @@ const AddAppointment = ({ onFormSubmit, agendaId,selectedDate  }) => {
                                 value={
                                     selectedDate
                                         ? [
-                                            moment(selectedDate.date), // Start date
-                                            moment(selectedDate.date).add(1, 'hour') // End date
-                                          ]
+                                                moment(
+                                                    selectedDate.date
+                                                ).utcOffset("+0100"),
+                                                moment(selectedDate.date)
+                                                    .add(1, "hour")
+                                                    .utcOffset("+0100"),
+                                            ]
                                         : null
                                 }
-                                
-                                
-                                
                                 showTime={{
                                     format: "HH:mm",
                                     minuteStep: 15,
@@ -202,7 +203,7 @@ const AddAppointment = ({ onFormSubmit, agendaId,selectedDate  }) => {
                                             disabledHours.push(i);
                                         }
                                         // Hours after 6 PM
-                                        for (let i = 18; i < 24; i++) {
+                                        for (let i = 20; i < 24; i++) {
                                             disabledHours.push(i);
                                         }
                                         return disabledHours;
@@ -220,11 +221,10 @@ const AddAppointment = ({ onFormSubmit, agendaId,selectedDate  }) => {
                                     } else {
                                         setFormData({
                                             ...formData,
-                                            appointment_date: null, 
+                                            appointment_date: null,
                                         });
                                     }
                                 }}
-                                
                             />
                         </ConfigProvider>
                     </Col>

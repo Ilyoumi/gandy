@@ -12,6 +12,8 @@ import servisymbol from "../../assets/images/servisymbol.png";
 import optinergy from "../../assets/images/optinergy.png";
 import optisymbole from "../../assets/images/optisymbole.png";
 import gysymbol from "../../assets/images/gysymbol.png";
+import { Link } from "react-router-dom";
+import { Row, Col, Button } from "antd";
 
 const CompanyCard = ({ number, name, logoFrontSrc, logoBackSrc, buttonText, buttonLink }) => {
   return (
