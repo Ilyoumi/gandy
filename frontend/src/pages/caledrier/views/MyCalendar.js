@@ -129,20 +129,10 @@ function MyCalendar() {
             agendaId
         );
         setSelectedAppointmentDate(event.start);
+        
     };
 
     const handleAddAppointmentCallback = (arg, userContext) => {
-        const currentDate = new Date();
-        const selectedDate = new Date(arg.date);
-
-        if (selectedDate < currentDate) {
-            Modal.warning({
-                title: "Impossible d'ajouter un rendez-vous",
-                content:
-                    "Vous ne pouvez pas ajouter de rendez-vous à des dates passées.",
-            });
-            return;
-        }
         handleAddAppointment(
             agentId,
             agendaId,
@@ -265,16 +255,13 @@ function MyCalendar() {
                                                 return (
                                                     <div>
                                                         <div>
-                                                            {arg.timeText} -{" "}
-                                                            {
+                                                            {arg.event.title}/{
                                                                 arg.event
                                                                     .extendedProps
                                                                     .status
                                                             }
                                                         </div>
-                                                        <div>
-                                                            {arg.event.title}
-                                                        </div>
+                                                        
                                                     </div>
                                                 );
                                             }}
@@ -282,26 +269,23 @@ function MyCalendar() {
                                                 const status =
                                                     arg.event.extendedProps
                                                         .status;
-
-                                                let backgroundColor;
-                                                if (status === "annuler") {
-                                                    backgroundColor = "#E72929";
-                                                } else if (
-                                                    status === "valider"
-                                                ) {
-                                                    backgroundColor = "#74E291";
-                                                } else {
-                                                    backgroundColor = "#B4B4B8";
-                                                }
+                                                
+                                                
                                                 arg.el.style.backgroundColor =
-                                                    backgroundColor;
+                                                    "#F6995C";
                                             }}
-                                            dateClick={(arg) =>
+                                            dateClick={(arg) => {
+                                                console.log("Clicked date in calendar:", arg.dateStr)
+                                                console.log("selected date in calendar:", selectedDate)
+                                                console.log("selectedAppointmentDate date in calendar:", selectedAppointmentDate)
                                                 handleAddAppointmentCallback(
                                                     arg,
                                                     user.id,
                                                     agenda.id
                                                 )
+
+                                            }
+                                                
                                             }
                                             eventClick={(info) =>
                                                 handleAppointmentClickCallback(
@@ -323,7 +307,9 @@ function MyCalendar() {
                                                         status: appointment.status,
                                                     };
                                                 })}
-                                            timeZone="UTC+1"
+                                                validRange={{
+                                                    start: new Date(),
+                                                }}
                                             views={{
                                                 week: {
                                                     type: "timeGridWeek",
@@ -334,7 +320,7 @@ function MyCalendar() {
                                             }}
                                             initialView="week"
                                             slotMinTime="09:00"
-                                            slotMaxTime="20:00"
+                                            slotMaxTime="20:00" 
                                             weekends={false}
                                         />
                                     )}
@@ -370,6 +356,7 @@ function MyCalendar() {
                                 initialValues={appointmentDetails}
                                 agendaId={agendaId}
                                 onFormSubmit={handleFormSubmitCallback}
+                                
                             />
                         )}
                     </Modal>

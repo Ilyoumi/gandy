@@ -53,12 +53,12 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             ...initialValues,
             startTime: moment(initialValues.start_date),
             endTime: moment(initialValues.end_date),
-            ppv: Boolean(initialValues.ppv), 
-            tarif: Boolean(initialValues.tarif), 
+            ppv: Boolean(initialValues.ppv),
+            tarif: Boolean(initialValues.tarif),
             haute_tension: Boolean(initialValues.haute_tension),
             tarification: initialValues.tarification === "Variable" ? true : false,
-            commentaire: initialValues.commentaire, 
-            note: initialValues.note, 
+            commentaire: initialValues.commentaire,
+            note: initialValues.note,
 
         };
         form.setFieldsValue(formattedInitialValues);
@@ -96,7 +96,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
     const handleFormSubmit = async () => {
         setLoading(true);
         let startDate, endDate;
-    
+
         // Check if formData and formData.appointment_date are defined
         if (formData && formData.appointment_date && formData.appointment_date.length === 2) {
             // If new dates are selected, use them
@@ -107,19 +107,27 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             startDate = new Date(initialValues.start_date);
             endDate = new Date(initialValues.end_date);
         }
-    
+
+        console.log("Start Date selected:", startDate);
+        console.log("End Date selected:", endDate);
+        console.log("Start Date initial value:", formData.appointment_date[0]);
+        console.log("End Date initial value:", formData.appointment_date[1]);
+
+        const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
+        const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
+
         // Convert dates to UTC format before sending
         const formDataToSend = {
             ...formData,
-            start_date: startDate.toISOString(), 
-            end_date: endDate.toISOString(), 
+            start_date: startDateFormatted.toISOString().slice(0, 19).replace("T", " "),
+            end_date: endDateFormatted.toISOString().slice(0, 19).replace("T", " "),
             id_agent: userId,
             id_agenda: agendaId,
             tarification: formData.tarif ? "Variable" : "Fixe",
         };
-    
+
         console.log("sending data =", formDataToSend);
-    
+
         try {
             const response = await axiosClient.put(
                 `/api/rdvs/${initialValues.id}`,
@@ -143,12 +151,12 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             console.error("Error updating appointment:", error);
         }
     };
-    
+
 
     const handleValidation = async () => {
         setLoading(true);
         let startDate, endDate;
-    
+
         // Check if formData and formData.appointment_date are defined
         if (formData && formData.appointment_date && formData.appointment_date.length === 2) {
             // If new dates are selected, use them
@@ -159,17 +167,24 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             startDate = new Date(initialValues.start_date);
             endDate = new Date(initialValues.end_date);
         }
-    
+
+        console.log("Start Date selected:", startDate);
+        console.log("End Date selected:", endDate);
+
+        const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
+        const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
+
+
         const formDataToSend = {
             ...formData,
-            start_date: startDate.toISOString().slice(0, 19).replace("T", " "), 
-            end_date: endDate.toISOString().slice(0, 19).replace("T", " "), 
+            start_date: startDateFormatted.toISOString().slice(0, 19).replace("T", " "),
+            end_date: endDateFormatted.toISOString().slice(0, 19).replace("T", " "),
             id_agent: userId,
             id_agenda: agendaId,
             tarification: formData.tarif ? "Variable" : "Fixe",
             status: "valider",
         };
-    
+
         try {
             const response = await axiosClient.put(
                 `/api/rdvs/${initialValues.id}`,
@@ -185,7 +200,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
 
             // You may add any further action you want after validation
             message.success("Rendez-vous validé avec succès !");
-            
+
         } catch (error) {
             setLoading(false);
             console.error("Error validating appointment:", error);
@@ -196,7 +211,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
     const handleAnnuler = async () => {
         setLoading(true);
         let startDate, endDate;
-    
+
         if (formData && formData.appointment_date && formData.appointment_date.length === 2) {
             startDate = new Date(formData.appointment_date[0]);
             endDate = new Date(formData.appointment_date[1]);
@@ -204,17 +219,23 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             startDate = new Date(initialValues.start_date);
             endDate = new Date(initialValues.end_date);
         }
-    
+        console.log("Start Date selected:", startDate);
+        console.log("End Date selected:", endDate);
+
+        const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
+        const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
+
+
         const formDataToSend = {
             ...formData,
-            start_date: startDate.toISOString().slice(0, 19).replace("T", " "), 
-            end_date: endDate.toISOString().slice(0, 19).replace("T", " "), 
+            start_date: startDateFormatted.toISOString().slice(0, 19).replace("T", " "),
+            end_date: endDateFormatted.toISOString().slice(0, 19).replace("T", " "),
             id_agent: userId,
             id_agenda: agendaId,
             tarification: formData.tarif ? "Variable" : "Fixe",
-            status: "annuler", 
+            status: "annuler",
         };
-    
+
         try {
             const response = await axiosClient.put(
                 `/api/rdvs/${initialValues.id}`,
@@ -233,9 +254,9 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             console.error("Error canceling appointment:", error);
         }
     };
-    
-    
-    
+
+
+
 
     return (
         <Form layout="vertical" form={form} onFinish={handleFormSubmit}>
@@ -253,18 +274,18 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                     <Col span={12}>
                         <ConfigProvider locale={frFR}>
                             <DatePicker.RangePicker
-                            defaultValue={[
-                                moment(initialValues.start_date, "YYYY-MM-DD HH:mm:ss"),
-                                moment(initialValues.end_date, "YYYY-MM-DD HH:mm:ss")
-                            ]}
+                                defaultValue={[
+                                    moment(initialValues.start_date, "YYYY-MM-DD HH:mm:ss"),
+                                    moment(initialValues.end_date, "YYYY-MM-DD HH:mm:ss")
+                                ]}
                                 onChange={(dates) => {
                                     console.log("New dates:", dates);
                                     if (dates && dates.length === 2) {
                                         setFormData((prevState) => ({
                                             ...prevState,
                                             appointment_date: [
-                                                dates[0].toDate(), 
-                                                dates[1].toDate(), 
+                                                dates[0].toDate(),
+                                                dates[1].toDate(),
                                             ],
                                         }));
                                     } else {
@@ -299,8 +320,8 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                         <ModifierButton
                             loading={loading}
                             buttonText="Valider"
-                            onClick={handleValidation} 
-                            
+                            onClick={handleValidation}
+
                         />
                     </Col>
 
@@ -308,7 +329,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                         <SupprimerButton
                             loading={loading}
                             buttonText="Annuler"
-                            onClick={handleAnnuler} 
+                            onClick={handleAnnuler}
 
                             danger
                         />
@@ -407,7 +428,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                                 {
                                                     validator: (_, value) => {
                                                         const regex =
-                                                            /^[B][E]\d+$/; 
+                                                            /^[B][E]\d+$/;
                                                         if (
                                                             value &&
                                                             !regex.test(value)
@@ -740,7 +761,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                                 ppv: e.target.value === "true",
                                             })
                                         }
-                                        
+
                                     >
                                         <Radio value={true}>Oui</Radio>
                                         <Radio value={false}>Non</Radio>
@@ -781,8 +802,8 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                                     e.target.value === "true",
                                             })
                                         }
-                                        
-                                        
+
+
                                     >
                                         <Radio value={true} >Oui</Radio>
                                         <Radio value={false}>Non</Radio>
@@ -808,7 +829,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                                 haute_tension: e.target.value,
                                             })
                                         }
-                                    
+
                                     >
                                         <Radio value={true}>Oui</Radio>
                                         <Radio value={false}>Non</Radio>
