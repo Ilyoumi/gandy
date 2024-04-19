@@ -303,7 +303,7 @@ function MyCalendar() {
                                                 .map((appointment) => {
                                                     return {
                                                         id: appointment.id,
-                                                        title: `${appointment.nom} ${appointment.prenom} - ${appointment.postal}`,
+                                                        title: `${appointment.postal}/${appointment.nom} ${appointment.prenom}`,
                                                         start: appointment.start_date,
                                                         end: appointment.end_date,
                                                         status: appointment.status,
