@@ -171,7 +171,7 @@
 }
 
 
-.ant-btn {
+.custom-btn {
   background-color: rgb(7,49,73);
   border-color: rgb(7,49,73);
   color: white;
@@ -179,8 +179,8 @@
   bottom: 20px;
 }
 
-.ant-btn:hover,
-.ant-btn:focus {
+.custom-btn:hover,
+.custom-btn:focus {
   background-color: #003366; /* Darker shade for hover and focus */
   border-color: #003366; /* Darker shade for border */
 }
@@ -198,6 +198,28 @@
   border-color: #003366; /* Change border color on hover */
 }
 
+.card2 {
+  /* Your existing styles */
+  transform-style: preserve-3d;
+  transition: transform 0.8s;
+}
+
+.card2:hover {
+  transform: rotateY(180deg);
+}
+
+.content2,
+.content2-back {
+  /* Your existing styles */
+  backface-visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* Rest of your CSS styles */
 
 
 
