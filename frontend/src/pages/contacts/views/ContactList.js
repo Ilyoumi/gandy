@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { axiosClient } from "../../../api/axios";
 import { Card, Checkbox } from "antd";
-
+import { fetchAgentCommercialUsers } from "../../caledrier/services/api";
 
 function ContactList({
     agentCommercialUsers,
@@ -24,14 +24,7 @@ function ContactList({
         }
     }, [agendas]);
 
-    const fetchAgentCommercialUsers = async () => {
-        try {
-            const response = await axiosClient.get("/api/users/agent-commercial");
-            // Update agentCommercialUsers state
-        } catch (error) {
-            console.error("Error fetching agent commercial users:", error);
-        }
-    };
+
     const handleCheckboxClick = async (userId) => {
         try {
             let updatedSelectedItems = [...selectedItems];

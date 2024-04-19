@@ -141,7 +141,7 @@ function MyCalendar() {
                 title: "Impossible d'ajouter un rendez-vous",
                 content: "Vous ne pouvez pas ajouter de rendez-vous à des dates passées.",
             });
-            return; 
+            return;
         }
         handleAddAppointment(
             agentId,
@@ -301,15 +301,16 @@ function MyCalendar() {
                                                         agenda.id
                                                 )
                                                 .map((appointment) => {
+                                                    const title = appointment.prenom ? `${appointment.postal}/${appointment.nom} ${appointment.prenom}` : `${appointment.postal}/${appointment.nom}`;
                                                     return {
                                                         id: appointment.id,
-                                                        title: `${appointment.postal}/${appointment.nom} ${appointment.prenom}`,
+                                                        title: title,
                                                         start: appointment.start_date,
                                                         end: appointment.end_date,
                                                         status: appointment.status,
                                                     };
                                                 })}
-                                            
+
                                             views={{
                                                 week: {
                                                     type: "timeGridWeek",

@@ -53,11 +53,11 @@ class RdvController extends Controller
             // Validate incoming request
             $validatedData = $request->validate([
                 'nom' => 'required|string',
-                'prenom' => 'required|string',
-                'nom_ste' => 'required|string',
-                'tva' => 'required|string',
+                'prenom' => 'nullable|string',
+                'nom_ste' => 'nullable|string',
+                'tva' => 'nullable|string',
                 'tel' => 'required|string',
-                'gsm' => 'required|string',
+                'gsm' => 'nullable|string',
                 'postal' => 'required|string',
                 'adresse' => 'required|string',
                 'fournisseur' => 'required|string',
@@ -169,11 +169,11 @@ class RdvController extends Controller
         // Validate the incoming request data
         $validatedData = $request->validate([
             'nom' => 'required|string',
-            'prenom' => 'required|string',
-            'nom_ste' => 'required|string',
-            'tva' => 'required|string',
+            'prenom' => 'nullable|string',
+            'nom_ste' => 'nullable|string',
+            'tva' => 'nullable|string',
             'tel' => 'required|string',
-            'gsm' => 'required|string',
+            'gsm' => 'nullable|string',
             'postal' => 'required|string',
             'adresse' => 'required|string',
             'fournisseur' => 'required|string',

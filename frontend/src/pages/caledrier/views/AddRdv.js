@@ -88,25 +88,24 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
     setLoading(true);
 
     console.log("Received selectedDate from parent component:", selectedDate);
+    console.log("Start Date formData:", formData.appointment_date[0]);
+    console.log("End Date formData:", formData.appointment_date[1]);
 
     let startDate, endDate;
 
-    // Check if an appointment date is selected
     if (!formData.appointment_date) {
-      // Use the default selected date from the calendar
+      // Use the default selected date from the calendar if an appointment date is not selected
       startDate = selectedDate.date;
-      endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Add 1 hour
+      endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
     } else {
-      startDate = formData.appointment_date[0].toDate();
-        endDate = formData.appointment_date[1].toDate();
+      startDate = formData.appointment_date[0]
+      endDate = formData.appointment_date[1]
     }
 
     console.log("Start Date before formatting:", startDate);
     console.log("End Date before formatting:", endDate);
-    console.log("Start Date formData:", formData.appointment_date[0]);
-    console.log("End Date formData:", formData.appointment_date[1]);
 
-    // Adjust dates for timezone
+
     const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
     const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
 
@@ -114,10 +113,17 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
     console.log("End Date after formatting:", endDateFormatted.toISOString().slice(0, 19).replace("T", " "));
 
     try {
+      const [nom, prenom] = formData.nom_prenom ? formData.nom_prenom.split(' ') : ['', ''];
+      console.log("nom", nom)
+      console.log("prenom", prenom)
+      const tvaValue = `BE0${formData.tva}`;
       const formDataToSend = {
         ...formData,
-        start_date: startDateFormatted.toISOString().slice(0, 19).replace("T", " "), // Format start date
-        end_date: endDateFormatted.toISOString().slice(0, 19).replace("T", " "), // Format end date
+        tva: tvaValue,
+        nom: nom,
+        prenom: prenom,
+        start_date: startDateFormatted.toISOString().slice(0, 19).replace("T", " "),
+        end_date: endDateFormatted.toISOString().slice(0, 19).replace("T", " "),
         id_agent: userId,
         id_agenda: agendaId,
         tarification: formData.tarif ? "Variable" : "Fixe",
@@ -148,9 +154,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
 
       setLoading(false);
       console.error("Error adding appointment:", error);
-      message.error(
-        "Erreur lors de l'ajout du rendez-vous. Veuillez réessayer plus tard."
-      );
+
     }
   };
 
@@ -205,12 +209,10 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                   minuteStep: 15,
                   disabledHours: () => {
                     const disabledHours = [];
-                    // Hours before 9 AM
                     for (let i = 0; i < 9; i++) {
                       disabledHours.push(i);
                     }
-                    // Hours after 6 PM
-                    for (let i = 18; i < 24; i++) {
+                    for (let i = 20; i < 24; i++) {
                       disabledHours.push(i);
                     }
                     return disabledHours;
@@ -219,7 +221,6 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                 format="YYYY-MM-DD HH:mm"
                 onChange={(dates) => {
                   console.log("Selected dates in range picker:", dates);
-                  // Check if dates array is not empty and contains valid start and end dates
                   if (dates && dates.length === 2) {
                     setFormData({
                       ...formData,
@@ -250,15 +251,38 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
             <Row gutter={[16, 16]}>
               <Col span={24}>
                 <Row gutter={[16, 16]}>
-                  <Col xs={24} sm={12} lg={12}>
+                  <Col span={12}>
                     <Form.Item
-                      label="Nom"
-                      name="nom"
+                      label="Êtes-vous un professionnel ?"
+                      name="isPro"
                       rules={[
                         {
                           required: true,
-                          message:
-                            "Veuillez entrer votre nom !",
+                          message: "Veuillez sélectionner votre statut professionnel !",
+                        },
+                      ]}
+                    >
+                      <Radio.Group
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            isPro: e.target.value,
+                          })
+                        }
+                      >
+                        <Radio value={true}>Oui</Radio>
+                        <Radio value={false}>Non</Radio>
+                      </Radio.Group>
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item
+                      label="Nom et Prénom"
+                      name="nom_prenom"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Veuillez entrer votre nom et prénom !",
                         },
                       ]}
                     >
@@ -266,98 +290,71 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            nom: e.target.value,
+                            nom_prenom: e.target.value,
                           })
                         }
                       />
                     </Form.Item>
                   </Col>
-                  <Col xs={24} sm={12} lg={12}>
-                    <Form.Item
-                      label="Prénom"
-                      name="prenom"
-                      rules={[
-                        {
-                          required: true,
-                          message:
-                            "Veuillez entrer votre prénom !",
-                        },
-                      ]}
-                    >
-                      <Input
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            prenom: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Item>
-                  </Col>
+
                 </Row>
               </Col>
               <Col span={24}>
                 <Row gutter={[16, 16]}>
-                  <Col xs={24} sm={12} lg={12}>
-                    <Form.Item
-                      label="Nom de Société"
-                      name="nom_ste"
-                      rules={[
-                        {
-                          required: true,
-                          message:
-                            "Veuillez entrer le nom de votre société !",
-                        },
-                      ]}
-                    >
-                      <Input
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            nom_ste: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={12} lg={12}>
-                    <Form.Item
-                      defaultValue="BEs"
-                      label="TVA"
-                      name="tva"
-                      rules={[
-                        {
-                          required: true,
-                          message:
-                            "Veuillez entrer votre numéro de TVA !",
-                        },
-                        {
-                          validator: (_, value) => {
-                            const regex =
-                              /^[B][E]\d+$/; // Regular expression for validating TVA number format (starts with "BE" followed by one or more digits)
-                            if (
-                              value &&
-                              !regex.test(value)
-                            ) {
-                              return Promise.reject(
-                                'Le numéro de TVA doit commencer par "BE" suivi de chiffres.'
-                              );
-                            }
-                            return Promise.resolve();
-                          },
-                        },
-                      ]}
-                    >
-                      <Input
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            tva: e.target.value,
-                          })
-                        }
-                      />
-                    </Form.Item>
-                  </Col>
+                  {formData.isPro && ( 
+                    <>
+                      <Col span={24}>
+                        <Row gutter={[16, 16]}>
+                          <Col xs={24} sm={12} lg={12}>
+                            <Form.Item
+                              label="Nom de Société"
+                              name="nom_ste"
+                              
+                            >
+                              <Input
+                                onChange={(e) =>
+                                  setFormData({
+                                    ...formData,
+                                    nom_ste: e.target.value,
+                                  })
+                                }
+                              />
+                            </Form.Item>
+                          </Col>
+                          <Col xs={24} sm={12} lg={12}>
+                            <Form.Item
+                              label="TVA"
+                              name="tva"
+                              rules={[
+                                
+                                {
+                                  validator: (_, value) => {
+                                    const regex = /^\d{9}$/;
+                                    if (value && !regex.test(value)) {
+                                      return Promise.reject(
+                                        'Le numéro de TVA doit commencer par "BE0" suivi de 9 chiffres.'
+                                      );
+                                    }
+                                    return Promise.resolve();
+                                  },
+                                },
+                              ]}
+                            >
+                              <Input
+                              addonBefore="BE0"
+                                onChange={(e) =>
+                                  setFormData({
+                                    ...formData,
+                                    tva: e.target.value,
+                                  })
+                                }
+                              />
+                            </Form.Item>
+                          </Col>
+                        </Row>
+                      </Col>
+                    </>
+                  )}
                 </Row>
               </Col>
               <Col span={24}>
@@ -395,7 +392,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                             "Veuillez entrer votre code postal !",
                         },
                         {
-                          pattern: /^\d{4}$/, // Regex pattern to match exactly 4 digits
+                          pattern: /^\d{4}$/,
                           message:
                             "Veuillez entrer un code postal valide (4 chiffres).",
                         },
@@ -426,7 +423,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                             "Veuillez saisir votre numéro de téléphone!",
                         },
                         {
-                          pattern: /^\d{8}$/, // Regex pattern to match +32 followed by 8 digits
+                          pattern: /^\d{8}$/,
                           message:
                             "Veuillez saisir un numéro de téléphone valide de 8 chiffres (ex: +32123456789).",
                         },
@@ -458,13 +455,9 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                       label="GSM"
                       name="gsm"
                       rules={[
+
                         {
-                          required: true,
-                          message:
-                            "Veuillez entrer votre gsm !",
-                        },
-                        {
-                          pattern: /^\d{8}$/, // Regex pattern to match +324 followed by 8 digits
+                          pattern: /^\d{8}$/,
                           message:
                             "Veuillez saisir un numéro de GSM valide de 8 chiffres(ex: +32412345678).",
                         },
