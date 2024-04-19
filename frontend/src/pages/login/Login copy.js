@@ -10,16 +10,13 @@ import {
     Switch,
     message,
     Alert,
-    Modal,Card
+    Modal,
 } from "antd";
 import signinbg from "../../assets/images/loginbg.png";
-import sunlogo from "../../assets/images/sunlogo.png";
-import logo from "../../assets/images/lg.png";
-import by from "../../assets/images/by.png";
+import logo from "../../assets/images/gy.png";
 import { axiosClient } from "../../api/axios";
 import { useAuth } from "../../AuthContext";
-import { useHistory, Link } from "react-router-dom";
-import "./login.css";
+import { useHistory } from "react-router-dom";
 
 const { Title } = Typography;
 const { Content } = Layout;
@@ -55,6 +52,7 @@ const Login = () => {
     const onFinish = () => {
         form.validateFields()
             .then((values) => {
+                // validateFields is used to get form values
                 const data = {
                     email: values.email,
                     password: values.password,
@@ -115,12 +113,13 @@ const Login = () => {
                                         localStorage.getItem("auth_name"),
                                         localStorage.getItem("user_role")
                                     );
+                                    // Display success message using message.success
                                     message.success(
                                         `Bienvenue, ${res.data.nom},${res.data.role} `
                                     );
                                 } else if (res.data.status === 401) {
                                     console.log(res.data);
-                                    setAlertVisible(true);
+                                    setAlertVisible(true); // Show error message
                                     setAlertMessage(
                                         <p key="error-message">
                                             L'adresse e-mail ou le mot de passe
@@ -129,6 +128,7 @@ const Login = () => {
                                         </p>
                                     );
                                 } else {
+                                    // Handle other status codes or validation errors
                                     console.error(
                                         "Login failed:",
                                         res.data.message
@@ -140,6 +140,8 @@ const Login = () => {
                                     "An error occurred during login:",
                                     error
                                 );
+                                // Log the error
+                                // You can also handle the error or display an error message to the user if needed
                             });
                     })
                     .catch((error) => {
@@ -147,10 +149,14 @@ const Login = () => {
                             "An error occurred while fetching CSRF token:",
                             error
                         );
+                        // Log the error
+                        // You can also handle the error or display an error message to the user if needed
                     });
             })
             .catch((error) => {
                 console.error("Form validation failed:", error);
+                // Log the validation error
+                // You can also handle the validation error or display an error message to the user if needed
             });
     };
 
@@ -165,29 +171,29 @@ const Login = () => {
 
     return (
         <>
-         <Layout className="layout-default layout-signin">
+            <Layout className="layout-default layout-signin">
                 <Content className="signin">
-                    <Row justify="center" className="logo-row">
-                        <Col>
-                            <Link to="/login">
-                            <img src={sunlogo} alt="Logo 3" className="logo-img" style={{ width: 250 }} />
-                            </Link>
-                        </Col>
-                        <Col>
-                            <img src={by} alt="Logo 2" className="logo-img" style={{ width: 250 }}/>
-                        </Col>
-                        <Col>
-                            <Link to="/">
-                                <img src={logo} alt="Logo 3" className="logo-img" style={{ width: 250 }} />
-                            </Link>
-                        </Col>
-                    </Row>
-
-                    <Row justify="center">
-                        <Col xs={{ span: 24 }} lg={{ span: 8 }}>
-                            <Card className="login-card">
-                                <Title level={3} className="mb-15">Sunlight-call PRDV</Title>
-                                <Form
+            
+                    <Row
+                        gutter={[0, 0]}
+                        justify="space-around"
+                        align="middle"
+                        style={{ height: "70%" }}
+                    >
+                        <Col
+                            xs={{ span: 24, offset: 0 }}
+                            lg={{ span: 8, offset: 4 }}
+                            md={{ span: 12 }}
+                        >
+                            <Title className="mb-15">Connexion</Title>
+                            <Title
+                                className="font-regular text-muted"
+                                level={5}
+                            >
+                                Entrez votre email et votre mot de passe pour
+                                vous connecter
+                            </Title>
+                            <Form
                                 form={form}
                                 onFinish={onFinish}
                                 onFinishFailed={onFinishFailed}
@@ -200,7 +206,7 @@ const Login = () => {
                                     name="email"
                                     validateStatus={
                                         alertVisible &&
-                                            form.getFieldError("email")
+                                        form.getFieldError("email")
                                             ? "error"
                                             : ""
                                     }
@@ -216,7 +222,7 @@ const Login = () => {
                                         },
                                     ]}
                                 >
-                                <Input placeholder="Email" />
+                                    <Input placeholder="Email" />
                                 </Form.Item>
 
                                 <Form.Item
@@ -225,7 +231,7 @@ const Login = () => {
                                     name="password"
                                     validateStatus={
                                         alertVisible &&
-                                            form.getFieldError("password")
+                                        form.getFieldError("password")
                                             ? "error"
                                             : ""
                                     }
@@ -276,7 +282,6 @@ const Login = () => {
                                     onClose={() => setAlertVisible(false)}
                                 />
                             )}
-                            </Card>
                         </Col>
                     </Row>
                     <Modal
@@ -295,6 +300,13 @@ const Login = () => {
                         </Button>
                     </Modal>
                 </Content>
+                {/* <Footer>
+    <p className="copyright">
+      {" "}
+      Copyright © 2024 GANDY Inc. All rights reserved
+.{" "}
+    </p>
+  </Footer> */}
             </Layout>
         </>
     );

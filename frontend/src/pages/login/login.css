@@ -1,0 +1,26 @@
+.layout-signin {
+    background-color: white !important;
+}
+
+.logo-row {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-bottom: 40px !important;
+}
+
+.logo-img {
+ 
+    height: auto !important; /* Maintain aspect ratio */
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+.login-card {
+    width: 100% !important;
+    border-radius: 5px !important; /* Apply border radius */
+}
+
+.ant-input {
+    border-radius: 5px !important; /* Apply border radius to form inputs */
+}
