@@ -611,6 +611,11 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                     }
                   >
                     {[
+                      "Luminus",
+                      "Mega",
+                      "OCTA+",
+                      "Eneco",
+                      "TotalEnergies",
                       "Aspiravi Energy",
                       "Bolt",
                       "COCITER",
@@ -618,14 +623,8 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                       "EBEM",
                       "Ecopower",
                       "Elegant",
-                      "Eneco",
                       "Energie.be",
-                      "ENGIE",
                       "Frank Energie",
-                      "Luminus",
-                      "Mega",
-                      "OCTA+",
-                      "TotalEnergies",
                       "Trevion",
                       "Wind voor A",
                     ].map((fournisseur, index) => (
