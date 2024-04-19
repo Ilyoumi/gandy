@@ -1,33 +1,31 @@
 import React from "react";
-import "./HomeCompanies.css"; // Import your CSS file for styling
+import "./HomeCompanies.css";
+import { Link } from "react-router-dom";
+import { Row, Col, Button } from "antd";
 import logo from "../../assets/images/lg.png";
-import gy from "../../assets/images/gy.png"
+import gy from "../../assets/images/gy.png";
 import expert from "../../assets/images/expert.png";
 import servihome from "../../assets/images/servihome.png";
-import sunlogo from "../../assets/images/sunlogo.png"; // Corrected import statement
+import sunlogo from "../../assets/images/LOGO_sunlightcall.png";
+import sunsymbole from "../../assets/images/sunlogo.png";
+import servisymbol from "../../assets/images/servisymbol.png";
+import optinergy from "../../assets/images/optinergy.png";
+import optisymbole from "../../assets/images/optisymbole.png";
+import gysymbol from "../../assets/images/gysymbol.png";
 import { Link } from "react-router-dom";
 import { Row, Col, Button } from "antd";
 
-
-const CompanyCard = ({ number, name, logoSrc, buttonText }) => {
-  const cardStyle = {
-    backgroundImage: `url(${logoSrc})`, // Set background image dynamically
-    backgroundSize: 'contain', 
-  };
+const CompanyCard = ({ number, name, logoFrontSrc, logoBackSrc, buttonText, buttonLink }) => {
   return (
     <Col xs={24} sm={12} md={12} lg={6}>
-      <Link to="/login" className="card-link2">
-        <div className="card2" style={cardStyle}> {/* Apply dynamic style */}
+      <Link to={buttonLink} className="card-link2">
+        <div className="card2">
           <div className="content2">
-            {/* <h2>{number}</h2> */}
-            {/* <h3>{name}</h3> */}
+            <img src={logoFrontSrc} alt="Front Logo" />
           </div>
           <div className="content2-back">
-            {/* <h2>{number}</h2> */}
-            {/* <h3>{name}</h3> */}
-            {/* <Button className="flip-button">{buttonText}</Button> */}
+            <img src={logoBackSrc} alt="Back Logo" />
             <Button className="custom-btn">{buttonText}</Button>
-
           </div>
           <div className="glow2"></div>
         </div>
@@ -42,37 +40,71 @@ const HomeCompanies = () => {
       <header className="header">
         <img src={logo} alt="Logo" className="logo" />
       </header>
-
       <Row gutter={[16, 16]} justify="center" style={{ margin: "0 80px" }}>
         <CompanyCard
           number="01"
           name="Sunlight-Call PRD"
-          logoSrc={sunlogo} // Pass different logo source for each card
+          logoFrontSrc={sunsymbole}
+          logoBackSrc={sunlogo}
           buttonText="Connexion"
+          buttonLink="/login"
         />
         <CompanyCard
           number="02"
           name="Expertinout"
-          logoSrc={expert} // Pass a different logo source for each card
+          logoFrontSrc={expert}
+          logoBackSrc={expert}
           buttonText="Connexion"
+          buttonLink="/expertinout"
         />
         <CompanyCard
           number="03"
           name="gandy invest"
-          logoSrc={gy} // Pass a different logo source for each card
+          logoFrontSrc={gysymbol}
+          logoBackSrc={gy}
           buttonText="Connexion"
-          style={{ backgroundSize: "10px", }}
-        
+          buttonLink="/gandy-invest"
+        />
+         <CompanyCard
+          number="04"
+          name="Servihome"
+          logoFrontSrc={servisymbol}
+          logoBackSrc={servihome}
+          buttonText="Connexion"
+          buttonLink="/servihome"
         />
         <CompanyCard
-          number="03"
-          name="Servihome"
-          logoSrc={servihome} // Pass a different logo source for each card
+          number="05"
+          name="optinergy"
+          logoFrontSrc={optisymbole}
+          logoBackSrc={optinergy}
           buttonText="Connexion"
-        
+          buttonLink="/optinergy"
         />
-        {/* Add more CompanyCard components with different logo sources as needed */}
-
+        <CompanyCard
+          number="06"
+          name="brandpartners"
+          logoFrontSrc={optisymbole}
+          logoBackSrc={optinergy}
+          buttonText="Connexion"
+          buttonLink="/brandpartners"
+        />
+        <CompanyCard
+          number="07"
+          name="wizoo"
+          logoFrontSrc={optisymbole}
+          logoBackSrc={optinergy}
+          buttonText="Connexion"
+          buttonLink="/wizoo"
+        />
+        <CompanyCard
+          number="08"
+          name="brandassurance"
+          logoFrontSrc={optisymbole}
+          logoBackSrc={optinergy}
+          buttonText="Connexion"
+          buttonLink="/brandassurance"
+        />
       </Row>
     </div>
   );
