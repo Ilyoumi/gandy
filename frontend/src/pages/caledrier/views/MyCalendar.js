@@ -255,16 +255,13 @@ function MyCalendar() {
                                                 return (
                                                     <div>
                                                         <div>
-                                                            {arg.timeText} -{" "}
-                                                            {
+                                                            {arg.event.title}/{
                                                                 arg.event
                                                                     .extendedProps
                                                                     .status
                                                             }
                                                         </div>
-                                                        <div>
-                                                            {arg.event.title}
-                                                        </div>
+                                                        
                                                     </div>
                                                 );
                                             }}
@@ -273,18 +270,9 @@ function MyCalendar() {
                                                     arg.event.extendedProps
                                                         .status;
                                                 
-                                                let backgroundColor;
-                                                if (status === "annuler") {
-                                                    backgroundColor = "#E72929";
-                                                } else if (
-                                                    status === "valider"
-                                                ) {
-                                                    backgroundColor = "#74E291";
-                                                } else {
-                                                    backgroundColor = "#B4B4B8";
-                                                }
+                                                
                                                 arg.el.style.backgroundColor =
-                                                    backgroundColor;
+                                                    "#F6995C";
                                             }}
                                             dateClick={(arg) => {
                                                 console.log("Clicked date in calendar:", arg.dateStr)
