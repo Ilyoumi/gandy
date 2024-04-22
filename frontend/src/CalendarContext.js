@@ -21,6 +21,10 @@ export const CalendarProvider = ({ children }) => {
     const [showDetailsModal, setShowDetailModal] = useState(false);
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [appointmentDetails, setAppointmentDetails] = useState(null);
+    const [contactName, setContactName] = useState("");
+    const [contactEmail, setContactEmail] = useState("");
+    const [agentName, setAgentName] = useState("");
+
 
 
     useEffect(() => {
@@ -60,6 +64,11 @@ export const CalendarProvider = ({ children }) => {
                 setAgentCommercialUsers,
                 agendas,
                 setAgendas,
+                contactName,
+                setContactName,
+                contactEmail,
+                setContactEmail,
+                agentName, setAgentName
             }}
         >
             {children}
