@@ -31,15 +31,33 @@ class RdvController extends Controller
 
 
 
-    public function index()
-    {
-        try {
-            $rdvs = Rdv::all();
-            return response()->json($rdvs);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while fetching RDVs.'], 500);
+    public function index(Request $request)
+{
+    try {
+        // Start with fetching all appointments
+        $query = Rdv::query();
+
+        // Check if an agent ID is provided in the request
+        if ($request->has('agent_id')) {
+            // Filter appointments by agent ID
+            $query->where('id_agent', $request->agent_id);
         }
+
+        // Check if an agenda ID is provided in the request
+        if ($request->has('agenda_id')) {
+            // Filter appointments by agenda ID
+            $query->where('id_agenda', $request->agenda_id);
+        }
+
+        // Fetch appointments based on the applied filters
+        $rdvs = $query->get();
+
+        return response()->json($rdvs);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'An error occurred while fetching RDVs.'], 500);
     }
+}
+
 
 
 

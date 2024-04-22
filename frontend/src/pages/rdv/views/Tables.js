@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Table, message } from "antd";
+import { Button, Modal, Table, message,Select, DatePicker, Card } from "antd";
 import { pencil, deletebtn } from "../../../constants/icons";
 
 import useColumnSearch from "../../../constants/tableSearchLogin";
@@ -7,6 +7,7 @@ import UpdateRdv from "./UpdateRdv";
 import { axiosClient } from "../../../api/axios";
 import { EyeOutlined } from "@ant-design/icons";
 import AppointmentDetails from "./AppoitmnetDetails";
+const { Option } = Select;
 
 const DataTable = () => {
     const [updateModalVisible, setUpdateModalVisible] = useState(false);
@@ -14,31 +15,115 @@ const DataTable = () => {
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [tableData, setTableData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [agentOptions, setAgentOptions] = useState([]);
+    const [agendaOptions, setAgendaOptions] = useState([]);
+    const [selectedAgent, setSelectedAgent] = useState(undefined);
+    const [selectedAgenda, setSelectedAgenda] = useState(undefined);
+    const [selectedDate, setSelectedDate] = useState(undefined);
     const { getColumnSearchProps } = useColumnSearch();
 
     useEffect(() => {
         fetchData();
+        fetchAgentOptions();
+        fetchAgendaOptions();
     }, []);
+
+    const fetchAgentOptions = async () => {
+        try {
+            const response = await axiosClient.get("/api/superviseur-and-agent-users");
+            setAgentOptions(response.data.users);
+        } catch (error) {
+            console.error("Error fetching agent options:", error);
+        }
+    };
+    
+
+    const fetchAgendaOptions = async () => {
+        try {
+            const response = await axiosClient.get("/api/agendas");
+            const agendas = response.data.agendas;
+            setAgendaOptions(agendas);
+        } catch (error) {
+            console.error("Error fetching agenda options:", error);
+        }
+    };
+    
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            const response = await axiosClient.get("/api/rdvs");
+            // Construct the query parameters based on selected filters
+            const queryParams = {};
+            if (selectedAgent) {
+                queryParams.agent_id = selectedAgent;
+            }
+            if (selectedAgenda) {
+                queryParams.agenda_id = selectedAgenda;
+            }
+            if (selectedDate) {
+                // Assuming selectedDate is a string in ISO format (YYYY-MM-DD)
+                queryParams.start_date = selectedDate.toISOString();
+            }
+            console.log("query", queryParams)
+    
+            // Make the API request with the constructed query parameters
+            const response = await axiosClient.get("/api/rdvs", {
+                params: queryParams,
+            });
+    
             const appointments = response.data;
+    
+            // Fetch additional data if necessary and process appointments
             const agentIds = appointments.map(appointment => appointment.id_agent);
             // Fetch unique agents based on agent IDs
             const uniqueAgentIds = [...new Set(agentIds)];
             const agentPromises = uniqueAgentIds.map(async (agentId) => {
-                const agentResponse = await axiosClient.get(`/api/users/${agentId}`);
-                return agentResponse.data;
+                try {
+                    const agentResponse = await axiosClient.get(`/api/users/${agentId}`);
+                    return agentResponse.data;
+                } catch (error) {
+                    console.error("Error fetching agent details:", error);
+                    throw error;
+                }
             });
             const agents = await Promise.all(agentPromises);
-            // Map appointments to their corresponding agents
-            const appointmentsWithAgents = appointments.map(appointment => {
-                const agent = agents.find(agent => agent.id === appointment.id_agent);
-                return { ...appointment, agent };
+    
+            // Fetch agent commercial names using agenda IDs
+            const agendaIds = appointments.map(appointment => appointment.id_agenda);
+            const uniqueAgendaIds = [...new Set(agendaIds)];
+            const agentCommercialPromises = uniqueAgendaIds.map(async (agendaId) => {
+                try {
+                    const agendaResponse = await axiosClient.get(`/api/agendas/${agendaId}`);
+                    console.log("agenda det", agendaResponse.data)
+                    const contactId = agendaResponse.data.agenda.contact_id;
+                    try {
+                        const contactResponse = await axiosClient.get(`/api/users/${contactId}`);
+                        console.log("comm det", contactResponse.data)
+    
+                        return contactResponse.data;
+                    } catch (error) {
+                        console.error("Error fetching agent commercial details:", error);
+                        throw error;
+                    }
+                } catch (error) {
+                    console.error("Error fetching agenda details:", error);
+                    throw error;
+                }
             });
-            setTableData(appointmentsWithAgents);
+            const agentCommercials = await Promise.all(agentCommercialPromises);
+    
+            // Map appointments to their corresponding agents and agent commercials
+            const appointmentsWithAgentsAndCommercials = appointments.map(appointment => {
+                const agent = agents.find(agent => agent.id === appointment.id_agent);
+                const agentCommercial = agentCommercials.find(contact => contact.id === appointment.id_agenda);
+                return { ...appointment, agent, agentCommercial };
+            });
+    
+            // Log the filtered appointments
+            console.log("Filtered Appointments:", appointmentsWithAgentsAndCommercials);
+    
+            // Update the state with the filtered appointments
+            setTableData(appointmentsWithAgentsAndCommercials);
         } catch (error) {
             console.error("Error fetching appointments:", error);
             message.error("Failed to fetch appointments");
@@ -46,6 +131,11 @@ const DataTable = () => {
             setLoading(false);
         }
     };
+    
+    
+    
+
+
 
 
 
@@ -114,13 +204,12 @@ const DataTable = () => {
         });
     };
 
-
     const columns = [
         {
-            title: "CLIENT",
+            title: "Client",
             dataIndex: "client",
             key: "client",
-            width: "32%",
+            width: "25%",
             ...getColumnSearchProps("client"),
             render: (_, record) => (
                 <span>
@@ -129,45 +218,48 @@ const DataTable = () => {
             ),
         },
         {
-            title: "AGENT",
+            title: "Agent",
             dataIndex: "agent",
             key: "agent",
+            width: "15%",
+            ...getColumnSearchProps("agent"),
             render: (_, record) => record.agent ? `${record.agent.nom} ${record.agent.prenom}` : "N/A",
         },
         {
-            title: "SOCIETE",
-            dataIndex: "nom_ste",
-            key: "nom_ste",
-            ...getColumnSearchProps("nom_ste"),
+            title: "Agent Commercial",
+            dataIndex: "agentCommercial",
+            key: "agentCommercial",
+            width: "20%",
+            ...getColumnSearchProps("agentCommercial"),
+            render: (_, record) => record.agentCommercial ? `${record.agentCommercial.nom} ${record.agentCommercial.prenom}` : "N/A",
         },
         {
             title: "TEL",
-            key: "tel",
             dataIndex: "tel",
+            key: "tel",
+            width: "10%",
             ...getColumnSearchProps("tel"),
+            render: (text) => text || "N/A",
         },
         {
-            title: "GSM",
-            key: "gsm",
-            dataIndex: "gsm",
-            ...getColumnSearchProps("gsm"),
+            title: "Code P",
+            dataIndex: "postal",
+            key: "postal",
+            width: "10%",
+            ...getColumnSearchProps("postal"),
+            render: (text) => text || "N/A",
         },
         {
-            title: "DEBUT DU RDV",
+            title: "Date Debut",
             dataIndex: "start_date",
             key: "start_date",
+            width: "20%",
+            ...getColumnSearchProps("start_date"),
             render: (text) => (text ? new Date(text).toLocaleString() : "-"),
         },
         {
-            title: "FIN DU RDV",
-            dataIndex: "end_date",
-            key: "end_date",
-            render: (text) => (text ? new Date(text).toLocaleString() : "-"),
-        },
-        {
-            title: "ACTION",
+            title: "Action",
             key: "action",
-            dataIndex: "action",
             render: (_, record) => (
                 <div>
                     <Button
@@ -182,7 +274,6 @@ const DataTable = () => {
                     >
                         {pencil}
                     </Button>
-
                     <Button
                         type="link"
                         onClick={() => handleDeleteClick(record)}
@@ -193,9 +284,39 @@ const DataTable = () => {
             ),
         },
     ];
+    
 
     return (
         <div>
+            <Card style={{ marginBottom: "20px" }}>
+                <Select
+                    style={{ width: 200, marginRight: "10px" }}
+                    placeholder="Select Agent"
+                    onChange={setSelectedAgent}
+                    value={selectedAgent}
+                >
+                    {agentOptions.map(agent => (
+                        <Option key={agent.id} value={agent.id}>{`${agent.nom} ${agent.prenom}`}</Option>
+                    ))}
+                </Select>
+                <Select
+                    style={{ width: 200, marginRight: "10px" }}
+                    placeholder="Select Agenda"
+                    onChange={setSelectedAgenda}
+                    value={selectedAgenda}
+                >
+                    {agendaOptions.map(agenda => (
+                        <Option key={agenda.id} value={agenda.id}>{agenda.name}</Option>
+                    ))}
+                </Select>
+                <DatePicker
+                    style={{ marginRight: "10px" }}
+                    placeholder="Select Date"
+                    onChange={setSelectedDate}
+                    value={selectedDate}
+                />
+                <Button type="primary" onClick={fetchData}>Apply Filters</Button>
+            </Card>
             <Table
                 columns={columns}
                 dataSource={tableData}
@@ -228,7 +349,7 @@ const DataTable = () => {
                 {selectedRowData && (
                     <AppointmentDetails
                         selectedRowData={selectedRowData}
-                        
+
                     />
                 )}
             </Modal>
