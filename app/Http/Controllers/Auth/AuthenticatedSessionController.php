@@ -49,52 +49,96 @@ class AuthenticatedSessionController extends Controller
         return response()->noContent();
     }
 
+    public function login(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email:191',
+        'password' => 'required',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => 400,
+            'message' => 'Validation failed',
+            'validation_errors' => $validator->messages(),
+        ], 400);
+    }
+
+    $credentials = $request->only('email', 'password');
+    $user = User::where('email', $credentials['email'])->first();
+
+    if (!$user) {
+        return response()->json([
+            'status' => 401,
+            'message' => 'Invalid email or password',
+        ], 401);
+    }
+
+    if (!Hash::check($credentials['password'], $user->password)) {
+        return response()->json([
+            'status' => 401,
+            'message' => 'Invalid email or password',
+        ], 401);
+    }
+
+    $token = $user->createToken($user->email . '_Token', [])->plainTextToken;
+
+    return response()->json([
+        'status' => 200,
+        'message' => 'Logged In Successfully',
+        'nom' => $user->nom,
+        'prenom' => $user->prenom,
+        'role' => $user->role,
+        'token' => $token,
+    ], 200);
+}
+
     /**
      * Handle an incoming login request.
      */
-    public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email:191',
-            'password' => 'required',
-        ]);
+    // public function login(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'email' => 'required|email:191',
+    //         'password' => 'required',
+    //     ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'validation_errors' => $validator->messages(),
-            ]);
-        } else {
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'validation_errors' => $validator->messages(),
+    //         ]);
+    //     } else {
 
-            $credentials = $request->only('email', 'password');
-            $user = User::where('email', $credentials['email'])->first();
+    //         $credentials = $request->only('email', 'password');
+    //         $user = User::where('email', $credentials['email'])->first();
 
-            if (!$user || !Hash::check($credentials['password'], $user->password)) {
-                // Log the provided password and the hashed password from the database
-                Log::info('Login failed: Provided Password - ' . $credentials['password'] . ', Hashed Password - ' . $user->password);
+    //         if (!$user || !Hash::check($credentials['password'], $user->password)) {
+    //             // Log the provided password and the hashed password from the database
+    //             Log::info('Login failed: Provided Password - ' . $credentials['password'] . ', Hashed Password - ' . $user->password);
 
-                return response()->json([
-                    'status' => 401,
-                    'message' => 'Invalid Credentials',
-                    'provided_password' => $credentials['password'],
-                    'hashed_password' => $user ? $user->password : null, // Include hashed password if user exists
-                ]);
-            } else {
-                if ($user->role_as == 1) {
-                    $token = $user->createToken($user->email . '_AdminToken', ['server:admin'])->plainTextToken;
-                } else {
-                    $token = $user->createToken($user->email . '_Token', [''])->plainTextToken;
-                }
-                return response()->json([
-                    'status' => 200,
-                    'nom' => $user->nom,
-                    'prenom' => $user->prenom,
-                    'role' => $user->role,
-                    'token' => $token,
-                    'message' => 'Logged In Successfully',
-                ]);
-            }
-        }
-    }
+    //             return response()->json([
+    //                 'status' => 401,
+    //                 'message' => 'Invalid Credentials',
+    //                 'provided_password' => $credentials['password'],
+    //                 'hashed_password' => $user ? $user->password : null, // Include hashed password if user exists
+    //             ]);
+    //         } else {
+    //             if ($user->role_as == 1) {
+    //                 $token = $user->createToken($user->email . '_AdminToken', ['server:admin'])->plainTextToken;
+    //             } else {
+    //                 $token = $user->createToken($user->email . '_Token', [''])->plainTextToken;
+    //             }
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'nom' => $user->nom,
+    //                 'prenom' => $user->prenom,
+    //                 'role' => $user->role,
+    //                 'token' => $token,
+    //                 'message' => 'Logged In Successfully',
+    //             ]);
+    //         }
+    //     }
+    // }
 
     public function logout()
 {
