@@ -22,7 +22,9 @@ const { Option } = Select;
 
 const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
     const [form] = Form.useForm();
-    const [loading, setLoading] = useState(false);
+    const [loadingValidation, setLoadingValidation] = useState(false);
+    const [loadingAnnuler, setLoadingAnnuler] = useState(false);
+    const [loadingEnregistrer, setLoadingEnregistrer] = useState(false);
     const [showAdditionalInput, setShowAdditionalInput] = useState(false);
     const [userId, setUserId] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
@@ -96,9 +98,9 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
     };
 
     const handleFormSubmit = async () => {
-        setLoading(true);
+        setLoadingEnregistrer(true);
         let startDate, endDate;
-    
+
         // Check if formData and formData.appointment_date are defined
         if (formData && formData.appointment_date && formData.appointment_date.length === 2) {
             // If new dates are selected, use them
@@ -109,17 +111,17 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             startDate = new Date(initialValues.start_date);
             endDate = new Date(initialValues.end_date);
         }
-    
+
         console.log("Start Date selected:", startDate);
         console.log("End Date selected:", endDate);
-    
+
         // Add a check to ensure formData.appointment_date is defined
         console.log("Start Date initial value:", formData.appointment_date ? formData.appointment_date[0] : 'Not provided');
         console.log("End Date initial value:", formData.appointment_date ? formData.appointment_date[1] : 'Not provided');
-    
+
         const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
         const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
-    
+
         // Convert dates to UTC format before sending
         const formDataToSend = {
             ...formData,
@@ -129,9 +131,9 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             id_agenda: agendaId,
             tarification: formData.tarif ? "Variable" : "Fixe",
         };
-    
+
         console.log("sending data =", formDataToSend);
-    
+
         try {
             const response = await axiosClient.put(
                 `/api/rdvs/${initialValues.id}`,
@@ -141,25 +143,25 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                 ...response.data,
                 id: response.data.id,
             };
-            setLoading(false);
+            setLoadingEnregistrer(false);
             console.log("Form submission successful. Response:", response.data);
             onFormSubmit({ ...response.data, newAppointment });
             message.success("Rendez-vous modifié avec succès !");
         } catch (error) {
             if (error.response && error.response.status === 409) {
                 setShowAlert(true);
-                setLoading(false);
+                setLoadingEnregistrer(false);
                 return;
             }
-            setLoading(false);
+            setLoadingEnregistrer(false);
             console.error("Error updating appointment:", error);
         }
     };
-    
+
 
 
     const handleValidation = async () => {
-        setLoading(true);
+        setLoadingValidation(true);
         let startDate, endDate;
 
         // Check if formData and formData.appointment_date are defined
@@ -199,7 +201,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                 ...response.data,
                 id: response.data.id,
             };
-            setLoading(false);
+            setLoadingValidation(false);
             console.log("Form submission successful. Response:", response.data);
             onFormSubmit({ ...response.data, newAppointment });
 
@@ -207,14 +209,14 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             message.success("Rendez-vous validé avec succès !");
 
         } catch (error) {
-            setLoading(false);
+            setLoadingValidation(false);
             console.error("Error validating appointment:", error);
             // Handle error if needed
         }
     };
 
     const handleAnnuler = async () => {
-        setLoading(true);
+        setLoadingAnnuler(true);
         let startDate, endDate;
 
         if (formData && formData.appointment_date && formData.appointment_date.length === 2) {
@@ -250,12 +252,12 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                 ...response.data,
                 id: response.data.id,
             };
-            setLoading(false);
+            setLoadingAnnuler(false);
             console.log("Form submission successful. Response:", response.data);
             onFormSubmit({ ...response.data, newAppointment });
             message.success("Rendez-vous annulé avec succès !");
         } catch (error) {
-            setLoading(false);
+            setLoadingAnnuler(false);
             console.error("Error canceling appointment:", error);
         }
     };
@@ -323,8 +325,8 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                     </Col>
                     <Col span={4}>
                         <ModifierButton
-                            loading={loading}
-                            buttonText="Valider"
+                            loading={loadingValidation}
+                            buttonText="Confirmer"
                             onClick={handleValidation}
 
                         />
@@ -332,7 +334,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
 
                     <Col span={4}>
                         <SupprimerButton
-                            loading={loading}
+                            loading={loadingAnnuler}
                             buttonText="Annuler"
                             onClick={handleAnnuler}
 
@@ -341,7 +343,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                     </Col>
                     <Col span={4}>
                         <SaveButton
-                            loading={loading}
+                            loading={loadingEnregistrer}
                             buttonText="Enregistrer"
                         />
                     </Col>
@@ -427,25 +429,25 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                         )}
                                     </Col>
                                     <Col xs={24} sm={12} lg={12}>
-                                        {initialValues.pro && ( 
+                                        {initialValues.pro && (
                                             <Form.Item
                                                 label="TVA"
                                                 name="tva"
                                                 value={initialValues.tva ? initialValues.tva.replace(/^BE0/, '') : ''}
                                                 rules={[
-                                
+
                                                     {
-                                                      validator: (_, value) => {
-                                                        const regex = /^\d{9}$/;
-                                                        if (value && !regex.test(value)) {
-                                                          return Promise.reject(
-                                                            'Le numéro de TVA doit commencer par "BE0" suivi de 9 chiffres.'
-                                                          );
-                                                        }
-                                                        return Promise.resolve();
-                                                      },
+                                                        validator: (_, value) => {
+                                                            const regex = /^\d{9}$/;
+                                                            if (value && !regex.test(value)) {
+                                                                return Promise.reject(
+                                                                    'Le numéro de TVA doit commencer par "BE0" suivi de 9 chiffres.'
+                                                                );
+                                                            }
+                                                            return Promise.resolve();
+                                                        },
                                                     },
-                                                  ]}
+                                                ]}
                                             >
                                                 <Input
                                                     addonBefore="BE0"

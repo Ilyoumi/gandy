@@ -57,6 +57,10 @@ function MyCalendar() {
         setAgentCommercialUsers,
         agendas,
         setAgendas,
+        contactName,
+        setContactName,
+        contactEmail,
+        setContactEmail
     } = useCalendar();
     const userContext = useUser();
     const [selectedAppointmentDate, setSelectedAppointmentDate] =
@@ -89,7 +93,10 @@ function MyCalendar() {
 
     useEffect(() => {
         fetchAgentCommercialUsers(setAgentCommercialUsers);
-        fetchAgendasAndAppointments(setAgendas, setAppointments, agendaId);
+        fetchAgendasAndAppointments(setAgendas, setAppointments, agendaId, contactName,
+            setContactName,
+            contactEmail,
+            setContactEmail);
         const interval = setInterval(fetchAgentCommercialUsers, 5 * 60 * 1000);
         return () => clearInterval(interval);
     }, []);
@@ -175,7 +182,11 @@ function MyCalendar() {
             await fetchAgendasAndAppointments(
                 setAgendas,
                 setAppointments,
-                agendaId
+                agendaId,
+                contactName,
+                setContactName,
+                contactEmail,
+                setContactEmail
             );
         } catch (error) {
             // Handle any errors
@@ -332,7 +343,7 @@ function MyCalendar() {
                     </Card>
                     <Modal
                         open={showAddModal}
-                        title="Nouveau rendez-vous"
+                        title={`Nouveau rendez-vous : ${contactName} - ${contactEmail}`}
                         onCancel={handleCloseModal}
                         footer={null}
                         width={1000}
@@ -347,7 +358,9 @@ function MyCalendar() {
                     </Modal>
                     <Modal
                         open={showUpdateModal}
-                        title="Modifier rendez-vous"
+                        title={`Modifier rendez-vous : ${contactName} - ${contactEmail}`}
+
+ 
                         onCancel={() => setShowUpdateModal(false)}
                         footer={null}
                         width={1000}
@@ -372,7 +385,9 @@ function MyCalendar() {
                         title={
                             <Row justify="space-between" align="middle">
                                 <Col>
-                                    <h2>Détails de rendez-vous</h2>
+                                    <p style={{
+                                        fontSize:"16px"
+                                    }} >Détails de rendez-vous : {contactName} - {contactEmail}</p>
                                 </Col>
                                 <Col style={{ marginRight: "40px" }}>
                                     {(userContext.userRole === "Admin" ||
@@ -403,12 +418,6 @@ function MyCalendar() {
                         )}
                     </Modal>
 
-                    {/* {userContext.userRole === "Agent Commercial" && (
-                        <>
-                            <h2>Mon Calendrier</h2>
-                            <FullCalendar {...fullCalendarConfig} />
-                        </>
-                    )} */}
                 </>
             )}
         </div>

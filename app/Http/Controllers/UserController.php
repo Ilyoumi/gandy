@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserController extends Controller
 {
@@ -149,18 +150,18 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        try {
-            $user = User::find($id);
-            if (!$user) {
-                return response()->json(['message' => 'User not found'], 404);
-            }
-            return response()->json($user);
-        } catch (\Exception $e) {
-            Log::error('Failed to fetch user data by ID: ' . $e->getMessage());
-            return response()->json(['message' => 'Failed to fetch user data by ID'], 500);
-        }
+{
+    try {
+        // Use findOrFail instead of find to automatically handle the case where the user is not found
+        $user = User::findOrFail($id);
+        return response()->json($user);
+    } catch (ModelNotFoundException $e) {
+        return response()->json(['message' => 'User not found'], 404);
+    } catch (\Exception $e) {
+        Log::error('Failed to fetch user data by ID: ' . $e->getMessage());
+        return response()->json(['message' => 'Failed to fetch user data by ID'], 500);
     }
+}
 
     /**
      * Update the specified resource in storage.

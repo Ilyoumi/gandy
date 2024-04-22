@@ -19,29 +19,38 @@ const DataTable = () => {
     useEffect(() => {
         fetchData();
     }, []);
-    let agentName
+
     const fetchData = async () => {
         setLoading(true);
         try {
             const response = await axiosClient.get("/api/rdvs");
-            const updatedTableData = await Promise.all(response.data.map(async (record) => {
-                const agentResponse = await axiosClient.get(`/api/users/${record.id_agent}`);
-                agentName = `${agentResponse.data.nom} ${agentResponse.data.prenom}`;
-                // Return the updated record with the agent's name
-                return {
-                    ...record,
-                    agentName: agentName,
-                };
-            }));
-            setTableData(updatedTableData);
+            const appointments = response.data;
+            const agentIds = appointments.map(appointment => appointment.id_agent);
+            // Fetch unique agents based on agent IDs
+            const uniqueAgentIds = [...new Set(agentIds)];
+            const agentPromises = uniqueAgentIds.map(async (agentId) => {
+                const agentResponse = await axiosClient.get(`/api/users/${agentId}`);
+                return agentResponse.data;
+            });
+            const agents = await Promise.all(agentPromises);
+            // Map appointments to their corresponding agents
+            const appointmentsWithAgents = appointments.map(appointment => {
+                const agent = agents.find(agent => agent.id === appointment.id_agent);
+                return { ...appointment, agent };
+            });
+            setTableData(appointmentsWithAgents);
         } catch (error) {
-            console.error("Error fetching RDV data:", error);
+            console.error("Error fetching appointments:", error);
+            message.error("Failed to fetch appointments");
         } finally {
             setLoading(false);
         }
     };
-    
-    
+
+
+
+
+
 
     const handleUpdateClick = (record) => {
         setSelectedRowData(record);
@@ -81,29 +90,29 @@ const DataTable = () => {
     };
 
 
-const deleteRecord = async (record) => {
-    Modal.confirm({
-        title: "Confirmation",
-        content: "Voulez-vous vraiment supprimer ce Rdv ?",
-        okText: "Oui",
-        cancelText: "Non",
-        onOk: async () => {
-            try {
-                await axiosClient.delete(`/api/rdvs/${record.id}`);
-                Modal.success({
-                    title: "Suppression réussie",
-                    content: "Le Rdv a été supprimé avec succès.",
-                });
-                // Refetch data after deletion
-                fetchData();
-            } catch (error) {
-                console.error("Erreur lors de la suppression du Rdv :", error);
-                console.log("Réponse d'erreur :", error.response);
-                message.error("Échec de la suppression du Rdv");
-            }
-        },
-    });
-};
+    const deleteRecord = async (record) => {
+        Modal.confirm({
+            title: "Confirmation",
+            content: "Voulez-vous vraiment supprimer ce Rdv ?",
+            okText: "Oui",
+            cancelText: "Non",
+            onOk: async () => {
+                try {
+                    await axiosClient.delete(`/api/rdvs/${record.id}`);
+                    Modal.success({
+                        title: "Suppression réussie",
+                        content: "Le Rdv a été supprimé avec succès.",
+                    });
+                    // Refetch data after deletion
+                    fetchData();
+                } catch (error) {
+                    console.error("Erreur lors de la suppression du Rdv :", error);
+                    console.log("Réponse d'erreur :", error.response);
+                    message.error("Échec de la suppression du Rdv");
+                }
+            },
+        });
+    };
 
 
     const columns = [
@@ -118,6 +127,12 @@ const deleteRecord = async (record) => {
                     {record.nom} {record.prenom}
                 </span>
             ),
+        },
+        {
+            title: "AGENT",
+            dataIndex: "agent",
+            key: "agent",
+            render: (_, record) => record.agent ? `${record.agent.nom} ${record.agent.prenom}` : "N/A",
         },
         {
             title: "SOCIETE",
@@ -194,33 +209,30 @@ const deleteRecord = async (record) => {
             />
             <Modal
                 title="Update Data"
-                open={updateModalVisible}
+                visible={updateModalVisible}
                 onCancel={() => setUpdateModalVisible(false)}
                 footer={null}
-                style={{ marginTop: "-50px" }}
-                width="80%"
-                bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }} 
-                destroyOnClose 
+                destroyOnClose
             >
-                <UpdateRdv
-                    initialValues={selectedRowData}
-                    onSubmit={handleUpdateFormSubmit}
-                />
+                <UpdateRdv initialValues={selectedRowData} onSubmit={handleUpdateFormSubmit} />
             </Modal>
             <Modal
                 title="Modifier rendez-vous"
-                open={detailsModalVisible}
+                visible={detailsModalVisible}
                 onCancel={() => setDetailsModalVisible(false)}
                 footer={null}
                 style={{ marginTop: "-50px" }}
                 width="80%"
-                bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }} 
                 destroyOnClose
             >
                 {selectedRowData && (
-                    <AppointmentDetails selectedRowData={selectedRowData} agentName={agentName} />
+                    <AppointmentDetails
+                        selectedRowData={selectedRowData}
+                        
+                    />
                 )}
             </Modal>
+
         </div>
     );
 };

@@ -55,11 +55,33 @@ export const fetchAgentCommercialUsers = async (setAgentCommercialUsers) => {
     }
 };
 
+// Function to fetch contact information by contact ID
+export const fetchContactInfo = async (contactId, contactName,
+    setContactName,
+    contactEmail,
+    setContactEmail) => {
+    let contactResponse
+    try {
+        contactResponse = await axiosClient.get(`/api/users/${contactId}`);
+        const { nom, prenom, email } = contactResponse.data;
+        setContactName(`${prenom} ${nom}`);
+        setContactEmail(email);
+        console.log("contact information:", contactName, contactEmail);
+
+    } catch (error) {
+        console.error("Error fetching contact information:", contactResponse.data);
+    }
+};
+
 // Fetches agendas and appointments for all agendas, updates state with them
 export const fetchAgendasAndAppointments = async (
     setAgendas,
     setAppointments,
-    agendaId
+    agendaId,
+    contactName,
+    setContactName,
+    contactEmail,
+    setContactEmail
 ) => {
     try {
         // Fetch all agendas
@@ -71,8 +93,14 @@ export const fetchAgendasAndAppointments = async (
         const allAppointments = [];
         for (const agenda of agendas) {
             console.log("Agendas id from response:", agenda.id);
-
+            const contactId = agenda.contact_id;
+            console.log("conqtct id ", contactId)
             try {
+                // Fetch contact details for the agenda
+                await fetchContactInfo(contactId, contactName,
+                    setContactName,
+                    contactEmail,
+                    setContactEmail);
                 const appointmentsResponse = await axiosClient.get(
                     `/api/agendas/${agenda.id}/appointments`
                 );
@@ -170,7 +198,7 @@ export const handleAppointmentClick = async (
     agendaId,
     selectedRowData
 ) => {
-    console.log("event date", event.start )
+    console.log("event date", event.start)
 
     try {
         // Make a GET request to fetch the agent ID by appointment ID
@@ -181,12 +209,6 @@ export const handleAppointmentClick = async (
         // Extract the agent ID from the response data
         const agentId = response.data.agentId;
         setAgentId(agentId);
-        console.log("Fetched agent ID:", agentId);
-        console.log("Fetched data :", response.data);
-        console.log("agenda id ------", agendaId);
-        console.log("agent id ------", agentId);
-        console.log("context loggin id id ------", userContext.userId);
-        console.log("app id ------", event.id);
 
         // Compare the agent ID with the logged-in user's ID
         if (
@@ -206,7 +228,6 @@ export const handleAppointmentClick = async (
                 `User (${userContext.userId}) is either a supervisor or the owner. Agent ID: ${agentId}, User Role: ${userContext.userRole}`
             );
 
-            console.log("selectedRowData", selectedRowData, setShowDetailModal);
         } else {
             console.log(
                 `User (${userContext.userId}) is neither a supervisor nor the owner. Agent ID: ${agentId}, User Role: ${userContext.userRole}`
