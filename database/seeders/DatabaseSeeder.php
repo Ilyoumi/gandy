@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
+    // dima appel l had cmd pour cree admin account si perdu : php artisan db:seed
     /**
      * Seed the application's database.
      *
@@ -14,12 +15,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\User::factory(10)->create();
+        $this->call(AdminUserSeeder::class);
 
-        \App\Models\User::factory()->create([
-            'name' => 'admin',
-            'email' => 'admin@login.com',
-            'password' => '123456789'
-        ]);
+        // \App\Models\User::factory(10)->create();
+
+        // \App\Models\User::factory()->create([
+        //     'nom' => 'admin', // 'name' should be 'nom' according to your migration file
+        //     'prenom' => 'admin', // add prenom if it's required
+        //     'email' => 'admin@example.com',
+        //     'role' => 'admin', // assuming 'admin' is the role for admin user
+        //     'password' => bcrypt('11111111') // Hash the password using bcrypt
+        // ]);
     }
 }

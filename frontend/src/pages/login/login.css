@@ -24,3 +24,6 @@
 .ant-input {
     border-radius: 5px !important; /* Apply border radius to form inputs */
 }
+.title-auth{
+    color: #1BA0B3!important;
+}

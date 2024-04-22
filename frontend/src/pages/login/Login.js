@@ -12,8 +12,8 @@ import {
     Alert,
     Modal,Card
 } from "antd";
-import signinbg from "../../assets/images/loginbg.png";
-import sunlogo from "../../assets/images/sunlogo.png";
+import sunsymbol from "../../assets/images/sunlogo.png";
+import sunlogo from "../../assets/images/LOGO_sunlightcall.png";
 import logo from "../../assets/images/lg.png";
 import by from "../../assets/images/by.png";
 import { axiosClient } from "../../api/axios";
@@ -59,101 +59,64 @@ const Login = () => {
                     email: values.email,
                     password: values.password,
                 };
-
+    
                 axiosClient
                     .get("/sanctum/csrf-cookie")
-                    .then((response) => {
+                    .then(() => {
                         axiosClient
                             .post(`api/login`, data)
                             .then((res) => {
                                 if (res.data.status === 200) {
-                                    if (res.data.role === "Admin") {
-                                        history.push("/dashboard");
+                                    const { token, nom, prenom, role } = res.data;
+    
+                                    // Store user info in localStorage
+                                    localStorage.setItem("auth_token", token);
+                                    localStorage.setItem("auth_name", `${nom} ${prenom}`);
+                                    localStorage.setItem("user_role", role);
+    
+                                    handleLoginSuccess();
+    
+                                    // Redirect based on user role
+                                    switch (role) {
+                                        case "Admin":
+                                            history.push("/dashboard");
+                                            break;
+                                        case "superviseur":
+                                            history.push("/calendrier");
+                                            break;
+                                        case "Agent":
+                                            history.push("/calendrier");
+                                            break;
+                                        default:
+                                            console.error("Unknown user role:", role);
                                     }
-                                    console.log("res:", res.data);
-                                    localStorage.setItem(
-                                        "auth_token",
-                                        res.data.token
-                                    );
-                                    localStorage.setItem(
-                                        "auth_name",
-                                        res.data.nom + " " + res.data.prenom
-                                    );
-                                    localStorage.setItem(
-                                        "auth_nom",
-                                        res.data.nom
-                                    );
-                                    localStorage.setItem(
-                                        "auth_prenom",
-                                        res.data.prenom
-                                    );
-                                    localStorage.setItem(
-                                        "user_id",
-                                        res.data.id
-                                    );
-                                    localStorage.setItem(
-                                        "user_role",
-                                        res.data.role
-                                    );
-
-                                    handleLoginSuccess(
-                                        res.data.id,
-                                        res.data.nom + " " + res.data.prenom
-                                    );
-                                    console.log("local Storage", localStorage);
-                                    setSuccessModalVisible(true);
-                                    setUserInfo({
-                                        name: localStorage.getItem("auth_name"),
-                                        role: localStorage.getItem("user_role"),
-                                    });
-                                    console.log(
-                                        "successModalVisible",
-                                        successModalVisible
-                                    );
-                                    console.log(
-                                        "user info from login: ",
-                                        localStorage.getItem("auth_name"),
-                                        localStorage.getItem("user_role")
-                                    );
-                                    message.success(
-                                        `Bienvenue, ${res.data.nom},${res.data.role} `
-                                    );
-                                } else if (res.data.status === 401) {
-                                    console.log(res.data);
-                                    setAlertVisible(true);
-                                    setAlertMessage(
-                                        <p key="error-message">
-                                            L'adresse e-mail ou le mot de passe
-                                            est incorrect. <br></br> Veuillez
-                                            réessayer.
-                                        </p>
-                                    );
+    
+                                    message.success(`Bienvenue, ${nom} !`);
                                 } else {
-                                    console.error(
-                                        "Login failed:",
-                                        res.data.message
-                                    );
+                                    // Handle other responses (e.g., validation errors)
+                                    console.error("Échec de la connexion :", res.data.message);
                                 }
                             })
                             .catch((error) => {
-                                console.error(
-                                    "An error occurred during login:",
-                                    error
-                                );
+                                if (error.response && error.response.status === 401) {
+                                    // Handle 401 Unauthorized error
+                                    setAlertVisible(true);
+                                    setAlertMessage("Adresse e-mail ou mot de passe incorrect. Veuillez réessayer.");
+                                } else {
+                                    // Handle other errors
+                                    console.error("Une erreur s'est produite lors de la connexion :", error);
+                                }
                             });
                     })
                     .catch((error) => {
-                        console.error(
-                            "An error occurred while fetching CSRF token:",
-                            error
-                        );
+                        console.error("Une erreur s'est produite lors de la récupération du jeton CSRF :", error);
                     });
             })
             .catch((error) => {
-                console.error("Form validation failed:", error);
+                console.error("La validation du formulaire a échoué :", error);
             });
     };
-
+    
     const onFinishFailed = (errorInfo) => {
         setAlertVisible(true);
         console.log("Failed:", errorInfo);
@@ -165,7 +128,7 @@ const Login = () => {
 
     return (
         <>
-         <Layout className="layout-default layout-signin">
+         <Layout className="layout-default" style={{ backgroundColor: 'white'}}>
                 <Content className="signin">
                     <Row justify="center" className="logo-row">
                         <Col>
@@ -182,11 +145,25 @@ const Login = () => {
                             </Link>
                         </Col>
                     </Row>
-
+                    <Row justify="center">
+                        <Col xs={{ span: 24 }} lg={{ span: 10 }}>
+                        {alertVisible && (
+                                <Alert
+                                    message="Erreur de connexion"
+                                    description={alertMessage}
+                                    type="error"
+                                    showIcon
+                                    closable
+                                    onClose={() => setAlertVisible(false)}
+                                />
+                            )}
+                        </Col>
+                    </Row>
+<br></br>
                     <Row justify="center">
                         <Col xs={{ span: 24 }} lg={{ span: 8 }}>
                             <Card className="login-card">
-                                <Title level={3} className="mb-15">Sunlight-call PRDV</Title>
+                                <Title level={3} className="mb-15 title-auth">Sunlight-call PRDV</Title>
                                 <Form
                                 form={form}
                                 onFinish={onFinish}
@@ -266,16 +243,7 @@ const Login = () => {
                                     </Button>
                                 </Form.Item>
                             </Form>
-                            {alertVisible && (
-                                <Alert
-                                    message="Erreur de connexion"
-                                    description={alertMessage}
-                                    type="error"
-                                    showIcon
-                                    closable
-                                    onClose={() => setAlertVisible(false)}
-                                />
-                            )}
+                            
                             </Card>
                         </Col>
                     </Row>
