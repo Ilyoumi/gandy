@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
     const [userId, setUserId] = useState(localStorage.getItem("user_id"));
     const [username, setUsername] = useState(localStorage.getItem("auth_name"));
     const [userRole, setUserRole] = useState(localStorage.getItem("user_role"));
-    const [userRoles, setUserRoles] = useState("");
 
     const history = useHistory();
     
