@@ -91,7 +91,7 @@ const Login = () => {
                                             console.error("Unknown user role:", role);
                                     }
     
-                                    message.success(`Bienvenue, ${nom} !`);
+                                    message.success(`Bienvenue, ${nom} - ${role} !`);
                                 } else {
                                     // Handle other responses (e.g., validation errors)
                                     console.error("Échec de la connexion :", res.data.message);
@@ -247,21 +247,6 @@ const Login = () => {
                             </Card>
                         </Col>
                     </Row>
-                    <Modal
-                        title="Connexion réussie"
-                        open={successModalVisible}
-                        onCancel={() => setSuccessModalVisible(false)}
-                        footer={null}
-                    >
-                        <p>Bienvenue, {userInfo.name}!</p>
-                        <p>Votre rôle est {userInfo.role}.</p>
-                        <Button
-                            type="primary"
-                            onClick={() => setSuccessModalVisible(false)}
-                        >
-                            OK
-                        </Button>
-                    </Modal>
                 </Content>
             </Layout>
         </>

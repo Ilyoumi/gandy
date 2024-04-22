@@ -403,12 +403,12 @@ function MyCalendar() {
                         )}
                     </Modal>
 
-                    {userContext.userRole === "Agent" && (
+                    {/* {userContext.userRole === "Agent Commercial" && (
                         <>
                             <h2>Mon Calendrier</h2>
                             <FullCalendar {...fullCalendarConfig} />
                         </>
-                    )}
+                    )} */}
                 </>
             )}
         </div>

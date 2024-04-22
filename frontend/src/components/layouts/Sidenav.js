@@ -1,12 +1,40 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import { Menu } from "antd";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation ,Redirect } from "react-router-dom";
 import logo from "../../assets/images/lg.png";
+import { axiosClient } from "../../api/axios";
 
-const Sidenav = ({ color, userRole }) => {
+const Sidenav = ({ color }) => {
     const { pathname } = useLocation();
     const page = pathname.replace("/", "");
     const [expanded, setExpanded] = useState(true);
+    const [role, setRole] = useState("");
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const authToken = localStorage.getItem("auth_token");
+                if (!authToken) {
+                    console.log("User is not logged in");
+                    return;
+                }
+
+                const response = await axiosClient.get("/api/user", {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`,
+                    },
+                });
+                const { role } = response.data;
+                setRole(role);
+                console.log("User role:", role);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
     const dashboard = [
         <svg
             width="20"
@@ -143,7 +171,7 @@ const Sidenav = ({ color, userRole }) => {
             { key: "contact", label: "Liste des contacts", icon: contact },
             { key: "utilisateurs", label: "Liste des utilisateurs", icon: contact },
         ],
-        superviseur: [
+        Superviseur: [
             { key: "calendrier", label: "Calendrier", icon: mycalendar },
             { key: "rdv", label: "Liste de RDV", icon: rdv },
             { key: "agenda", label: "Liste des agendas", icon: agenda },
@@ -151,15 +179,21 @@ const Sidenav = ({ color, userRole }) => {
         ],
         Agent: [
             { key: "calendrier", label: "Calendrier", icon: mycalendar }
+        ],
+        "Agent Commercial": [
+            { key: "calendrier", label: "Calendrier", icon: mycalendar }
         ]
     };
 
-     // Convert userRole to lowercase for case-insensitive comparison
-     const role = userRole ? userRole.toLowerCase() : "Admin";
-
-     // If the user role is invalid, default to "admin"
-     const roleItems = menuItems[role] || menuItems["Admin"];
  
+    // console.log('jay mn tema' ,role);
+     const roleItems = menuItems[role];
+
+     // If user is not logged in, redirect to login page
+    if (!localStorage.getItem("auth_token")) {
+        return <Redirect to="/login" />;
+    }
+    // console.log('role item', roleItems);
      return (
          <div>
              <div className="brand">
@@ -183,12 +217,14 @@ const Sidenav = ({ color, userRole }) => {
                  }}
                  className=""
              >
+
                  {/* Render menu items based on user role */}
-                 {roleItems.map((item) => (
-                     <Menu.Item
-                         key={item.key}
-                         style={{ width: expanded ? "200px" : "10px" }}
-                     >
+                 {roleItems &&
+                    roleItems.map((item) => (
+                        <Menu.Item
+                            key={item.key}
+                            style={{ width: expanded ? "200px" : "10px" }}
+                        >
                          <NavLink
                              to={"/" + item.key}
                              className={` overflow-hidden transition-all ${
