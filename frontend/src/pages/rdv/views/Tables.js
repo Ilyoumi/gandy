@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Table, message, Select, DatePicker, Card } from "antd";
 import { pencil, deletebtn } from "../../../constants/icons";
-
-import useColumnSearch from "../../../constants/tableSearchLogin";
 import UpdateRdv from "./UpdateRdv";
 import { axiosClient } from "../../../api/axios";
 import { EyeOutlined } from "@ant-design/icons";
 import AppointmentDetails from "./AppoitmnetDetails";
+import SearchInput from "../../../constants/SearchInput";
+
 const { Option } = Select;
 const { RangePicker } = DatePicker;
+
 const DataTable = () => {
     const [updateModalVisible, setUpdateModalVisible] = useState(false);
     const [detailsModalVisible, setDetailsModalVisible] = useState(false);
@@ -21,18 +22,19 @@ const DataTable = () => {
     const [selectedAgenda, setSelectedAgenda] = useState(undefined);
     const [selectedDateRange, setSelectedDateRange] = useState([]);
     const [filtersChanged, setFiltersChanged] = useState(false);
-    const { getColumnSearchProps } = useColumnSearch();
-    
+    const [searchText, setSearchText] = useState("");
+
 
     useEffect(() => {
         fetchData();
         fetchAgentOptions();
         fetchAgendaOptions();
     }, []);
+
     useEffect(() => {
         if (filtersChanged) {
             fetchData();
-            setFiltersChanged(false); 
+            setFiltersChanged(false);
         }
     }, [filtersChanged]);
 
@@ -50,11 +52,30 @@ const DataTable = () => {
         try {
             const response = await axiosClient.get("/api/agendas");
             const agendas = response.data.agendas;
-            setAgendaOptions(agendas);
+
+            // Map through agendas and fetch contact name for each agenda
+            const agendaOptionsWithContactNames = await Promise.all(
+                agendas.map(async (agenda) => {
+                    try {
+                        const contactResponse = await axiosClient.get(`/api/users/${agenda.contact_id}`);
+                        const contact = contactResponse.data;
+                        return { ...agenda, contact_nom: contact.nom, contact_prenom: contact.prenom };
+                    } catch (error) {
+                        console.error("Error fetching contact details for agenda:", agenda.id, error);
+                        throw error;
+                    }
+                })
+            );
+
+            console.log("Agendas with contact names:", agendaOptionsWithContactNames);
+
+            // Set the agenda options with contact names
+            setAgendaOptions(agendaOptionsWithContactNames);
         } catch (error) {
             console.error("Error fetching agenda options:", error);
         }
     };
+
 
 
     const fetchData = async () => {
@@ -153,15 +174,6 @@ const DataTable = () => {
     };
 
 
-
-
-
-
-
-
-
-
-
     const handleUpdateClick = (record) => {
         setSelectedRowData(record);
         setUpdateModalVisible(true);
@@ -230,10 +242,11 @@ const DataTable = () => {
             dataIndex: "client",
             key: "client",
             width: "25%",
-            ...getColumnSearchProps("client"),
             render: (_, record) => (
                 <span>
-                    {record.nom} {record.prenom}
+                    {highlightText(record.nom)}
+                    &nbsp;
+                    {highlightText(record.prenom)}
                 </span>
             ),
         },
@@ -242,41 +255,52 @@ const DataTable = () => {
             dataIndex: "agent",
             key: "agent",
             width: "15%",
-            ...getColumnSearchProps("agent"),
-            render: (_, record) => record.agent ? `${record.agent.nom} ${record.agent.prenom}` : "N/A",
+            render: (_, record) => (
+                <span>
+                    {record.agent ? highlightText(record.agent.nom) : "N/A"}
+                    &nbsp;
+                    {record.agent ? highlightText(record.agent.prenom) : ""}
+                </span>
+            ),
         },
         {
             title: "Agent Commercial",
             dataIndex: "agentCommercial",
             key: "agentCommercial",
             width: "20%",
-            ...getColumnSearchProps("agentCommercial"),
-            render: (_, record) => record.agentCommercial ? `${record.agentCommercial.nom} ${record.agentCommercial.prenom}` : "N/A",
+            render: (_, record) => (
+                <span>
+                    {record.agentCommercial ? highlightText(record.agentCommercial.nom) : "N/A"}
+                    &nbsp;
+                    {record.agentCommercial ? highlightText(record.agentCommercial.prenom) : ""}
+                </span>
+            ),
         },
         {
             title: "TEL",
             dataIndex: "tel",
             key: "tel",
             width: "10%",
-            ...getColumnSearchProps("tel"),
-            render: (text) => text || "N/A",
+            render: (text) => highlightText(text || "N/A"),
         },
         {
             title: "Postal",
             dataIndex: "postal",
             key: "postal",
             width: "10%",
-            ...getColumnSearchProps("postal"),
-            render: (text) => text || "N/A",
+            render: (text) => highlightText(text || "N/A"),
         },
         {
             title: "Date Debut",
             dataIndex: "start_date",
             key: "start_date",
             width: "20%",
-            ...getColumnSearchProps("start_date"),
-            render: (text) => (text ? new Date(text).toLocaleString() : "-"),
+            render: (text) => {
+                const formattedDate = text ? new Date(text).toLocaleString() : "-";
+                return highlightText(formattedDate);
+            },
         },
+        
         {
             title: "Action",
             key: "action",
@@ -304,6 +328,51 @@ const DataTable = () => {
             ),
         },
     ];
+    
+    const highlightText = (text) => {
+        if (!text || !searchText) return text;
+        const searchWords = searchText.toLowerCase().split(' ');
+        // Escape special characters in the search text and join with '|'
+        const escapedSearchWords = searchWords.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        const regex = new RegExp(`(${escapedSearchWords.join('|')})`, 'gi');
+        return text.toString().split(regex).map((part, index) => {
+            return searchWords.includes(part.toLowerCase()) ? (
+                <span key={index} style={{ backgroundColor: "#FB6D48", fontWeight: "bold" }}>{part}</span>
+            ) : (
+                part
+            );
+        });
+    };
+    
+    
+    
+    
+    const filteredTableData = searchText
+    ? tableData.filter(item =>
+        searchText
+            .toLowerCase()
+            .split(' ')
+            .every(word =>
+                Object.values(item).some(value => {
+                    if (!value) return false;
+                    const lowerCaseValue = typeof value === "string" ? value.toLowerCase() : value.toLocaleString().toLowerCase();
+                    const trimmedWord = word.trim();
+                    const wordParts = trimmedWord.split('/');
+                    const includesWord = lowerCaseValue.includes(trimmedWord);
+                    const includesWordWithSlash = lowerCaseValue.includes(wordParts[0]);
+                    const includesWordWithAnotherValue = wordParts.length > 1 && lowerCaseValue.includes(wordParts[1]);
+                    return includesWord || includesWordWithSlash || includesWordWithAnotherValue;
+                })
+            )
+    )
+    : tableData;
+
+
+
+
+
+
+
 
 
     return (
@@ -311,12 +380,12 @@ const DataTable = () => {
             <Card style={{ marginBottom: "20px" }}>
                 <Select
                     style={{ width: 200, marginRight: "10px" }}
-                    placeholder="Select Agent"
+                    placeholder="Sélectionner un Agent"
                     onChange={(value) => {
                         setSelectedAgent(value);
-                        setFiltersChanged(true); 
+                        setFiltersChanged(true);
                     }}
-                    allowClear  
+                    allowClear
                     value={selectedAgent}
                 >
                     {agentOptions.map(agent => (
@@ -325,21 +394,24 @@ const DataTable = () => {
                 </Select>
                 <Select
                     style={{ width: 200, marginRight: "10px" }}
-                    placeholder="Select Agenda"
+                    placeholder="Sélectionner un Agenda"
                     onChange={(value) => {
                         setSelectedAgenda(value);
-                        setFiltersChanged(true); 
+                        setFiltersChanged(true);
                     }}
-                    allowClear  
+                    allowClear
                     value={selectedAgenda}
                 >
                     {agendaOptions.map(agenda => (
-                        <Option key={agenda.id} value={agenda.id}>{agenda.name}</Option>
+                        <Option key={agenda.id} value={agenda.id}>
+                            {`${agenda.contact_nom} ${agenda.contact_prenom}`}
+                        </Option>
                     ))}
                 </Select>
+
                 <RangePicker
                     style={{ marginRight: "10px" }}
-                    placeholder={['Start Date', 'End Date']}
+                    placeholder={['Date de début', 'Date de fin']}
                     onChange={(dates) => {
                         setSelectedDateRange(dates)
                         setFiltersChanged(true);
@@ -347,16 +419,17 @@ const DataTable = () => {
                     value={selectedDateRange}
                 />
             </Card>
+            <SearchInput onChange={(value) => setSearchText(value)} />
+
+
+
+
             <Table
                 columns={columns}
-                dataSource={tableData}
+                dataSource={filteredTableData}
                 loading={loading}
                 pagination={{ pageSize: 5 }}
-                style={{
-                    boxShadow: "0px 20px 27px #0000000d",
-                    padding: "10px 1px",
-                    overflowX: "auto",
-                }}
+            
             />
             <Modal
                 title="Update Data"

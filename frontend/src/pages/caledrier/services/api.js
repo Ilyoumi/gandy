@@ -152,7 +152,6 @@ export const handleAgendaCreated = async (
     axiosClient,
     setAppointments
 ) => {
-    console.log("userContext.userId", userContext.userId);
     try {
         // Combine the default event with existing events from the database
         const updatedEvents = [...appointments];
@@ -171,8 +170,19 @@ export const handleAgendaCreated = async (
             fullcalendar_config: config,
             contact_id: userContext.userId,
         });
-
-        console.log("Agenda updated with FullCalendar data:", response.data);
+        
+        console.log("Response from server:", response);
+        
+        // Check if response is defined before accessing its data property
+        if (response && response.data) {
+            console.log("Agenda updated with FullCalendar data:", response.data);
+            // Update appointments state with the updated events
+            setAppointments(updatedEvents);
+            console.log("appointments handleAgendaCreated", updatedEvents);
+        } else {
+            console.error("Unexpected response from server:", response);
+        }
+        
 
         // Update appointments state with the updated events
         setAppointments(updatedEvents);
