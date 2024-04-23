@@ -34,22 +34,30 @@ class RdvController extends Controller
     public function index(Request $request)
 {
     try {
-        // Start with fetching all appointments
         $query = Rdv::query();
-
-        // Check if an agent ID is provided in the request
         if ($request->has('agent_id')) {
             // Filter appointments by agent ID
             $query->where('id_agent', $request->agent_id);
         }
 
-        // Check if an agenda ID is provided in the request
         if ($request->has('agenda_id')) {
             // Filter appointments by agenda ID
             $query->where('id_agenda', $request->agenda_id);
         }
 
-        // Fetch appointments based on the applied filters
+        if ($request->has('start_date')) {
+            // Filter appointments by start date
+            $query->whereDate('start_date', '>=', $request->start_date);
+        }
+
+        if ($request->has('end_date')) {
+            // Filter appointments by end date
+            $query->whereDate('start_date', '<=', $request->end_date);
+        }
+
+        // Order appointments by start date in ascending order
+        $query->orderBy('start_date', 'asc');
+
         $rdvs = $query->get();
 
         return response()->json($rdvs);
@@ -57,6 +65,9 @@ class RdvController extends Controller
         return response()->json(['error' => 'An error occurred while fetching RDVs.'], 500);
     }
 }
+
+
+
 
 
 

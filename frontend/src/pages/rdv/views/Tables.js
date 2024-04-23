@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Table, message,Select, DatePicker, Card } from "antd";
+import { Button, Modal, Table, message, Select, DatePicker, Card } from "antd";
 import { pencil, deletebtn } from "../../../constants/icons";
 
 import useColumnSearch from "../../../constants/tableSearchLogin";
@@ -8,7 +8,7 @@ import { axiosClient } from "../../../api/axios";
 import { EyeOutlined } from "@ant-design/icons";
 import AppointmentDetails from "./AppoitmnetDetails";
 const { Option } = Select;
-
+const { RangePicker } = DatePicker;
 const DataTable = () => {
     const [updateModalVisible, setUpdateModalVisible] = useState(false);
     const [detailsModalVisible, setDetailsModalVisible] = useState(false);
@@ -19,14 +19,22 @@ const DataTable = () => {
     const [agendaOptions, setAgendaOptions] = useState([]);
     const [selectedAgent, setSelectedAgent] = useState(undefined);
     const [selectedAgenda, setSelectedAgenda] = useState(undefined);
-    const [selectedDate, setSelectedDate] = useState(undefined);
+    const [selectedDateRange, setSelectedDateRange] = useState([]);
+    const [filtersChanged, setFiltersChanged] = useState(false);
     const { getColumnSearchProps } = useColumnSearch();
+    
 
     useEffect(() => {
         fetchData();
         fetchAgentOptions();
         fetchAgendaOptions();
     }, []);
+    useEffect(() => {
+        if (filtersChanged) {
+            fetchData();
+            setFiltersChanged(false); 
+        }
+    }, [filtersChanged]);
 
     const fetchAgentOptions = async () => {
         try {
@@ -36,7 +44,7 @@ const DataTable = () => {
             console.error("Error fetching agent options:", error);
         }
     };
-    
+
 
     const fetchAgendaOptions = async () => {
         try {
@@ -47,7 +55,7 @@ const DataTable = () => {
             console.error("Error fetching agenda options:", error);
         }
     };
-    
+
 
     const fetchData = async () => {
         setLoading(true);
@@ -56,23 +64,35 @@ const DataTable = () => {
             const queryParams = {};
             if (selectedAgent) {
                 queryParams.agent_id = selectedAgent;
+                console.log("selectedAgent", selectedAgent)
+
             }
             if (selectedAgenda) {
                 queryParams.agenda_id = selectedAgenda;
+                console.log("selectedAgenda", selectedAgenda)
+
             }
-            if (selectedDate) {
-                // Assuming selectedDate is a string in ISO format (YYYY-MM-DD)
-                queryParams.start_date = selectedDate.toISOString();
+            if (selectedDateRange.length === 1) {
+                const startDate = selectedDateRange[0].startOf('day').toISOString();
+                queryParams.start_date = startDate;
             }
+
+            if (selectedDateRange.length === 2) {
+                const startDate = selectedDateRange[0].startOf('day').toISOString();
+                const endDate = selectedDateRange[1].endOf('day').toISOString();
+                queryParams.start_date = startDate;
+                queryParams.end_date = endDate;
+            }
+
             console.log("query", queryParams)
-    
+
             // Make the API request with the constructed query parameters
             const response = await axiosClient.get("/api/rdvs", {
                 params: queryParams,
             });
-    
+
             const appointments = response.data;
-    
+
             // Fetch additional data if necessary and process appointments
             const agentIds = appointments.map(appointment => appointment.id_agent);
             // Fetch unique agents based on agent IDs
@@ -87,7 +107,7 @@ const DataTable = () => {
                 }
             });
             const agents = await Promise.all(agentPromises);
-    
+
             // Fetch agent commercial names using agenda IDs
             const agendaIds = appointments.map(appointment => appointment.id_agenda);
             const uniqueAgendaIds = [...new Set(agendaIds)];
@@ -99,7 +119,7 @@ const DataTable = () => {
                     try {
                         const contactResponse = await axiosClient.get(`/api/users/${contactId}`);
                         console.log("comm det", contactResponse.data)
-    
+
                         return contactResponse.data;
                     } catch (error) {
                         console.error("Error fetching agent commercial details:", error);
@@ -111,17 +131,17 @@ const DataTable = () => {
                 }
             });
             const agentCommercials = await Promise.all(agentCommercialPromises);
-    
+
             // Map appointments to their corresponding agents and agent commercials
             const appointmentsWithAgentsAndCommercials = appointments.map(appointment => {
                 const agent = agents.find(agent => agent.id === appointment.id_agent);
                 const agentCommercial = agentCommercials.find(contact => contact.id === appointment.id_agenda);
                 return { ...appointment, agent, agentCommercial };
             });
-    
+
             // Log the filtered appointments
             console.log("Filtered Appointments:", appointmentsWithAgentsAndCommercials);
-    
+
             // Update the state with the filtered appointments
             setTableData(appointmentsWithAgentsAndCommercials);
         } catch (error) {
@@ -131,9 +151,9 @@ const DataTable = () => {
             setLoading(false);
         }
     };
-    
-    
-    
+
+
+
 
 
 
@@ -242,7 +262,7 @@ const DataTable = () => {
             render: (text) => text || "N/A",
         },
         {
-            title: "Code P",
+            title: "Postal",
             dataIndex: "postal",
             key: "postal",
             width: "10%",
@@ -284,7 +304,7 @@ const DataTable = () => {
             ),
         },
     ];
-    
+
 
     return (
         <div>
@@ -292,7 +312,11 @@ const DataTable = () => {
                 <Select
                     style={{ width: 200, marginRight: "10px" }}
                     placeholder="Select Agent"
-                    onChange={setSelectedAgent}
+                    onChange={(value) => {
+                        setSelectedAgent(value);
+                        setFiltersChanged(true); 
+                    }}
+                    allowClear  
                     value={selectedAgent}
                 >
                     {agentOptions.map(agent => (
@@ -302,20 +326,26 @@ const DataTable = () => {
                 <Select
                     style={{ width: 200, marginRight: "10px" }}
                     placeholder="Select Agenda"
-                    onChange={setSelectedAgenda}
+                    onChange={(value) => {
+                        setSelectedAgenda(value);
+                        setFiltersChanged(true); 
+                    }}
+                    allowClear  
                     value={selectedAgenda}
                 >
                     {agendaOptions.map(agenda => (
                         <Option key={agenda.id} value={agenda.id}>{agenda.name}</Option>
                     ))}
                 </Select>
-                <DatePicker
+                <RangePicker
                     style={{ marginRight: "10px" }}
-                    placeholder="Select Date"
-                    onChange={setSelectedDate}
-                    value={selectedDate}
+                    placeholder={['Start Date', 'End Date']}
+                    onChange={(dates) => {
+                        setSelectedDateRange(dates)
+                        setFiltersChanged(true);
+                    }}
+                    value={selectedDateRange}
                 />
-                <Button type="primary" onClick={fetchData}>Apply Filters</Button>
             </Card>
             <Table
                 columns={columns}
