@@ -25,6 +25,7 @@ Route::get('/users/{id}', [UserController::class, 'show']);
 Route::post('/users', [UserController::class, 'store'])->middleware('web');
 Route::put('/users/{id}', [UserController::class, 'update']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
+Route::get('/superviseur-and-agent-users', [UserController::class, 'getSuperviseurAndAgentUsers']);
 Route::get('/csrf-token', function () {
     return response()->json(['csrfToken' => csrf_token()]);
 });
@@ -36,7 +37,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Routes pour les agendas
 Route::post('/agendas', [AgendaController::class, 'store']);
-Route::get('/agendas/{id}', 'AgendaController@show');
+Route::get('/agendas/{id}', [AgendaController::class, 'show']);
+
 Route::get('/agendas/{agendaId}/calendar', [CalendarController::class, 'getCalendarEvents']);
 Route::put('/agendas/{id}', [AgendaController::class, 'update']);
 Route::delete('/agendas/{id}', [AgendaController::class, 'destroy']);

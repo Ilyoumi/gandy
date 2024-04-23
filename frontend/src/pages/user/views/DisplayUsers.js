@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Avatar, Space, Table, Button , Row, Col, Card, message, Tag, Modal} from "antd";
+import { Avatar, Space, Table, Button, Row, Col, Card, message, Tag, Modal } from "antd";
 import UpdateUser from "./UpdateUser";
-import {fetchUsers} from "../services/api";
+import { fetchUsers } from "../services/api";
 import { pencil, deletebtn } from "../../../constants/icons";
 import { useHistory } from "react-router-dom";
-
-import useColumnSearch from "../../../constants/tableSearchLogin";
 import { axiosClient } from "../../../api/axios";
+import SearchInput from "../../../constants/SearchInput";
+
 const DisplayUsers = () => {
     const [users, setUsers] = useState([]);
-    
     const [updateModalVisible, setUpdateModalVisible] = useState(false);
     const [updateData, setUpdateData] = useState({});
-    const { getColumnSearchProps } = useColumnSearch();
     const [loading, setLoading] = useState(false);
+    const [searchText, setSearchText] = useState("");
 
     const history = useHistory();
 
@@ -50,7 +49,7 @@ const DisplayUsers = () => {
             message.error("Failed to update user");
         }
     };
-    
+
 
     const handleButtonClick = () => {
         // Redirect to the desired route
@@ -64,7 +63,7 @@ const DisplayUsers = () => {
 
     const fetchUsersData = async () => {
         try {
-        setLoading(true);
+            setLoading(true);
 
             const userData = await fetchUsers();
             console.log('Type of users:', typeof userData.users);
@@ -74,7 +73,7 @@ const DisplayUsers = () => {
             setUsers(userData.users);
         } catch (error) {
             console.error("Error fetching users:", error);
-        }finally {
+        } finally {
             setLoading(false);
         }
     };
@@ -85,7 +84,7 @@ const DisplayUsers = () => {
         setUpdateModalVisible(true);
     };
 
-    
+
 
     const updateModalProps = {
         visible: updateModalVisible,
@@ -94,60 +93,59 @@ const DisplayUsers = () => {
         userData: updateData,
     };
 
-    
+
 
     const roleColors = {
-        1: 'success', 
+        1: 'success',
         2: 'processing',
         3: 'error',
         4: 'warning',
     };
 
-const handleDeleteUser = async (id) => {
-    Modal.confirm({
-        title: "Confirmation de suppression",
-        content: "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
-        okText: "Oui",
-        okType: "danger",
-        cancelText: "Annuler",
-        onOk: async () => {
-            try {
-                // Send a request to delete the user with the specified ID
-                await axiosClient.delete(`/api/users/${id}`);
-                fetchUsersData()
+    const handleDeleteUser = async (id) => {
+        Modal.confirm({
+            title: "Confirmation de suppression",
+            content: "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
+            okText: "Oui",
+            okType: "danger",
+            cancelText: "Annuler",
+            onOk: async () => {
+                try {
+                    // Send a request to delete the user with the specified ID
+                    await axiosClient.delete(`/api/users/${id}`);
+                    fetchUsersData()
 
-                // Display success message
-                Modal.success({
-                    title: "Suppression réussie",
-                    content: "L'utilisateur a été supprimé avec succès.",
-                });
-            } catch (error) {
-                // Display error message
-                Modal.error({
-                    title: "Erreur de suppression",
-                    content: "Une erreur s'est produite lors de la suppression de l'utilisateur.",
-                });
-                console.error("Error deleting user:", error);
-            }
-        },
-        onCancel() {
-            console.log("Suppression annulée");
-        },
-    });
-};
+                    // Display success message
+                    Modal.success({
+                        title: "Suppression réussie",
+                        content: "L'utilisateur a été supprimé avec succès.",
+                    });
+                } catch (error) {
+                    // Display error message
+                    Modal.error({
+                        title: "Erreur de suppression",
+                        content: "Une erreur s'est produite lors de la suppression de l'utilisateur.",
+                    });
+                    console.error("Error deleting user:", error);
+                }
+            },
+            onCancel() {
+                console.log("Suppression annulée");
+            },
+        });
+    };
 
 
     const columns = [
         {
             title: "NOM",
-            dataIndex: "name",
+            dataIndex: "nom",
             key: "name",
             width: "32%",
-            ...getColumnSearchProps("name"),
             render: (text, record) => (
                 <div>
                     <Avatar src={record.image} />
-                    <span style={{ marginLeft: 8 }}>{text}</span>
+                    <span style={{ marginLeft: 8 }}>{highlightText(text)}</span>
                 </div>
             ),
         },
@@ -155,22 +153,14 @@ const handleDeleteUser = async (id) => {
             title: "EMAIL",
             dataIndex: "email",
             key: "email",
-            ...getColumnSearchProps("email"),
+            render: (text) => highlightText(text),
         },
         {
             title: "ROLE",
             dataIndex: "role",
             key: "role",
-            ...getColumnSearchProps("role"),
-            render: (text, record) => (
-                <Tag color={record.role === "Agent Commercial" ? "yellow" : (record.role === "Superviseur" ? "blue" : roleColors[record.role_id])}>
-                    {record.role} 
-                </Tag>
-            ),
+            render: (text) => highlightText(text),
         },
-        
-        
-        
         {
             title: "ACTION",
             key: "action",
@@ -179,10 +169,7 @@ const handleDeleteUser = async (id) => {
                     <Button type="link" onClick={() => showUpdateModal(record)}>
                         {pencil}
                     </Button>
-                    <Button
-                        type="link"
-                        onClick={() => handleDeleteUser(record.id)}
-                    >
+                    <Button type="link" onClick={() => handleDeleteUser(record.id)}>
                         {deletebtn}
                     </Button>
                 </Space>
@@ -193,9 +180,29 @@ const handleDeleteUser = async (id) => {
     const modifiedUsers = users.map(user => {
         return {
             ...user,
-            name: `${user.nom} ${user.prenom}` 
+            name: `${user.nom} ${user.prenom}`
         };
     });
+    // Function to handle search
+    const handleSearch = (value) => {
+        setSearchText(value);
+    };
+    // Function to highlight search text
+    const highlightText = (text) => {
+        if (!searchText) return text;
+        const regex = new RegExp(`(${searchText})`, 'gi');
+        return text.split(regex).map((part, index) => {
+            return part.toLowerCase() === searchText.toLowerCase() ? <span key={index} style={{ backgroundColor: "#FB6D48", fontWeight: "bold" }}>{part}</span> : part;
+        });
+    };
+    
+
+    // Filter users based on search text
+    const filteredUsers = searchText ? modifiedUsers.filter(user =>
+        user.nom.toLowerCase().includes(searchText.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchText.toLowerCase()) ||
+        user.role.toLowerCase().includes(searchText.toLowerCase())
+    ) : modifiedUsers;
     return (
         <div
             style={{
@@ -203,9 +210,9 @@ const handleDeleteUser = async (id) => {
                 marginBottom: "20px",
             }}
         >
-            <Card style={{ marginBottom:"10px" }}>
-            <Row style={{ margin:"10px 20px" }}>
-                    <Col span={12} style={{ textAlign: "left", fontWeight:"bold", fontSize:"20px" }}>
+            <Card style={{ marginBottom: "10px" }}>
+                <Row style={{ margin: "10px 20px" }}>
+                    <Col span={12} style={{ textAlign: "left", fontWeight: "bold", fontSize: "20px" }}>
                         Liste des Utilisateurs
                     </Col>
                     <Col span={12} style={{ textAlign: "right" }}>
@@ -219,21 +226,22 @@ const handleDeleteUser = async (id) => {
                     </Col>
                 </Row>
 
-        </Card>
+            </Card>
             <Card>
-            <Table
-                columns={columns}
-                loading={loading}
-                dataSource={modifiedUsers} 
-                pagination={{ pageSize: 5}}
-                responsive={{
-                    xs: 1, // 1 column for extra small screens (mobile)
-                    sm: 3, // 3 columns for small screens (tablet)
-                }}
-                style={{
-                    padding: "10px 1px",
-                }}
-            />
+                <SearchInput onChange={handleSearch} />
+                <Table
+                    columns={columns}
+                    loading={loading}
+                    dataSource={filteredUsers}
+                    pagination={{ pageSize: 5 }}
+                    responsive={{
+                        xs: 1,
+                        sm: 3,
+                    }}
+                    style={{
+                        padding: "10px 1px",
+                    }}
+                />
             </Card>
             <UpdateUser {...updateModalProps} onUpdate={handleUpdate} />
         </div>

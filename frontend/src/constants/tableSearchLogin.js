@@ -1,16 +1,25 @@
-import { useRef, useState } from "react";
-import { Input , Space, Button} from "antd";
-import {SearchOutlined} from "@ant-design/icons"
+import { useRef, useState, useEffect } from "react";
+import { Input, Space, Button } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from 'react-highlight-words';
-const useColumnSearch = () => {
+
+const useColumnSearch = (tableData) => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
+    const [filterDropdownVisible, setFilterDropdownVisible] = useState(false);
     const searchInputRef = useRef(null);
 
+    useEffect(() => {
+        // Close dropdown when searchText is empty
+        if (!searchText && filterDropdownVisible) {
+            setFilterDropdownVisible(false);
+        }
+    }, [searchText, filterDropdownVisible]);
+
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
         setSearchText(selectedKeys[0]);
         setSearchedColumn(dataIndex);
+        confirm();
     };
 
     const handleReset = (clearFilters) => {
@@ -25,60 +34,83 @@ const useColumnSearch = () => {
                     ref={searchInputRef}
                     placeholder={`Search ${dataIndex}`}
                     value={selectedKeys[0]}
-                    onChange={(e) =>
-                        setSelectedKeys(e.target.value ? [e.target.value] : [])
-                    }
-                    onPressEnter={() =>
-                        handleSearch(selectedKeys, confirm, dataIndex)
-                    }
+                    onChange={(e) => {
+                        const { value } = e.target;
+                        setSelectedKeys(value ? [value] : []);
+                        setSearchText(value); // Update search text
+                        if (!value) {
+                            handleSearch([], confirm, dataIndex); // If value is empty, reset filter
+                        }
+                    }}
+                    onBlur={() => {
+                        if (!searchText) {
+                            setFilterDropdownVisible(false); // Close dropdown only if searchText is empty
+                        }
+                    }}
+                    onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
                     style={{ width: 188, marginBottom: 8, display: "block" }}
                 />
-                <Space>
-                    <Button
-                        type="primary"
-                        onClick={() =>
-                            handleSearch(selectedKeys, confirm, dataIndex)
-                        }
-                        icon={<SearchOutlined />}
-                        size="small"
-                        style={{ width: 90 }}
-                    >
-                        Search
-                    </Button>
-                    <Button onClick={() => handleReset(clearFilters)} size="small" style={{ width: 90 }}>
-                        Reset
-                    </Button>
-                </Space>
+                
             </div>
         ),
         filterIcon: (filtered) => (
             <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
         ),
-        onFilter: (value, record) =>
-            record[dataIndex]
-                .toString()
-                .toLowerCase()
-                .includes(value.toLowerCase()),
+        onFilter: (value, record) => {
+            const dataIndexValue = record[dataIndex];
+            if (dataIndexValue !== undefined && dataIndexValue !== null) {
+                return dataIndexValue
+                    .toString()
+                    .toLowerCase()
+                    .includes(searchText.toLowerCase());
+            }
+            return false;
+        },
+
         onFilterDropdownVisibleChange: (visible) => {
+            setFilterDropdownVisible(visible);
             if (visible) {
                 setTimeout(() => {
                     if (searchInputRef.current) {
-                        searchInputRef.current.select();
+                        searchInputRef.current.focus();
                     }
                 });
             }
         },
-        render: (text) =>
-            searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text.toString()}
-                />
-            ) : (
-                text
-            ),
+        render: (text, record) => {
+            console.log("Rendering...");
+            console.log("Text:", text);
+            console.log("Record:", record);
+            if (!text || !record) {
+                console.log("Text or record is null or undefined");
+                return null;
+            }
+            const dataIndexValue = record[dataIndex];
+            console.log("DataIndexValue:", dataIndexValue);
+            if (dataIndexValue !== undefined && dataIndexValue !== null) {
+                const dataString = dataIndexValue.toString();
+                console.log("DataString:", dataString);
+                if (searchText && dataString) {
+                    console.log("SearchText:", searchText);
+                    console.log("DataString:", dataString);
+                    if (dataString.toLowerCase().includes(searchText.toLowerCase())) {
+                        console.log("Highlighting...");
+                        return (
+                            <Highlighter
+                                highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+                                searchWords={[searchText]}
+                                autoEscape
+                                textToHighlight={dataString}
+                            />
+                        );
+                    }
+                }
+            }
+            console.log("Not highlighting...");
+            return text;
+        },
+        
+        
     });
 
     return { getColumnSearchProps };

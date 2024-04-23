@@ -258,4 +258,15 @@ class UserController extends Controller
             return response()->json(['message' => 'Failed to fetch users by role'], 500);
         }
     }
+
+    public function getSuperviseurAndAgentUsers()
+{
+    try {
+        $users = User::whereIn('role', ['Superviseur', 'Agent'])->get();
+        return response()->json(['users' => $users]);
+    } catch (\Exception $e) {
+        Log::error('Failed to fetch users by role: ' . $e->getMessage());
+        return response()->json(['message' => 'Failed to fetch users by role'], 500);
+    }
+}
 }

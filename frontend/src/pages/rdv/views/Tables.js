@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Table, message } from "antd";
+import { Button, Modal, Table, message, Select, DatePicker, Card } from "antd";
 import { pencil, deletebtn } from "../../../constants/icons";
-
-import useColumnSearch from "../../../constants/tableSearchLogin";
 import UpdateRdv from "./UpdateRdv";
 import { axiosClient } from "../../../api/axios";
 import { EyeOutlined } from "@ant-design/icons";
 import AppointmentDetails from "./AppoitmnetDetails";
+import SearchInput from "../../../constants/SearchInput";
+
+const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 const DataTable = () => {
     const [updateModalVisible, setUpdateModalVisible] = useState(false);
@@ -14,31 +16,155 @@ const DataTable = () => {
     const [selectedRowData, setSelectedRowData] = useState(null);
     const [tableData, setTableData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const { getColumnSearchProps } = useColumnSearch();
+    const [agentOptions, setAgentOptions] = useState([]);
+    const [agendaOptions, setAgendaOptions] = useState([]);
+    const [selectedAgent, setSelectedAgent] = useState(undefined);
+    const [selectedAgenda, setSelectedAgenda] = useState(undefined);
+    const [selectedDateRange, setSelectedDateRange] = useState([]);
+    const [filtersChanged, setFiltersChanged] = useState(false);
+    const [searchText, setSearchText] = useState("");
+
 
     useEffect(() => {
         fetchData();
+        fetchAgentOptions();
+        fetchAgendaOptions();
     }, []);
+
+    useEffect(() => {
+        if (filtersChanged) {
+            fetchData();
+            setFiltersChanged(false);
+        }
+    }, [filtersChanged]);
+
+    const fetchAgentOptions = async () => {
+        try {
+            const response = await axiosClient.get("/api/superviseur-and-agent-users");
+            setAgentOptions(response.data.users);
+        } catch (error) {
+            console.error("Error fetching agent options:", error);
+        }
+    };
+
+
+    const fetchAgendaOptions = async () => {
+        try {
+            const response = await axiosClient.get("/api/agendas");
+            const agendas = response.data.agendas;
+
+            // Map through agendas and fetch contact name for each agenda
+            const agendaOptionsWithContactNames = await Promise.all(
+                agendas.map(async (agenda) => {
+                    try {
+                        const contactResponse = await axiosClient.get(`/api/users/${agenda.contact_id}`);
+                        const contact = contactResponse.data;
+                        return { ...agenda, contact_nom: contact.nom, contact_prenom: contact.prenom };
+                    } catch (error) {
+                        console.error("Error fetching contact details for agenda:", agenda.id, error);
+                        throw error;
+                    }
+                })
+            );
+
+            console.log("Agendas with contact names:", agendaOptionsWithContactNames);
+
+            // Set the agenda options with contact names
+            setAgendaOptions(agendaOptionsWithContactNames);
+        } catch (error) {
+            console.error("Error fetching agenda options:", error);
+        }
+    };
+
+
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            const response = await axiosClient.get("/api/rdvs");
+            // Construct the query parameters based on selected filters
+            const queryParams = {};
+            if (selectedAgent) {
+                queryParams.agent_id = selectedAgent;
+                console.log("selectedAgent", selectedAgent)
+
+            }
+            if (selectedAgenda) {
+                queryParams.agenda_id = selectedAgenda;
+                console.log("selectedAgenda", selectedAgenda)
+
+            }
+            if (selectedDateRange.length === 1) {
+                const startDate = selectedDateRange[0].startOf('day').toISOString();
+                queryParams.start_date = startDate;
+            }
+
+            if (selectedDateRange.length === 2) {
+                const startDate = selectedDateRange[0].startOf('day').toISOString();
+                const endDate = selectedDateRange[1].endOf('day').toISOString();
+                queryParams.start_date = startDate;
+                queryParams.end_date = endDate;
+            }
+
+            console.log("query", queryParams)
+
+            // Make the API request with the constructed query parameters
+            const response = await axiosClient.get("/api/rdvs", {
+                params: queryParams,
+            });
+
             const appointments = response.data;
+
+            // Fetch additional data if necessary and process appointments
             const agentIds = appointments.map(appointment => appointment.id_agent);
             // Fetch unique agents based on agent IDs
             const uniqueAgentIds = [...new Set(agentIds)];
             const agentPromises = uniqueAgentIds.map(async (agentId) => {
-                const agentResponse = await axiosClient.get(`/api/users/${agentId}`);
-                return agentResponse.data;
+                try {
+                    const agentResponse = await axiosClient.get(`/api/users/${agentId}`);
+                    return agentResponse.data;
+                } catch (error) {
+                    console.error("Error fetching agent details:", error);
+                    throw error;
+                }
             });
             const agents = await Promise.all(agentPromises);
-            // Map appointments to their corresponding agents
-            const appointmentsWithAgents = appointments.map(appointment => {
-                const agent = agents.find(agent => agent.id === appointment.id_agent);
-                return { ...appointment, agent };
+
+            // Fetch agent commercial names using agenda IDs
+            const agendaIds = appointments.map(appointment => appointment.id_agenda);
+            const uniqueAgendaIds = [...new Set(agendaIds)];
+            const agentCommercialPromises = uniqueAgendaIds.map(async (agendaId) => {
+                try {
+                    const agendaResponse = await axiosClient.get(`/api/agendas/${agendaId}`);
+                    console.log("agenda det", agendaResponse.data)
+                    const contactId = agendaResponse.data.agenda.contact_id;
+                    try {
+                        const contactResponse = await axiosClient.get(`/api/users/${contactId}`);
+                        console.log("comm det", contactResponse.data)
+
+                        return contactResponse.data;
+                    } catch (error) {
+                        console.error("Error fetching agent commercial details:", error);
+                        throw error;
+                    }
+                } catch (error) {
+                    console.error("Error fetching agenda details:", error);
+                    throw error;
+                }
             });
-            setTableData(appointmentsWithAgents);
+            const agentCommercials = await Promise.all(agentCommercialPromises);
+
+            // Map appointments to their corresponding agents and agent commercials
+            const appointmentsWithAgentsAndCommercials = appointments.map(appointment => {
+                const agent = agents.find(agent => agent.id === appointment.id_agent);
+                const agentCommercial = agentCommercials.find(contact => contact.id === appointment.id_agenda);
+                return { ...appointment, agent, agentCommercial };
+            });
+
+            // Log the filtered appointments
+            console.log("Filtered Appointments:", appointmentsWithAgentsAndCommercials);
+
+            // Update the state with the filtered appointments
+            setTableData(appointmentsWithAgentsAndCommercials);
         } catch (error) {
             console.error("Error fetching appointments:", error);
             message.error("Failed to fetch appointments");
@@ -46,10 +172,6 @@ const DataTable = () => {
             setLoading(false);
         }
     };
-
-
-
-
 
 
     const handleUpdateClick = (record) => {
@@ -114,60 +236,74 @@ const DataTable = () => {
         });
     };
 
-
     const columns = [
         {
-            title: "CLIENT",
+            title: "Client",
             dataIndex: "client",
             key: "client",
-            width: "32%",
-            ...getColumnSearchProps("client"),
+            width: "25%",
             render: (_, record) => (
                 <span>
-                    {record.nom} {record.prenom}
+                    {highlightText(record.nom)}
+                    &nbsp;
+                    {highlightText(record.prenom)}
                 </span>
             ),
         },
         {
-            title: "AGENT",
+            title: "Agent",
             dataIndex: "agent",
             key: "agent",
-            render: (_, record) => record.agent ? `${record.agent.nom} ${record.agent.prenom}` : "N/A",
+            width: "15%",
+            render: (_, record) => (
+                <span>
+                    {record.agent ? highlightText(record.agent.nom) : "N/A"}
+                    &nbsp;
+                    {record.agent ? highlightText(record.agent.prenom) : ""}
+                </span>
+            ),
         },
         {
-            title: "SOCIETE",
-            dataIndex: "nom_ste",
-            key: "nom_ste",
-            ...getColumnSearchProps("nom_ste"),
+            title: "Agent Commercial",
+            dataIndex: "agentCommercial",
+            key: "agentCommercial",
+            width: "20%",
+            render: (_, record) => (
+                <span>
+                    {record.agentCommercial ? highlightText(record.agentCommercial.nom) : "N/A"}
+                    &nbsp;
+                    {record.agentCommercial ? highlightText(record.agentCommercial.prenom) : ""}
+                </span>
+            ),
         },
         {
             title: "TEL",
-            key: "tel",
             dataIndex: "tel",
-            ...getColumnSearchProps("tel"),
+            key: "tel",
+            width: "10%",
+            render: (text) => highlightText(text || "N/A"),
         },
         {
-            title: "GSM",
-            key: "gsm",
-            dataIndex: "gsm",
-            ...getColumnSearchProps("gsm"),
+            title: "Postal",
+            dataIndex: "postal",
+            key: "postal",
+            width: "10%",
+            render: (text) => highlightText(text || "N/A"),
         },
         {
-            title: "DEBUT DU RDV",
+            title: "Date Debut",
             dataIndex: "start_date",
             key: "start_date",
-            render: (text) => (text ? new Date(text).toLocaleString() : "-"),
+            width: "20%",
+            render: (text) => {
+                const formattedDate = text ? new Date(text).toLocaleString() : "-";
+                return highlightText(formattedDate);
+            },
         },
+        
         {
-            title: "FIN DU RDV",
-            dataIndex: "end_date",
-            key: "end_date",
-            render: (text) => (text ? new Date(text).toLocaleString() : "-"),
-        },
-        {
-            title: "ACTION",
+            title: "Action",
             key: "action",
-            dataIndex: "action",
             render: (_, record) => (
                 <div>
                     <Button
@@ -182,7 +318,6 @@ const DataTable = () => {
                     >
                         {pencil}
                     </Button>
-
                     <Button
                         type="link"
                         onClick={() => handleDeleteClick(record)}
@@ -193,19 +328,108 @@ const DataTable = () => {
             ),
         },
     ];
+    
+    const highlightText = (text) => {
+        if (!text || !searchText) return text;
+        const searchWords = searchText.toLowerCase().split(' ');
+        // Escape special characters in the search text and join with '|'
+        const escapedSearchWords = searchWords.map(word => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        const regex = new RegExp(`(${escapedSearchWords.join('|')})`, 'gi');
+        return text.toString().split(regex).map((part, index) => {
+            return searchWords.includes(part.toLowerCase()) ? (
+                <span key={index} style={{ backgroundColor: "#FB6D48", fontWeight: "bold" }}>{part}</span>
+            ) : (
+                part
+            );
+        });
+    };
+    
+    
+    
+    
+    const filteredTableData = searchText
+    ? tableData.filter(item =>
+        searchText
+            .toLowerCase()
+            .split(' ')
+            .every(word =>
+                Object.values(item).some(value => {
+                    if (!value) return false;
+                    const lowerCaseValue = typeof value === "string" ? value.toLowerCase() : value.toLocaleString().toLowerCase();
+                    const trimmedWord = word.trim();
+                    const wordParts = trimmedWord.split('/');
+                    const includesWord = lowerCaseValue.includes(trimmedWord);
+                    const includesWordWithSlash = lowerCaseValue.includes(wordParts[0]);
+                    const includesWordWithAnotherValue = wordParts.length > 1 && lowerCaseValue.includes(wordParts[1]);
+                    return includesWord || includesWordWithSlash || includesWordWithAnotherValue;
+                })
+            )
+    )
+    : tableData;
+
+
+
+
+
+
+
+
 
     return (
         <div>
+            <Card style={{ marginBottom: "20px" }}>
+                <Select
+                    style={{ width: 200, marginRight: "10px" }}
+                    placeholder="Sélectionner un Agent"
+                    onChange={(value) => {
+                        setSelectedAgent(value);
+                        setFiltersChanged(true);
+                    }}
+                    allowClear
+                    value={selectedAgent}
+                >
+                    {agentOptions.map(agent => (
+                        <Option key={agent.id} value={agent.id}>{`${agent.nom} ${agent.prenom}`}</Option>
+                    ))}
+                </Select>
+                <Select
+                    style={{ width: 200, marginRight: "10px" }}
+                    placeholder="Sélectionner un Agenda"
+                    onChange={(value) => {
+                        setSelectedAgenda(value);
+                        setFiltersChanged(true);
+                    }}
+                    allowClear
+                    value={selectedAgenda}
+                >
+                    {agendaOptions.map(agenda => (
+                        <Option key={agenda.id} value={agenda.id}>
+                            {`${agenda.contact_nom} ${agenda.contact_prenom}`}
+                        </Option>
+                    ))}
+                </Select>
+
+                <RangePicker
+                    style={{ marginRight: "10px" }}
+                    placeholder={['Date de début', 'Date de fin']}
+                    onChange={(dates) => {
+                        setSelectedDateRange(dates)
+                        setFiltersChanged(true);
+                    }}
+                    value={selectedDateRange}
+                />
+            </Card>
+            <SearchInput onChange={(value) => setSearchText(value)} />
+
+
+
+
             <Table
                 columns={columns}
-                dataSource={tableData}
+                dataSource={filteredTableData}
                 loading={loading}
                 pagination={{ pageSize: 5 }}
-                style={{
-                    boxShadow: "0px 20px 27px #0000000d",
-                    padding: "10px 1px",
-                    overflowX: "auto",
-                }}
+            
             />
             <Modal
                 title="Update Data"
@@ -228,7 +452,7 @@ const DataTable = () => {
                 {selectedRowData && (
                     <AppointmentDetails
                         selectedRowData={selectedRowData}
-                        
+
                     />
                 )}
             </Modal>
