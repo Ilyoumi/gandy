@@ -168,20 +168,22 @@ const Sidenav = ({ color }) => {
             { key: "rdv", label: "Liste de RDV", icon: rdv },
             { key: "agenda", label: "Liste des agendas", icon: agenda },
             { key: "creer-utilisateur", label: "Créer utilisateur", icon: mycalendar },
-            { key: "contact", label: "Liste des contacts", icon: contact },
             { key: "utilisateurs", label: "Liste des utilisateurs", icon: contact },
+            { key: "contact", label: "Liste des contacts", icon: contact },
         ],
         Superviseur: [
             { key: "calendrier", label: "Calendrier", icon: user },
             { key: "rdv", label: "Liste de RDV", icon: rdv },
             { key: "agenda", label: "Liste des agendas", icon: agenda },
             { key: "contact", label: "Liste des contacts", icon: contact },
+            { key: "creer-utilisateur", label: "Créer utilisateur", icon: mycalendar },
+            { key: "utilisateurs", label: "Liste des utilisateurs", icon: rdv },
         ],
         Agent: [
             { key: "calendrier", label: "Calendrier", icon: user }
         ],
         "Agent Commercial": [
-            { key: "calendrier", label: "Calendrier", icon: user }
+            { key: "agent-calendrier", label: "Calendrier", icon: user }
         ]
     };
 

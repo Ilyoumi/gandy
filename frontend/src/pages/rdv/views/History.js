@@ -110,9 +110,9 @@ const History = () => {
         },
         {
             title: "SUPERVISEUR",
-            key: "superviseur",
-            dataIndex: "superviseur",
-            ...getColumnSearchProps("superviseur"),
+            key: "Superviseur",
+            dataIndex: "Superviseur",
+            ...getColumnSearchProps("Superviseur"),
         },
     ];
 
@@ -164,7 +164,7 @@ const History = () => {
                     </div>
                 </>
             ),
-            superviseur: (
+            Superviseur: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -228,7 +228,7 @@ const History = () => {
                     </div>
                 </>
             ),
-            superviseur: (
+            Superviseur: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -292,7 +292,7 @@ const History = () => {
                     </div>
                 </>
             ),
-            superviseur: (
+            Superviseur: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -421,7 +421,7 @@ const History = () => {
                     </div>
                 </>
             ),
-            superviseur: (
+            Superviseur: (
                 <>
                     <Avatar.Group>
                         <Avatar
@@ -485,7 +485,7 @@ const History = () => {
                     </div>
                 </>
             ),
-            superviseur: (
+            Superviseur: (
                 <>
                     <Avatar.Group>
                         <Avatar

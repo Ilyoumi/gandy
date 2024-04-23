@@ -68,12 +68,13 @@ function App() {
                     <Main>
                       <PrivateRoute exact path="/dashboard" component={Home} allowedRoles={["Admin"]}  />
                       <Route exact path="/calendrier" component={MyCalendar} />
-                      <PrivateRoute exact path="/rdv" component={Tables} allowedRoles={["Admin", "superviseur"]} />
-                      <PrivateRoute exact path="/history" component={History} allowedRoles={["Admin", "superviseur"]} />
-                      <PrivateRoute exact path="/contact" component={Contacts} allowedRoles={["Admin", "superviseur"]} />
-                      <PrivateRoute exact path="/agenda" component={Agenda} allowedRoles={["Admin", "superviseur", "Agent"]} />
-                      <PrivateRoute exact path="/creer-utilisateur" component={AddUserForm} allowedRoles={["Admin"]} />
-                      <PrivateRoute exact path="/utilisateurs" component={DisplayUsers} allowedRoles={["Admin"]} />
+                      <PrivateRoute exact path="/rdv" component={Tables} allowedRoles={["Admin", "Superviseur"]} />
+                      <PrivateRoute exact path="/history" component={History} allowedRoles={["Admin"]} />
+                      <PrivateRoute exact path="/contact" component={Contacts} allowedRoles={["Admin", "Superviseur"]} />
+                      <PrivateRoute exact path="/agenda" component={Agenda} allowedRoles={["Admin", "Superviseur"]} />
+                      <PrivateRoute exact path="/creer-utilisateur" component={AddUserForm} allowedRoles={["Admin", "Superviseur"]} />
+                      <PrivateRoute exact path="/utilisateurs" component={DisplayUsers} allowedRoles={["Admin", "Superviseur"]} />
+                      <PrivateRoute exact path="/agent-calendrier" component={DisplayUsers} allowedRoles={["Admin", "Superviseur"]} />
                       {/* <Redirect from="*" to="/calendrier" /> */}
                     </Main>
                   </Switch>
