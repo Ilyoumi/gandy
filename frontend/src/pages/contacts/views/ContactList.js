@@ -24,54 +24,64 @@ function ContactList({
     }, []);
 
     useEffect(() => {
-        console.log("Agendas updated:", agendas);
         if (agendas.length > 0) {
             setAgendaId(agendas[0].id);
-            console.log("Setting agendaId:", agendas[0].id);
         }
     }, [agendas]);
 
     const handleCheckboxClick = async (userId) => {
         try {
-
-            let updatedSelectedItems = [...selectedItems];
-
+            console.log("useeer **** ", userId)
+            let updatedSelectedItems = [];
+    
             if (role === "Agent") {
-
                 setAgentSelectedItemId(userId);
                 updatedSelectedItems = [userId];
                 console.log("Selected user:", userId);
             } else {
                 if (selectedItems.includes(userId)) {
-                    updatedSelectedItems = updatedSelectedItems.filter(
+                    updatedSelectedItems = selectedItems.filter(
                         (id) => id !== userId
                     );
                     console.log("Deselected user:", userId);
                 } else {
-                    updatedSelectedItems.push(userId);
+                    updatedSelectedItems = [...selectedItems, userId];
                     console.log("Added user to selectedItems:", userId);
                 }
             }
+    
+            // Fetch agendas for the selected users
+            const promises = updatedSelectedItems.map(async (id) => {
+                const response = await axiosClient.get(`/api/users/${id}/agendas`);
+            console.log("id **** ", id)
 
-            // Fetch agendas for the selected user
-            console.log("Fetching agendas for user:", userId);
-            const response = await axiosClient.get(
-                `/api/users/${userId}/agendas`
-            );
-            setContactAgendas(response.data.agendas)
-            console.log("Fetched agendas:", contactAgendas);
+                return response.data.agendas;
+            });
+    
+            // Wait for all promises to resolve
+            const agendasArray = await Promise.all(promises);
+    
+            // Flatten the arrays of agendas
+            const mergedAgendas = agendasArray.flat();
+            console.log("Merged agendas:", mergedAgendas);
+    
+            // Set the contactAgendas state with the merged agendas
+            setContactAgendas(mergedAgendas);
+    
             // Set the agendaId to the ID of the first agenda for the selected user
-            if (contactAgendas.length > 0) {
-                setAgendaId(contactAgendas[0].id);
-                console.log("Setting agendaId for user:", contactAgendas[0].id);
+            if (mergedAgendas.length > 0) {
+                setAgendaId(mergedAgendas[0].id);
+                console.log("Setting agendaId for user:", mergedAgendas[0].id);
             }
-
+    
             setSelectedItems(updatedSelectedItems);
             console.log("Updated selectedItems:", updatedSelectedItems);
         } catch (error) {
             console.error("Error fetching agendas:", error);
         }
     };
+    
+    
 
     return (
         <Card title="Contacts" style={{ width: "15%" }}>
@@ -84,7 +94,7 @@ function ContactList({
                 <Checkbox.Group value={selectedItems}>
                     {agentCommercialUsers.map((user, index) => (
                         <Checkbox
-                            key={index}
+                            key={user.id}
                             value={user.id}
                             checked={
                                 role === "agent"
