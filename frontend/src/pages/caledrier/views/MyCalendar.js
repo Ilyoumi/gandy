@@ -68,6 +68,8 @@ function MyCalendar() {
         useState(null);
 
 
+
+
     useEffect(() => {
         const timeout = setTimeout(() => {
             setLoading(false);
@@ -103,12 +105,12 @@ function MyCalendar() {
         setShowAddModal(false);
     };
 
-    const handleAgendaCreatedCallback = (agendaId, agendaName,contactId) => {
+    const handleAgendaCreatedCallback = (agendaId, agendaName, contactId) => {
         handleAgendaCreated(
             agendaId,
             agendaName,
             contactId
-,
+            ,
             appointments,
             handleAddAppointment,
             agentId,
@@ -119,6 +121,7 @@ function MyCalendar() {
     };
 
     const handleAppointmentClickCallback = (event) => {
+        console.log("Appointment ID:", event.id);
 
         handleAppointmentClick(
             event,
@@ -184,10 +187,13 @@ function MyCalendar() {
         }
     };
 
-    const handleUpdateClick = () => {
+    const handleUpdateClick = (appointmentId) => {
         setShowDetailModal(false);
         setShowUpdateModal(true);
+        console.log("appio", appointmentId)
+
     };
+
 
     const handleDeleteClick = () => {
         // Handle delete logic here
@@ -251,7 +257,7 @@ function MyCalendar() {
                         {selectedItems.length > 0 && (
                             <>
                                 {contactAgendas.map((agenda) => {
-                                    
+
                                     // Find the user corresponding to the contact ID
                                     const user = agentCommercialUsers.find(
                                         (user) => user.id === agenda.contact_id
@@ -376,13 +382,16 @@ function MyCalendar() {
                         width={1000}
                     >
                         {appointmentDetails && (
-                            <UpdateRdv
-                                initialValues={appointmentDetails}
-                                agendaId={agendaId}
-                                onFormSubmit={handleFormSubmitCallback}
-
-                            />
+                            <>
+                                {console.log("Appointment Details from update modal:", appointmentDetails)}
+                                <UpdateRdv
+                                    initialValues={appointmentDetails}
+                                    agendaId={agendaId}
+                                    onFormSubmit={handleFormSubmitCallback}
+                                />
+                            </>
                         )}
+
                     </Modal>
                     <Modal
                         open={showDetailsModal}
@@ -403,7 +412,7 @@ function MyCalendar() {
                                     {(userContext.userRole === "Admin" ||
                                         agentId === userContext.userId) && (
                                             <Button
-                                                onClick={handleUpdateClick}
+                                                onClick={() => handleUpdateClick(selectedRowData.id)}
                                                 style={{ marginRight: "10px" }}
                                             >
                                                 Modifier

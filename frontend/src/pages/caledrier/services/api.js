@@ -187,12 +187,11 @@ export const handleAppointmentClick = async (
             userContext.userRole === "Superviseur"
         ) {
             const response = await axiosClient.get(`/api/rdvs/${event.id}`);
-            // Extract the appointment details from the response data
             const appointmentDetails = response.data;
-            // Update the state with the fetched appointment details
             setAppointmentDetails(appointmentDetails);
+            console.log("appointmentDetails", appointmentDetails.id)
+            console.log("appointmentDetails id", event.id)
             setSelectedRowData(appointmentDetails);
-            // Show the update modal
             setShowDetailModal(true);
             setSelectedAppointment(event);
             console.log(
