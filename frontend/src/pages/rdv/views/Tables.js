@@ -437,11 +437,13 @@ const DataTable = () => {
                 onCancel={() => setUpdateModalVisible(false)}
                 footer={null}
                 destroyOnClose
+                width="80%"
+
             >
                 <UpdateRdv initialValues={selectedRowData} onSubmit={handleUpdateFormSubmit} />
             </Modal>
             <Modal
-                title="Modifier rendez-vous"
+                title="Consulter rendez-vous"
                 visible={detailsModalVisible}
                 onCancel={() => setDetailsModalVisible(false)}
                 footer={null}

@@ -71,7 +71,7 @@ export const CalendarProvider = ({ children }) => {
                 setContactName,
                 contactEmail,
                 setContactEmail,
-                agentName, setAgentName, selectedContacts, setSelectedContacts,contactAgendas, setContactAgendas
+                agentName, setAgentName, selectedContacts, setSelectedContacts, contactAgendas, setContactAgendas,
             }}
         >
             {children}

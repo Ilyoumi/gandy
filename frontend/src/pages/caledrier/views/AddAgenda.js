@@ -1,7 +1,7 @@
 // AddAgendaModal.js
 
 import React, { useState, useEffect } from "react";
-import { Modal, Form, Input, Button, Card, Row, Col, Select } from "antd";
+import { Modal, Form, Input, Button, Card, Row, Col, Select, message } from "antd";
 import { axiosClient } from "../../../api/axios";
 
 const { Option } = Select;
@@ -21,26 +21,26 @@ const AddAgendaModal = ({ visible, onCancel, onAgendaCreated }) => {
                 "/api/users/agent-commercial"
             );
             setAgentCommercialUsers(response.data.users);
-            console.log("agentCommercialUsers", response.data.users);
         } catch (error) {
             console.error("Error fetching agent commercial users:", error);
         }
     };
-    
-    
+
+
 
     const handleSubmit = async (values) => {
         try {
             // Log the sending data
-            console.log("Sending data to create agenda:", values);
-
+            let contactId = values.contact
+    
             // Send request to create agenda
             const response = await axiosClient.post("/api/agendas", {
-                ...values, // Check if values.contact is correct here
-                contact_id: values.contact,
+                ...values, 
+                contact_id: contactId,
             });
-            console.log("Agenda created:", response.data.agenda);
-
+            
+            
+    
             // Verify the agenda ID received from the server
             const agendaId = response.data.agenda.id;
             const agendaName = response.data.agenda.name;
@@ -48,12 +48,13 @@ const AddAgendaModal = ({ visible, onCancel, onAgendaCreated }) => {
                 console.error("Invalid agenda ID received:", agendaId, agendaName);
                 return;
             }
-
+    
             // Call onAgendaCreated with the agendaId
-            onAgendaCreated(agendaId, agendaName);
-
+            onAgendaCreated(agendaId, agendaName,contactId);
+    
             // Reset form fields and close modal
             form.resetFields();
+            message.success("Agenda created successfully")
             onCancel();
         } catch (error) {
             // Log error and response data if available
@@ -63,6 +64,7 @@ const AddAgendaModal = ({ visible, onCancel, onAgendaCreated }) => {
             }
         }
     };
+    
 
     return (
         <Modal
@@ -74,7 +76,7 @@ const AddAgendaModal = ({ visible, onCancel, onAgendaCreated }) => {
             <Form
                 form={form}
                 layout="vertical"
-                onFinish={handleSubmit} // Handle form submission
+                onFinish={handleSubmit}
                 initialValues={{
                     contact:
                         agentCommercialUsers.length > 0
@@ -114,10 +116,10 @@ const AddAgendaModal = ({ visible, onCancel, onAgendaCreated }) => {
                             },
                         ]}
                     >
-                        <Select placeholder="Sélectionner un contact">
+                        <Select placeholder="Sélectionner un contact" >
                             {agentCommercialUsers.map((user) => (
                                 <Option key={user.id} value={user.id}>
-                                    {user.prenom} {user.nom}
+                                {user.prenom} {user.nom}
                                 </Option>
                             ))}
                         </Select>

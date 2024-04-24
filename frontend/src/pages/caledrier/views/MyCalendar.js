@@ -3,7 +3,6 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { fullCalendarConfig } from "../services/calendarConfig";
 import { Modal, Card, Spin, Button, Col, Row } from "antd";
 import AddAppointment from "./AddRdv";
 import NewButton from "../../../constants/NewButton";
@@ -25,7 +24,6 @@ import {
     handleEventDrop,
     handleFormSubmit,
 } from "../services/api";
-import AgentContactList from "../../contacts/views/AgentContactList";
 
 function MyCalendar() {
     const {
@@ -65,8 +63,10 @@ function MyCalendar() {
         contactAgendas, setContactAgendas
     } = useCalendar();
     const userContext = useUser();
+    const userId = userContext.userId;
     const [selectedAppointmentDate, setSelectedAppointmentDate] =
         useState(null);
+
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -87,24 +87,15 @@ function MyCalendar() {
         return () => clearInterval(interval);
     }, [userContext]);
 
-    useEffect(() => {
-        if (agentCommercialUsers.length > 0) {
-            setSelectedItems([agentCommercialUsers[0].id]);
-        }
-    }, [agentCommercialUsers, setSelectedItems]);
 
     useEffect(() => {
         fetchAgentCommercialUsers(setAgentCommercialUsers);
-        fetchAgendasAndAppointments(setAgendas, setAppointments, agendaId, contactName,
-            setContactName,
-            contactEmail,
-            setContactEmail);
+        fetchAgendasAndAppointments(setAgendas, setAppointments,);
         const interval = setInterval(fetchAgentCommercialUsers, 5 * 60 * 1000);
         return () => clearInterval(interval);
     }, []);
 
     const handleOpenAddAgendaModal = () => {
-        console.log("Button clicked");
         setAddAgendaModalVisible(true);
     };
 
@@ -112,17 +103,18 @@ function MyCalendar() {
         setShowAddModal(false);
     };
 
-    const handleAgendaCreatedCallback = (agendaId, agendaName, userContext) => {
+    const handleAgendaCreatedCallback = (agendaId, agendaName,contactId) => {
         handleAgendaCreated(
             agendaId,
             agendaName,
-            userContext,
+            contactId
+,
             appointments,
             handleAddAppointment,
             agentId,
             handleEventDropCallback,
             axiosClient,
-            setAppointments
+            setAppointments,
         );
     };
 
@@ -185,11 +177,6 @@ function MyCalendar() {
             await fetchAgendasAndAppointments(
                 setAgendas,
                 setAppointments,
-                agendaId,
-                contactName,
-                setContactName,
-                contactEmail,
-                setContactEmail
             );
         } catch (error) {
             // Handle any errors
@@ -253,11 +240,18 @@ function MyCalendar() {
                             open={addAgendaModalVisible}
                             onCancel={() => setAddAgendaModalVisible(false)}
                             onAgendaCreated={handleAgendaCreatedCallback}
+                            appointments={appointments}
+                            handleAddAppointment={handleAddAppointment}
+                            agentId={agentId}
+                            agendaId={agendaId}
+                            handleEventDrop={handleEventDrop}
                         />
+
 
                         {selectedItems.length > 0 && (
                             <>
                                 {contactAgendas.map((agenda) => {
+                                    
                                     // Find the user corresponding to the contact ID
                                     const user = agentCommercialUsers.find(
                                         (user) => user.id === agenda.contact_id
@@ -265,6 +259,11 @@ function MyCalendar() {
                                     const userName = user
                                         ? `${user.prenom} ${user.nom}`
                                         : "Unknown User";
+                                    const email = user
+                                        ? `${user.email}`
+                                        : "Unknown User";
+                                    setContactName(userName)
+                                    setContactEmail(email)
 
                                     return (
                                         <div key={agenda.id}>
