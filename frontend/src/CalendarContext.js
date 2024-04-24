@@ -24,6 +24,9 @@ export const CalendarProvider = ({ children }) => {
     const [contactName, setContactName] = useState("");
     const [contactEmail, setContactEmail] = useState("");
     const [agentName, setAgentName] = useState("");
+    const [selectedContacts, setSelectedContacts] = useState(null);
+    const [contactAgendas, setContactAgendas] = useState([]);
+
 
 
 
@@ -68,7 +71,7 @@ export const CalendarProvider = ({ children }) => {
                 setContactName,
                 contactEmail,
                 setContactEmail,
-                agentName, setAgentName
+                agentName, setAgentName, selectedContacts, setSelectedContacts,contactAgendas, setContactAgendas
             }}
         >
             {children}

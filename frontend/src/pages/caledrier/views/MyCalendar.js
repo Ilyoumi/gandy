@@ -25,6 +25,7 @@ import {
     handleEventDrop,
     handleFormSubmit,
 } from "../services/api";
+import AgentContactList from "../../contacts/views/AgentContactList";
 
 function MyCalendar() {
     const {
@@ -60,7 +61,8 @@ function MyCalendar() {
         contactName,
         setContactName,
         contactEmail,
-        setContactEmail
+        setContactEmail,
+        contactAgendas, setContactAgendas
     } = useCalendar();
     const userContext = useUser();
     const [selectedAppointmentDate, setSelectedAppointmentDate] =
@@ -224,6 +226,7 @@ function MyCalendar() {
                 />
             ) : (
                 <>
+
                     <ContactList
                         agentCommercialUsers={agentCommercialUsers}
                         selectedItems={selectedItems}
@@ -233,6 +236,9 @@ function MyCalendar() {
                         setAgentId={setAgentId}
                         agendaId={agendaId}
                         setAgendaId={setAgendaId}
+                        role={userContext.userRole}
+                        contactAgendas={contactAgendas}
+                        setContactAgendas={setContactAgendas}
                     />
                     <Card style={{ width: "83%" }}>
                         {(userContext.userRole === "Admin" ||
@@ -250,101 +256,101 @@ function MyCalendar() {
                         />
 
                         {selectedItems.length > 0 && (
-        <>
-            {agendas.map((agenda) => {
-                // Find the user corresponding to the contact ID
-                const user = agentCommercialUsers.find(
-                    (user) => user.id === agenda.contact_id
-                );
-                const userName = user
-                    ? `${user.prenom} ${user.nom}`
-                    : "Unknown User";
+                            <>
+                                {contactAgendas.map((agenda) => {
+                                    // Find the user corresponding to the contact ID
+                                    const user = agentCommercialUsers.find(
+                                        (user) => user.id === agenda.contact_id
+                                    );
+                                    const userName = user
+                                        ? `${user.prenom} ${user.nom}`
+                                        : "Unknown User";
 
-                return (
-                    <div key={agenda.id}>
-                        <h2>{userName}</h2>{" "}
-                        {/* <Card style={{ marginBottom: "30px" }}> */}
-                        {agenda.fullcalendar_config && (
-                            <FullCalendar
-                                plugins={[
-                                    dayGridPlugin,
-                                    timeGridPlugin,
-                                    interactionPlugin,
-                                ]}
-                                {...JSON.parse(
-                                    agenda.fullcalendar_config
-                                )}
-                                eventContent={(arg) => {
                                     return (
-                                        <div>
-                                            <div>
-                                                {arg.event.title}/{
-                                                    arg.event
-                                                        .extendedProps
-                                                        .status
-                                                }
-                                            </div>
+                                        <div key={agenda.id}>
+                                            <h2>{userName}</h2>{" "}
+                                            {/* <Card style={{ marginBottom: "30px" }}> */}
+                                            {agenda.fullcalendar_config && (
+                                                <FullCalendar
+                                                    plugins={[
+                                                        dayGridPlugin,
+                                                        timeGridPlugin,
+                                                        interactionPlugin,
+                                                    ]}
+                                                    {...JSON.parse(
+                                                        agenda.fullcalendar_config
+                                                    )}
+                                                    eventContent={(arg) => {
+                                                        return (
+                                                            <div>
+                                                                <div>
+                                                                    {arg.event.title}/{
+                                                                        arg.event
+                                                                            .extendedProps
+                                                                            .status
+                                                                    }
+                                                                </div>
 
+                                                            </div>
+                                                        );
+                                                    }}
+                                                    eventDidMount={(arg) => {
+                                                        arg.el.style.backgroundColor =
+                                                            "#219fbbbe";
+                                                    }}
+                                                    dateClick={(arg) => {
+
+                                                        handleAddAppointmentCallback(
+                                                            arg,
+                                                            user.id,
+                                                            agenda.id
+                                                        )
+
+                                                    }
+
+                                                    }
+                                                    eventClick={(info) =>
+                                                        handleAppointmentClickCallback(
+                                                            info.event
+                                                        )
+                                                    }
+                                                    events={appointments
+                                                        .filter(
+                                                            (appointment) =>
+                                                                appointment.agendaId ===
+                                                                agenda.id
+                                                        )
+                                                        .map((appointment) => {
+                                                            const title = appointment.prenom ? `${appointment.postal}/${appointment.nom} ${appointment.prenom}` : `${appointment.postal}/${appointment.nom}`;
+                                                            return {
+                                                                id: appointment.id,
+                                                                title: title,
+                                                                start: appointment.start_date,
+                                                                end: appointment.end_date,
+                                                                status: appointment.status,
+                                                            };
+                                                        })}
+
+                                                    views={{
+                                                        week: {
+                                                            type: "timeGridWeek",
+                                                            duration: {
+                                                                weeks: 1,
+                                                            },
+                                                        },
+                                                    }}
+                                                    initialView="week"
+                                                    slotMinTime="09:00"
+                                                    slotMaxTime="20:00"
+                                                    weekends={false}
+                                                />
+                                            )}
+                                            {/* </Card> */}
                                         </div>
                                     );
-                                }}
-                                eventDidMount={(arg) => {
-                                    arg.el.style.backgroundColor =
-                                        "#219fbbbe";
-                                }}
-                                dateClick={(arg) => {
-
-                                    handleAddAppointmentCallback(
-                                        arg,
-                                        user.id,
-                                        agenda.id
-                                    )
-
-                                }
-
-                                }
-                                eventClick={(info) =>
-                                    handleAppointmentClickCallback(
-                                        info.event
-                                    )
-                                }
-                                events={appointments
-                                    .filter(
-                                        (appointment) =>
-                                            appointment.agendaId ===
-                                            agenda.id
-                                    )
-                                    .map((appointment) => {
-                                        const title = appointment.prenom ? `${appointment.postal}/${appointment.nom} ${appointment.prenom}` : `${appointment.postal}/${appointment.nom}`;
-                                        return {
-                                            id: appointment.id,
-                                            title: title,
-                                            start: appointment.start_date,
-                                            end: appointment.end_date,
-                                            status: appointment.status,
-                                        };
-                                    })}
-
-                                views={{
-                                    week: {
-                                        type: "timeGridWeek",
-                                        duration: {
-                                            weeks: 1,
-                                        },
-                                    },
-                                }}
-                                initialView="week"
-                                slotMinTime="09:00"
-                                slotMaxTime="20:00"
-                                weekends={false}
-                            />
+                                })}
+                            </>
                         )}
-                        {/* </Card> */}
-                    </div>
-                );
-            })}
-        </>
-    )}
                     </Card>
                     <Modal
                         open={showAddModal}

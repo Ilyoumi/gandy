@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { axiosClient } from "../../../api/axios";
-import { Card, Checkbox, Empty } from "antd"; // Import Empty component from Ant Design
+import { Card, Checkbox, Empty } from "antd";
 import { fetchAgentCommercialUsers } from "../../caledrier/services/api";
-import { UserOutlined } from "@ant-design/icons"; // Import icons if necessary
+import { UserOutlined } from "@ant-design/icons";
 
 function ContactList({
     agentCommercialUsers,
@@ -13,15 +13,17 @@ function ContactList({
     setAgentId,
     agendaId,
     setAgendaId,
+    role,
+    contactAgendas, setContactAgendas
 }) {
-    
+    const [agentSelectedItemId, setAgentSelectedItemId] = useState(null);
+
     useEffect(() => {
         console.log("Fetching agent commercial users...");
         fetchAgentCommercialUsers();
     }, []);
 
     useEffect(() => {
-        // Set the agendaId to the ID of the first agenda when agendas are available
         console.log("Agendas updated:", agendas);
         if (agendas.length > 0) {
             setAgendaId(agendas[0].id);
@@ -31,36 +33,39 @@ function ContactList({
 
     const handleCheckboxClick = async (userId) => {
         try {
-            console.log("Checkbox clicked for user:", userId);
+
             let updatedSelectedItems = [...selectedItems];
-            if (selectedItems.includes(userId)) {
-                // Remove the user if already selected
-                updatedSelectedItems = updatedSelectedItems.filter(
-                    (id) => id !== userId
-                );
-                console.log("User removed from selectedItems:", userId);
-                // If there are no selected items, clear the agendaId
-                if (updatedSelectedItems.length === 0) {
-                    setAgendaId(null);
-                    console.log("Cleared agendaId as there are no selected items");
-                }
+
+            if (role === "Agent") {
+
+                setAgentSelectedItemId(userId);
+                updatedSelectedItems = [userId];
+                console.log("Selected user:", userId);
             } else {
-                // Add the user if not already selected
-                updatedSelectedItems.push(userId);
-                console.log("User added to selectedItems:", userId);
-                // Fetch agendas for the selected user
-                console.log("Fetching agendas for user:", userId);
-                const response = await axiosClient.get(
-                    `/api/users/${userId}/agendas`
-                );
-                const userAgendas = response.data.agendas;
-                console.log("Fetched agendas:", userAgendas);
-                // Set the agendaId to the ID of the first agenda for the selected user
-                if (userAgendas.length > 0) {
-                    setAgendaId(userAgendas[0].id);
-                    console.log("Setting agendaId for user:", userAgendas[0].id);
+                if (selectedItems.includes(userId)) {
+                    updatedSelectedItems = updatedSelectedItems.filter(
+                        (id) => id !== userId
+                    );
+                    console.log("Deselected user:", userId);
+                } else {
+                    updatedSelectedItems.push(userId);
+                    console.log("Added user to selectedItems:", userId);
                 }
             }
+
+            // Fetch agendas for the selected user
+            console.log("Fetching agendas for user:", userId);
+            const response = await axiosClient.get(
+                `/api/users/${userId}/agendas`
+            );
+            setContactAgendas(response.data.agendas)
+            console.log("Fetched agendas:", contactAgendas);
+            // Set the agendaId to the ID of the first agenda for the selected user
+            if (contactAgendas.length > 0) {
+                setAgendaId(contactAgendas[0].id);
+                console.log("Setting agendaId for user:", contactAgendas[0].id);
+            }
+
             setSelectedItems(updatedSelectedItems);
             console.log("Updated selectedItems:", updatedSelectedItems);
         } catch (error) {
@@ -76,17 +81,23 @@ function ContactList({
                     description="No data"
                 />
             ) : (
-                <Checkbox.Group
-                    onChange={setSelectedItems}
-                    value={selectedItems}
-                >
+                <Checkbox.Group value={selectedItems}>
                     {agentCommercialUsers.map((user, index) => (
                         <Checkbox
                             key={index}
                             value={user.id}
-                            checked={selectedItems.includes(user.id)}
+                            checked={
+                                role === "agent"
+                                    ? agentSelectedItemId === user.id
+                                    : selectedItems.includes(user.id)
+                            }
                             onClick={() => handleCheckboxClick(user.id)}
-                            style={{ margin: 0 }} 
+                            style={{ margin: 0 }}
+                            disabled={
+                                role === "agent" &&
+                                agentSelectedItemId !== user.id &&
+                                agentSelectedItemId !== null
+                            }
                         >
                             {user.prenom} {user.nom}
                         </Checkbox>
