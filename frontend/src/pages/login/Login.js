@@ -235,7 +235,7 @@ const Login = () => {
                                             onChange={handleRememberChange}
                                         />
 
-                                        Remember me
+Souviens moi
                                     </Form.Item>
 
 

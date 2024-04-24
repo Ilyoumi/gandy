@@ -1,13 +1,13 @@
 const lineChart = {
   series: [
     {
-      name: "Mobile apps",
-      data: [350, 40, 300, 220, 500, 250, 400, 230, 500],
+      name: "Rendez-vouz confirmé",
+      data: [20, 10, 5, 16],
       offsetY: 0,
     },
     {
-      name: "Websites",
-      data: [30, 90, 40, 140, 290, 290, 340, 230, 400],
+      name: "Rendez-vouz annulé",
+      data: [30, 9, 40, 7],
       offsetY: 0,
     },
   ],
@@ -61,17 +61,7 @@ const lineChart = {
           ],
         },
       },
-      categories: [
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-      ],
+      categories: ["Semaine 1", "Semaine 2", "Semaine 3", "Semaine 4"], 
     },
 
     tooltip: {
