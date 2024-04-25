@@ -1,14 +1,28 @@
-import React, {useEffect,useState} from "react";
-import {  List, message } from "antd";
+import React, { useEffect, useState, useRef } from "react";
+import { Card, Col, Row, message, Alert, Space, Typography, Tag } from "antd";
+import { CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
+import "./rdv.css";
 import { axiosClient } from "../../../api/axios";
 
+const { Text } = Typography;
+
 const AppointmentDetails = ({ selectedRowData }) => {
-    const { nom, prenom,pro, nom_ste, tva, tel, gsm, adresse, postal, fournisseur, nbr_comp_elect, nbr_comp_gaz, ppv, tarif,tarification, haute_tension , start_date, end_date, note, commentaire } = selectedRowData;
+    const { start_date, end_date, note, commentaire, nom, prenom, pro, status, nom_ste, tva, tel, gsm, adresse, postal, fournisseur, nbr_comp_elect, nbr_comp_gaz, ppv, tarif, tarification, haute_tension } = selectedRowData;
     const [agentName, setAgentName] = useState("N/A");
+    const [cardHeight, setCardHeight] = useState("auto");
+
+    const clientInfoCardRef = useRef(null);
+    const appointmentInfoCardRef = useRef(null);
+    const notesCardRef = useRef(null);
 
     useEffect(() => {
         fetchAgentName();
+        updateCardHeight(); // Calculate initial card heights
     }, []);
+
+    useEffect(() => {
+        updateCardHeight(); // Recalculate card heights when data changes
+    }, [selectedRowData]);
 
     const fetchAgentName = async () => {
         try {
@@ -16,76 +30,153 @@ const AppointmentDetails = ({ selectedRowData }) => {
             const agent = agentResponse.data;
             const name = `${agent.nom} ${agent.prenom}`;
             setAgentName(name);
-            console.log("agentResponse", agentResponse)
         } catch (error) {
             console.error("Error fetching agent name:", error);
             message.error("Failed to fetch agent name");
         }
     };
 
-    const data = [
-        { title: "Date de début", content: start_date },
-        { title: "Nom", content: `${nom}${prenom ? ' ' + prenom : ''}` },
-
-        { title: "Agent", content: agentName },
-        { title: "Adresse", content: adresse || "N/A" },
-        { title: "Code Postal", content: postal || "N/A" },
-        { title: "Société", content: nom_ste || "N/A" },
-        { title: "TVA", content: tva || "N/A" },
-        { title: "Date de fin", content: end_date },
-        { title: "Téléphone", content: tel || "N/A" },
-        { title: "Pro", content: pro ? "Yes" : "No" },
-        { title: "GSM", content: gsm || "N/A" },
-        { title: "Fournisseur", content: fournisseur || "N/A" },
-        { title: "Nombre de compteur électronique", content: nbr_comp_elect },
-        { title: "Nombre de compteur gaz", content: nbr_comp_gaz },
-        { title: "PPV", content: ppv ? "Yes" : "No" },
-        { title: "Tarif", content: tarif ? "Yes" : "No" },
-        { title: "Tarification", content: tarification || "N/A" },
-        { title: "Haute Tension", content: haute_tension ? "Yes" : "No" },
-        { title: "Commentaire", content: commentaire || "N/A" },
-        { title: "Note", content: note || "N/A" },
-    ];
+    const updateCardHeight = () => {
+        const clientInfoCardHeight = clientInfoCardRef.current.offsetHeight;
+        const appointmentInfoCardHeight = appointmentInfoCardRef.current.offsetHeight;
+        const notesCardHeight = notesCardRef.current.offsetHeight;
+    
+        const maxHeight = Math.max(clientInfoCardHeight, appointmentInfoCardHeight, notesCardHeight);
+        setCardHeight(maxHeight + "px");
+    };
+    
     
 
-    // Split the data into three parts
-    const splitIndex = Math.ceil(data.length / 3);
-    const firstData = data.slice(0, splitIndex);
-    const secondData = data.slice(splitIndex, splitIndex * 2);
-    const thirdData = data.slice(splitIndex * 2);
+    let statusColor = "#000";
+    const clientType = pro ? "Professionnel" : "Residential";
+    switch (status) {
+        case "encours":
+            statusColor = "purple";
+            break;
+        case "confirmer":
+            statusColor = "green";
+            break;
+        case "annuler":
+            statusColor = "red";
+            break;
+        default:
+            break;
+    }
+    const clientTypeColor = pro ? "geekblue" : "gold";
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return `${date.getDate()} ${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`;
+    };
 
     return (
-        <div style={{ display: "flex" }}>
-            {/* First List */}
-            <List
-                style={{ flex: 1, marginRight: "20px" }}
-                dataSource={firstData}
-                renderItem={(item) => (
-                    <List.Item>
-                        <strong>{item.title}: </strong> {item.content}
-                    </List.Item>
-                )}
-            />
-            {/* Second List */}
-            <List
-                style={{ flex: 1, marginRight: "20px" }}
-                dataSource={secondData}
-                renderItem={(item) => (
-                    <List.Item>
-                        <strong>{item.title}: </strong> {item.content}
-                    </List.Item>
-                )}
-            />
-            {/* Third List */}
-            <List
-                style={{ flex: 1 }}
-                dataSource={thirdData}
-                renderItem={(item) => (
-                    <List.Item>
-                        <strong>{item.title}: </strong> {item.content}
-                    </List.Item>
-                )}
-            />
+        <div>
+            <Card bordered={false} className="carddisplayrdvdate">
+                <Row justify="space-between" align="middle">
+                    <Col>
+                        <Text strong>Date de rendez-vous:</Text>
+                        <Text>{formatDate(start_date)}</Text>
+                    </Col>
+                    <Col>
+                        <Tag color={statusColor}>{status}</Tag>
+                    </Col>
+                </Row>
+            </Card>
+
+            <Row gutter={[16, 16]} >
+                <Col span={8}>
+                    <Card size="small" className="carddisplayrdv" ref={clientInfoCardRef} style={{ height: cardHeight  }}>
+                        <Row>
+                            <Col span={12}>
+                                <p><strong>Client:</strong> {nom} {prenom}</p>
+                            </Col>
+                            <Col span={12}>
+                                <Tag color={clientTypeColor}>{clientType}</Tag>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={12}>
+                                <p><strong>Téléphone:</strong> {tel}</p>
+                            </Col>
+                            <Col span={12}>
+                                <p><strong>GSM:</strong> {gsm}</p>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={24}>
+                                <p><strong>Adresse:</strong> {adresse}</p>
+                            </Col>
+                            
+                        </Row>
+                        <Row>
+                        <Col span={12}>
+                                <p><strong>Code postal:</strong> {agentName}</p>
+                            </Col>
+                            <Col span={12}>
+                                <p><strong>Société:</strong> {nom_ste}</p>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={12}>
+                                <p><strong>TVA:</strong> {tva}</p>
+                            </Col>
+                            <Col span={12}>
+                            <p><strong>Agent:</strong> {agentName}</p>
+                            </Col>
+                        </Row>
+                        
+                    </Card>
+                </Col>
+                <Col span={12}>
+                    <Card size="small" className="carddisplayrdv" ref={appointmentInfoCardRef} style={{ height: cardHeight }}>
+                        <Row>
+                            <Col span={24}>
+                                <p><strong>Fournisseur:</strong> {fournisseur}</p>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span={12}>
+                                <p><strong>Nombre de compteur électronique:</strong> {nbr_comp_elect}</p>
+                            </Col>
+                            <Col span={12}>
+                                <p><strong>Nombre de compteur gaz:</strong> {nbr_comp_gaz}</p>
+                            </Col>
+                        </Row>
+                        <Row gutter={[16, 16]}>
+                            <Col span={24}>
+                                {commentaire ? <Alert message={commentaire} type="info" /> : <Alert message="Aucun commentaire" type="warning" />}
+                            </Col>
+                        </Row>
+                        <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+                            <Col span={24}>
+                                <Space size="large">
+                                    <Space align="baseline">
+                                        <Text strong>PPV:</Text>
+                                        {ppv ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CloseCircleTwoTone twoToneColor="#eb2f96" />}
+                                    </Space>
+                                    <Space align="baseline">
+                                        <Text strong>Tarif social:</Text>
+                                        {tarif ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CloseCircleTwoTone twoToneColor="#eb2f96" />}
+                                    </Space>
+                                    <Space align="baseline">
+                                        <Text strong>Haute Tension:</Text>
+                                        {haute_tension ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CloseCircleTwoTone twoToneColor="#eb2f96" />}
+                                    </Space>
+                                    <Space align="baseline">
+                                        <Text strong>Tarification:</Text>
+                                        <Text type={tarification === "fixe" ? "default" : tarification === "Variable" ? "success" : "default"}>{tarification}</Text>
+                                    </Space>
+                                </Space>
+                            </Col>
+                        </Row>
+                    </Card>
+                </Col>
+                <Col span={4}>
+                    <Card title="Notes" size="small" bordered={false} className="carddisplayrdvnote" ref={notesCardRef} style={{ backgroundColor: "#FFF2F0" ,height: cardHeight }}>
+                        <p>{note}</p>
+                    </Card>
+                </Col>
+            </Row>
         </div>
     );
 };

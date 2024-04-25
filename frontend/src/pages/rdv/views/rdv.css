@@ -1,0 +1,21 @@
+.carddisplayrdv {
+    border-radius: 5px !important;
+    padding: 20px !important;
+    margin: 10px 0 !important;
+}
+
+.carddisplayrdvdate {
+    border-radius: 5px !important;
+    padding: 0 20px !important;
+    margin: 10px 0 !important;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.carddisplayrdvnote{
+    border-radius: 5px !important;
+    padding: 10px !important;
+    margin: 10px 0 !important;
+}
