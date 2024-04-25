@@ -48,6 +48,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         haute_tension: false,
         tarification: "",
         commentaire: "",
+        note: "",
         appointment_date: null,
     });
 
@@ -130,6 +131,9 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             id_agent: userId,
             id_agenda: agendaId,
             tarification: formData.tarif ? "Variable" : "Fixe",
+            note: formData.note,
+            commentaire: formData.commentaire,
+
         };
 
         console.log("sending data =", formDataToSend);
@@ -202,6 +206,8 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                 id: response.data.id,
             };
             setLoadingValidation(false);
+            console.log("Form submission with:", formDataToSend);
+
             console.log("Form submission successful. Response:", response.data);
             onFormSubmit({ ...response.data, newAppointment });
 
@@ -686,7 +692,11 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             label="Commentaire"
                                             name="commentaire"
                                         >
-                                            <Input.TextArea rows={3} />
+                                            <Input.TextArea rows={3} onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                commentaire: e.target.value,
+                                            })}  />
                                         </Form.Item>
                                     </Col>
                                 </Row>
@@ -869,7 +879,12 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                             </Col>
                             <Col span={24}>
                                 <Form.Item label="Note" name="note">
-                                    <Input.TextArea rows={3} />
+                                    <Input.TextArea rows={3} onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                note: e.target.value,
+                                            })
+                                        }/>
                                 </Form.Item>
                             </Col>
                         </Row>

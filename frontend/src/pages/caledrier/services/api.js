@@ -55,52 +55,25 @@ export const fetchAgentCommercialUsers = async (setAgentCommercialUsers) => {
     }
 };
 
-// Function to fetch contact information by contact ID
-export const fetchContactInfo = async (contactId, contactName,
-    setContactName,
-    contactEmail,
-    setContactEmail) => {
-    let contactResponse
-    try {
-        contactResponse = await axiosClient.get(`/api/users/${contactId}`);
-        const { nom, prenom, email } = contactResponse.data;
-        setContactName(`${prenom} ${nom}`);
-        setContactEmail(email);
-        console.log("contact information:", contactName, contactEmail);
 
-    } catch (error) {
-        console.error("Error fetching contact information:", contactResponse.data);
-    }
-};
 
 // Fetches agendas and appointments for all agendas, updates state with them
 export const fetchAgendasAndAppointments = async (
     setAgendas,
     setAppointments,
-    agendaId,
-    contactName,
-    setContactName,
-    contactEmail,
-    setContactEmail
 ) => {
     try {
         // Fetch all agendas
         const agendasResponse = await axiosClient.get("/api/agendas");
         const agendas = agendasResponse.data.agendas;
-        console.log("Agendas from response:", agendas);
 
         // Fetch appointments for each agenda
         const allAppointments = [];
         for (const agenda of agendas) {
-            console.log("Agendas id from response:", agenda.id);
             const contactId = agenda.contact_id;
-            console.log("conqtct id ", contactId)
             try {
                 // Fetch contact details for the agenda
-                await fetchContactInfo(contactId, contactName,
-                    setContactName,
-                    contactEmail,
-                    setContactEmail);
+                
                 const appointmentsResponse = await axiosClient.get(
                     `/api/agendas/${agenda.id}/appointments`
                 );
@@ -117,6 +90,7 @@ export const fetchAgendasAndAppointments = async (
                         id_agent: appointment.id_agent,
                         status: appointment.status,
                     }));
+                    
                 allAppointments.push(...appointmentsForAgenda);
             } catch (error) {
                 console.error(
@@ -126,25 +100,20 @@ export const fetchAgendasAndAppointments = async (
             }
         }
 
-        console.log("All Appointments:", allAppointments);
 
         // Update state with agendas and appointments
         setAgendas(agendas);
         setAppointments(allAppointments);
-        console.log(
-            "Appointments fetchAgendasAndAppointments",
-            allAppointments
-        );
+        
     } catch (error) {
         console.error("Error fetching agendas:", error.message);
     }
 };
-
-// Handles agenda creation, updates state with FullCalendar data
+// Handles agenda creation, updates state with FullCalendar data in api.js
 export const handleAgendaCreated = async (
     agendaId,
     agendaName,
-    userContext,
+    contactId,
     appointments,
     handleAddAppointment,
     agentId,
@@ -162,33 +131,26 @@ export const handleAgendaCreated = async (
             agendaId,
             handleEventDrop
         );
-        console.log("fullCalendarConfig", config);
-
         // Update existing agenda with FullCalendar data
         const response = await axiosClient.put(`/api/agendas/${agendaId}`, {
             name: agendaName,
             fullcalendar_config: config,
-            contact_id: userContext.userId,
+            contact_id: contactId,
         });
         
-        console.log("Response from server:", response);
         
         // Check if response is defined before accessing its data property
         if (response && response.data) {
             console.log("Agenda updated with FullCalendar data:", response.data);
             // Update appointments state with the updated events
             setAppointments(updatedEvents);
-            console.log("appointments handleAgendaCreated", updatedEvents);
         } else {
             console.error("Unexpected response from server:", response);
         }
-        
 
         // Update appointments state with the updated events
         setAppointments(updatedEvents);
-        console.log("appointments handleAgendaCreated", updatedEvents);
     } catch (error) {
-        console.log("Response data:", error.response.data);
 
         console.error("Error updating agenda with FullCalendar data:", error);
         // Handle error
@@ -208,7 +170,6 @@ export const handleAppointmentClick = async (
     agendaId,
     selectedRowData
 ) => {
-    console.log("event date", event.start)
 
     try {
         // Make a GET request to fetch the agent ID by appointment ID
@@ -273,7 +234,6 @@ export const handleFormSubmit = async (
     setSelectedDate
 ) => {
     try {
-        console.log("New appointment:", newAppointment);
 
         // Update appointments state using the state updater function
         setAppointments((prevAppointments) => [
@@ -284,7 +244,6 @@ export const handleFormSubmit = async (
         // Fetch agendas and appointments after updating appointments state
         fetchAgendasAndAppointments(setAgendas, setAppointments, agendaId);
 
-        console.log("setAppointments:", appointments);
         handleCloseModal();
         setShowUpdateModal(false);
         setSelectedDate(null);
@@ -295,7 +254,6 @@ export const handleFormSubmit = async (
 
 // Handles event drop (drag-and-drop) for appointments
 export const handleEventDrop = async (info, appointments, setAppointments) => {
-    console.log("handleEventDrop called", info);
     try {
         const { event } = info;
         const updatedAppointment = {
@@ -303,16 +261,12 @@ export const handleEventDrop = async (info, appointments, setAppointments) => {
             start_date: event.start.toISOString(),
             end_date: event.end.toISOString(),
         };
-        console.log("event", event);
-        // Log the updated appointment before sending the request
-        console.log("Updated Appointment:", updatedAppointment);
 
         // Update appointment in the database
         const response = await axiosClient.put(
             `/api/rdvs/${event.id}`,
             updatedAppointment
         );
-        console.log("Appointment updated successfully:", response.data);
 
         // Update appointments state with the updated event
         const updatedAppointments = appointments.map((appointment) => {
@@ -326,7 +280,6 @@ export const handleEventDrop = async (info, appointments, setAppointments) => {
             return appointment;
         });
         setAppointments(updatedAppointments);
-        console.log("appointments handleEventDrop", updatedAppointments);
     } catch (error) {
         console.error("Error updating appointment:", error);
     }
