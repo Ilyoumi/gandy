@@ -32,39 +32,39 @@ class RdvController extends Controller
 
 
     public function index(Request $request)
-{
-    try {
-        $query = Rdv::query();
-        if ($request->has('agent_id')) {
-            // Filter appointments by agent ID
-            $query->where('id_agent', $request->agent_id);
+    {
+        try {
+            $query = Rdv::query();
+            if ($request->has('agent_id')) {
+                // Filter appointments by agent ID
+                $query->where('id_agent', $request->agent_id);
+            }
+
+            if ($request->has('agenda_id')) {
+                // Filter appointments by agenda ID
+                $query->where('id_agenda', $request->agenda_id);
+            }
+
+            if ($request->has('start_date')) {
+                // Filter appointments by start date
+                $query->whereDate('start_date', '>=', $request->start_date);
+            }
+
+            if ($request->has('end_date')) {
+                // Filter appointments by end date
+                $query->whereDate('start_date', '<=', $request->end_date);
+            }
+
+            // Order appointments by start date in ascending order
+            $query->orderBy('start_date', 'asc');
+
+            $rdvs = $query->get();
+
+            return response()->json($rdvs);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred while fetching RDVs.'], 500);
         }
-
-        if ($request->has('agenda_id')) {
-            // Filter appointments by agenda ID
-            $query->where('id_agenda', $request->agenda_id);
-        }
-
-        if ($request->has('start_date')) {
-            // Filter appointments by start date
-            $query->whereDate('start_date', '>=', $request->start_date);
-        }
-
-        if ($request->has('end_date')) {
-            // Filter appointments by end date
-            $query->whereDate('start_date', '<=', $request->end_date);
-        }
-
-        // Order appointments by start date in ascending order
-        $query->orderBy('start_date', 'asc');
-
-        $rdvs = $query->get();
-
-        return response()->json($rdvs);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'An error occurred while fetching RDVs.'], 500);
     }
-}
 
 
 
@@ -102,7 +102,7 @@ class RdvController extends Controller
                 'end_date' => 'required|date|after:start_date',
                 'commentaire' => 'nullable|string',
                 'note' => 'nullable|string',
-                'status' => 'nullable|string' ,
+                'status' => 'nullable|string',
                 'pro' => 'required|boolean',
             ]);
 
@@ -147,6 +147,74 @@ class RdvController extends Controller
             ], 500);
         }
     }
+
+    public function bloquerRdv(Request $request)
+    {
+        try {
+            Log::info('Incoming request data:', $request->all());
+
+            $validatedData = $request->validate([
+                'start_date' => 'required|date',
+                'end_date' => 'required|date|after:start_date',
+                'postal' => 'required|string',
+                'commentaire' => 'nullable|string',
+                'bloquer' => 'required|boolean',
+                'id_agent' => 'required|exists:users,id',
+                'id_agenda' => 'required|exists:agendas,id',
+            ]);
+            $validatedData['nom'] = $request->input('nom', '');
+            $validatedData['prenom'] = $request->input('prenom', '');
+            $validatedData['nom_ste'] = $request->input('nom_ste', '');
+            $validatedData['tva'] = $request->input('tva', '');
+            $validatedData['tel'] = $request->input('tel', '');
+            $validatedData['gsm'] = $request->input('gsm', '');
+            $validatedData['adresse'] = $request->input('adresse', '');
+            $validatedData['fournisseur'] = $request->input('fournisseur', '');
+            $validatedData['tarification'] = $request->input('tarification', '');
+            $validatedData['nbr_comp_elect'] = $request->input('nbr_comp_elect', 0);
+            $validatedData['nbr_comp_gaz'] = $request->input('nbr_comp_gaz', 0);
+            $validatedData['ppv'] = $request->input('ppv', false);
+            $validatedData['tarif'] = $request->input('tarif', false);
+            $validatedData['haute_tension'] = $request->input('haute_tension', false);
+            $startDate = date('Y-m-d H:i:s', strtotime($validatedData['start_date']));
+            $endDate = date('Y-m-d H:i:s', strtotime($validatedData['end_date']));
+
+            // Check if the appointment with the same date range already exists
+            $existingAppointment = Rdv::where(function ($query) use ($startDate, $endDate) {
+                $query->where('start_date', '>=', $startDate)
+                    ->where('end_date', '<=', $endDate)
+                    ->orWhere(function ($query) use ($startDate, $endDate) {
+                        $query->where('start_date', '<=', $startDate)
+                            ->where('end_date', '>=', $endDate);
+                    });
+            })->exists();
+
+            // If the appointment already exists, return an error response
+            if ($existingAppointment) {
+                return response()->json([
+                    'message' => 'An appointment with the same date range already exists.',
+                    'received_data' => $validatedData // Include received data in the response
+                ], 409); // 409 Conflict status code indicates a conflict with the current state of the resource
+            }
+
+            $rdv = Rdv::create($validatedData);
+
+
+            return response()->json([
+                'message' => 'Rdv blocked successfully',
+                'rdv' => $rdv,
+                'received_data' => $validatedData
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Failed to block Rdv: ' . $e->getMessage());
+
+            return response()->json([
+                'message' => 'Failed to create Rdv: ' . $e->getMessage(),
+                'received_data' => $request->all()
+            ], 500);
+        }
+    }
+
 
 
 
@@ -217,7 +285,7 @@ class RdvController extends Controller
             'start_date' => 'required|date_format:Y-m-d H:i:s',
             'end_date' => 'required|date_format:Y-m-d H:i:s|after:start_date',
             'commentaire' => 'nullable|string',
-            'note' => 'nullable|string', 
+            'note' => 'nullable|string',
             'status' => 'nullable|string',
             'pro' => 'required|boolean',
 

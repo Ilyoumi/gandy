@@ -51,6 +51,8 @@ Route::get('/users/{userId}/agendas', 'App\Http\Controllers\AgendaController@get
 Route::post('/calendars', [CalendarController::class, 'store']);
 
 // Routes pour les rendez-vous (RDVs)
+Route::post('/rdvs/bloquer-rdv', [RdvController::class, 'bloquerRdv']);
+
 Route::post('/rdvs', [RdvController::class, 'store']);
 Route::get('/rdvs', [RdvController::class, 'index']);
 Route::put('/rdvs/{id}', [RdvController::class, 'update']);

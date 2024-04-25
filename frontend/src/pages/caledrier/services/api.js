@@ -187,12 +187,11 @@ export const handleAppointmentClick = async (
             userContext.userRole === "Superviseur"
         ) {
             const response = await axiosClient.get(`/api/rdvs/${event.id}`);
-            // Extract the appointment details from the response data
             const appointmentDetails = response.data;
-            // Update the state with the fetched appointment details
             setAppointmentDetails(appointmentDetails);
+            console.log("appointmentDetails", appointmentDetails)
+            console.log("appointmentDetails id", event.id)
             setSelectedRowData(appointmentDetails);
-            // Show the update modal
             setShowDetailModal(true);
             setSelectedAppointment(event);
             console.log(
@@ -222,6 +221,18 @@ export const handleAddAppointment = (
     setShowAddModal(true);
 };
 
+export const handleBlockAppointment = (
+    agentId,
+    agendaId,
+    arg,
+    userContext,
+    setSelectedDate,
+    setShowBlockModal
+) => {
+    setSelectedDate({ date: arg.date, agentId, agendaId });
+    setShowBlockModal(true)
+};
+
 // Handles form submission for new appointment
 export const handleFormSubmit = async (
     newAppointment,
@@ -229,6 +240,7 @@ export const handleFormSubmit = async (
     agendaId,
     setAgendas,
     handleCloseModal,
+    handleCloseBlockModal,
     setShowUpdateModal,
     appointments,
     setSelectedDate
@@ -245,6 +257,7 @@ export const handleFormSubmit = async (
         fetchAgendasAndAppointments(setAgendas, setAppointments, agendaId);
 
         handleCloseModal();
+        handleCloseBlockModal()
         setShowUpdateModal(false);
         setSelectedDate(null);
     } catch (error) {

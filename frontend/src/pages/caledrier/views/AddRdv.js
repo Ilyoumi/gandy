@@ -162,16 +162,10 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
 
 
 
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-    alert("Form validation failed. Please check your input.");
-  };
-
   return (
     <Form
       layout="vertical"
       onFinish={handleFormSubmit}
-      onFinishFailed={onFinishFailed}
     >
       {showAlert && (
         <Alert
