@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import { Spin } from "antd";
 import { AuthProvider } from "./AuthContext";
@@ -17,36 +17,18 @@ import Agenda from "./pages/caledrier/views/DisplayAgenda";
 import HomeCompanies from "./pages/home/HomeCompanies";
 import DisplayUsers from "./pages/user/views/DisplayUsers";
 import MyCalendar from "./pages/caledrier/views/MyCalendar";
-import axios from "axios";
 import { CalendarProvider } from "./CalendarContext";
 import { UserProvider } from "./GlobalContext";
 import NotAuthorizedPage from "./pages/NotAuthorizedPage";
 import PrivateRoute from "./PrivateRoute"; // Import PrivateRoute component
 
-axios.defaults.baseURL = "http://localhost:8000";
-axios.defaults.headers.post["Content-Type"] = "application/json";
-axios.defaults.headers.post["Accept"] = "application/json";
-
-axios.defaults.withCredentials = true;
-
-axios.interceptors.request.use(function (config) {
-  const token = localStorage.getItem("auth_token");
-  config.headers.Authorization = token ? `Bearer ${token}` : "";
-  return config;
-});
-
 function App() {
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Simulate loading for demonstration purposes
-    const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-
-    // Clean up timer
-    return () => clearTimeout(timeout);
-  }, []);
+  // Simulate loading for demonstration purposes
+  setTimeout(() => {
+    setLoading(false);
+  }, 2000);
 
   return (
     <Router>

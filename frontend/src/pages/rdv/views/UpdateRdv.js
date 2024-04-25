@@ -359,6 +359,9 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                             buttonText="Enregistrer"
                         />
                     </Col>
+                    <Col span={4}>
+                        
+                    </Col>
                 </Row>
             </Card>
             <Row gutter={[16, 16]}>

@@ -23,7 +23,6 @@ const fetchUserData = async (userContext) => {
         userContext.setUserId(id);
         userContext.setUserName(`${prenom} ${nom}`);
         
-        console.log("User info fetched successfully:", { role, id, name: `${prenom} ${nom}` });
     } catch (error) {
         console.error("Error fetching user data:", error.message);
     }
@@ -33,7 +32,6 @@ const obtainCSRFToken = async () => {
     try {
         // Make a request to obtain CSRF token
         await axios.get("http://localhost:8000/sanctum/csrf-cookie");
-        console.log("CSRF token obtained successfully.");
     } catch (error) {
         console.error("Error obtaining CSRF token:", error.message);
         throw new Error("Failed to obtain CSRF token.");

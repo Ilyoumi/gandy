@@ -189,7 +189,7 @@ export const handleAppointmentClick = async (
             const response = await axiosClient.get(`/api/rdvs/${event.id}`);
             const appointmentDetails = response.data;
             setAppointmentDetails(appointmentDetails);
-            console.log("appointmentDetails", appointmentDetails.id)
+            console.log("appointmentDetails", appointmentDetails)
             console.log("appointmentDetails id", event.id)
             setSelectedRowData(appointmentDetails);
             setShowDetailModal(true);
@@ -221,6 +221,18 @@ export const handleAddAppointment = (
     setShowAddModal(true);
 };
 
+export const handleBlockAppointment = (
+    agentId,
+    agendaId,
+    arg,
+    userContext,
+    setSelectedDate,
+    setShowBlockModal
+) => {
+    setSelectedDate({ date: arg.date, agentId, agendaId });
+    setShowBlockModal(true)
+};
+
 // Handles form submission for new appointment
 export const handleFormSubmit = async (
     newAppointment,
@@ -228,6 +240,7 @@ export const handleFormSubmit = async (
     agendaId,
     setAgendas,
     handleCloseModal,
+    handleCloseBlockModal,
     setShowUpdateModal,
     appointments,
     setSelectedDate
@@ -244,6 +257,7 @@ export const handleFormSubmit = async (
         fetchAgendasAndAppointments(setAgendas, setAppointments, agendaId);
 
         handleCloseModal();
+        handleCloseBlockModal()
         setShowUpdateModal(false);
         setSelectedDate(null);
     } catch (error) {
