@@ -63,7 +63,8 @@ function MyCalendar() {
         setContactName,
         contactEmail,
         setContactEmail,
-        contactAgendas, setContactAgendas
+        contactAgendas, setContactAgendas,setAgentName,
+        agentName
     } = useCalendar();
     const userContext = useUser();
     const [selectedAppointmentDate, setSelectedAppointmentDate] =
@@ -171,7 +172,8 @@ function MyCalendar() {
                     arg,
                     userContext,
                     setSelectedDate,
-                    setShowBlockModal
+                    setShowBlockModal,
+                    setAgentName
                 );
                 
                 console.log("Bloque Crénaux clicked");
@@ -289,7 +291,7 @@ function MyCalendar() {
                         contactAgendas={contactAgendas}
                         setContactAgendas={setContactAgendas}
                     />
-                    <Card style={{ width: "83%" }}>
+                    <Card style={{ width: "80%" }}>
                         {(userContext.userRole === "Admin" ||
                             userContext.userRole === "Superviseur") && (
                                 <NewButton
@@ -342,18 +344,25 @@ function MyCalendar() {
                                                         agenda.fullcalendar_config
                                                     )}
                                                     eventContent={(arg) => {
-                                                        let backgroundColor = "#219fbbbe"; // Default background color
+                                                        let content = ""; 
+                                                        let backgroundColor = "#219fbbbe"; 
+                                                    
                                                         if (arg.event.extendedProps.bloquer) {
-                                                            backgroundColor = "red"; // Change background color to red if the appointment is blocked
+                                                            content = `Bloquer / ${arg.event.title}`; 
+                                                            backgroundColor = "red"; 
+                                                        } else {
+                                                            content = `${arg.event.title} / ${arg.event.extendedProps.status}`; 
                                                         }
+                                                    
                                                         return (
                                                             <div>
                                                                 <div style={{ backgroundColor }}>
-                                                                    {arg.event.title}/{arg.event.extendedProps.status}
+                                                                    {content}
                                                                 </div>
                                                             </div>
                                                         );
                                                     }}
+                                                    
                                                     
                                                     eventDidMount={(arg) => {
                                                         arg.el.style.backgroundColor =
@@ -382,7 +391,7 @@ function MyCalendar() {
                                                                 agenda.id
                                                         )
                                                         .map((appointment) => {
-                                                            const title = appointment.bloquer ? `${appointment.id_agent}/${appointment.postal}` : (appointment.prenom ? `${appointment.postal}/${appointment.nom} ${appointment.prenom}` : `${appointment.postal}/${appointment.nom}`);
+                                                            const title = appointment.bloquer ? `${appointment.postal}` : (appointment.prenom ? `${appointment.postal}/${appointment.nom} ${appointment.prenom}` : `${appointment.postal}/${appointment.nom}`);
 
                                                             return {
                                                                 id: appointment.id,
@@ -391,6 +400,7 @@ function MyCalendar() {
                                                                 end: appointment.end_date,
                                                                 status: appointment.status,
                                                                 bloquer: appointment.bloquer,
+                                                                agent: appointment.id_agent,
                                                             };
                                                         })}
 
@@ -406,6 +416,8 @@ function MyCalendar() {
                                                     slotMinTime="09:00"
                                                     slotMaxTime="20:00"
                                                     weekends={false}
+                                                    height="auto"
+                                                    style={{ overflow: "visible" }}
                                                 />
                                             )}
                                             {/* </Card> */}
@@ -413,7 +425,8 @@ function MyCalendar() {
                                     );
                                 })}
                             </>
-                        )}
+                        )
+                        }
                     </Card>
                     <Modal
                         open={showAddModal}
@@ -470,7 +483,7 @@ function MyCalendar() {
                         onCancel={() => setShowDetailModal(false)}
                         footer={null}
                         style={{ marginTop: "-50px" }}
-                        width="80%"
+                        width="85%"
                         bodyStyle={{ maxHeight: "80vh", overflowY: "auto" }}
                         destroyOnClose
                         title={
@@ -533,7 +546,8 @@ function MyCalendar() {
 
 
                 </>
-            )}
+            )
+            }
         </div>
     );
 }

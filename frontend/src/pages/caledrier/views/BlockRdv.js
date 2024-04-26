@@ -23,14 +23,7 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 			: null,
 	});
 
-	const resetForm = () => {
-		setFormData({
-						postal: "",
-						commentaire: "",
-						bloquer: true,
-						appointment_date: null,
-		});
-};
+	
 	const handleClick = () => {
 		setLoading(true);
 		setTimeout(() => {
@@ -86,7 +79,7 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 		console.log("End Date before formatting:", endDate);
 
 		// Check if startDate is a Date object
-		if (startDate instanceof Date && !isNaN(startDate.getTime())) {
+		if (startDate instanceof Date || !isNaN(startDate.getTime())) {
 						const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
 						const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
 
@@ -114,7 +107,6 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 										console.log("Response block:", response.data);
 										message.success("Rendez-vous bloqué avec succès !");
 										setShowAlert(false);
-										debugger
 										setFormData({
 											postal: "",
 											commentaire: "",
@@ -136,8 +128,7 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 
 						}
 		} else {
-						// Log the error without displaying it on the page
-						console.error("Invalid startDate:", startDate);
+						console.log("Invalid startDate:", startDate);
 						setLoading(false);
 		}
 };

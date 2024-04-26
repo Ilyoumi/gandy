@@ -1,6 +1,6 @@
-import React, { useState , useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { Menu } from "antd";
-import { NavLink, useLocation ,Redirect } from "react-router-dom";
+import { NavLink, useLocation, Redirect } from "react-router-dom";
 import logo from "../../assets/images/lg.png";
 import { axiosClient } from "../../api/axios";
 
@@ -102,7 +102,7 @@ const Sidenav = ({ color }) => {
         </svg>,
     ];
 
-    
+
     const user = [
         <svg
             width="20"
@@ -187,73 +187,71 @@ const Sidenav = ({ color }) => {
         ]
     };
 
- 
-    // console.log('jay mn tema' ,role);
-     const roleItems = menuItems[role];
 
-     // If user is not logged in, redirect to login page
+    // console.log('jay mn tema' ,role);
+    const roleItems = menuItems[role];
+
+    // If user is not logged in, redirect to login page
     if (!localStorage.getItem("auth_token")) {
         return <Redirect to="/login" />;
     }
     // console.log('role item', roleItems);
-     return (
-         <div>
-             <div className="brand">
-                 <img
-                     src={logo}
-                     alt=""
-                     style={{
-                         width: "200px",
-                         height: "auto",
-                         marginTop: "-10px",
-                     }}
-                 />
-             </div>
-             <Menu
-                 theme="light"
-                 mode="inline"
-                 style={{
-                     marginTop: "28px",
-                     width: expanded ? "200px" : "50px",
-                     marginTop: "8px"
-                 }}
-                 className=""
-             >
+    return (
+        <div>
+            <div className="brand">
+                <img
+                    src={logo}
+                    alt=""
+                    style={{
+                        width: "200px",
+                        height: "auto",
+                        marginTop: "-10px",
+                    }}
+                />
+            </div>
+            <Menu
+                theme="light"
+                mode="inline"
+                style={{
+                    marginTop: "28px",
+                    width: expanded ? "150px" : "50px",
+                    marginTop: "8px"
+                }}
+                className=""
+            >
 
-                 {/* Render menu items based on user role */}
-                 {roleItems &&
+                {/* Render menu items based on user role */}
+                {roleItems &&
                     roleItems.map((item) => (
                         <Menu.Item
                             key={item.key}
                             style={{ width: expanded ? "200px" : "10px" }}
                         >
-                         <NavLink
-                             to={"/" + item.key}
-                             className={` overflow-hidden transition-all ${
-                                 expanded ? "w-48" : "w-16"
-                             }`}
-                         >
-                             <span
-                                 className="icon"
-                                 style={{
-                                     background: page === item.key ? color : "",
-                                 }}
-                             >
-                                 {item.icon}
-                             </span>
-                             <span
-                                 className={`label overflow-hidden transition-all ${
-                                     expanded ? "w-32" : "w-0"
-                                 }`}
-                             >
-                                 {item.label}
-                             </span>
-                         </NavLink>
-                     </Menu.Item>
-                 ))}
-             </Menu>
-         </div>
-     );
- }
- 
- export default Sidenav;
+                            <NavLink
+                                to={"/" + item.key}
+                                className={` overflow-hidden transition-all ${expanded ? "w-48" : "w-16"
+                                    }`}
+                            >
+                                <span
+                                    className="icon"
+                                    style={{
+                                        background: page === item.key ? color : "",
+                                    }}
+                                >
+                                    {item.icon}
+                                </span>
+                                <span
+                                    className={`label overflow-hidden transition-all ${expanded ? "w-32" : "w-0"
+                                        }`}
+                                >
+                                    {item.label}
+                                </span>
+                            </NavLink>
+                        </Menu.Item>
+                    ))}
+            </Menu>
+        </div>
+    );
+}
+
+export default Sidenav;

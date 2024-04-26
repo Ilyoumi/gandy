@@ -84,7 +84,7 @@ function ContactList({
     
 
     return (
-        <Card title="Contacts" style={{ width: "15%" }}>
+        <Card title="Contacts" style={{ width: "18%" }}>
             {agentCommercialUsers.length === 0 ? (
                 <Empty
                     image={<UserOutlined style={{ fontSize: 48 }} />}

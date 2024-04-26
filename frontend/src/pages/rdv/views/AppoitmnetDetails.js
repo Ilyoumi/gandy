@@ -84,7 +84,7 @@ const AppointmentDetails = ({ selectedRowData }) => {
             </Card>
 
             <Row gutter={[16, 16]} >
-                <Col span={8}>
+                <Col span={10}>
                     <Card size="small" className="carddisplayrdv" ref={clientInfoCardRef} style={{ height: cardHeight  }}>
                         <Row>
                             <Col span={12}>
@@ -127,7 +127,7 @@ const AppointmentDetails = ({ selectedRowData }) => {
                         
                     </Card>
                 </Col>
-                <Col span={12}>
+                <Col span={14}>
                     <Card size="small" className="carddisplayrdv" ref={appointmentInfoCardRef} style={{ height: cardHeight }}>
                         <Row>
                             <Col span={24}>
@@ -135,10 +135,10 @@ const AppointmentDetails = ({ selectedRowData }) => {
                             </Col>
                         </Row>
                         <Row>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <p><strong>Nombre de compteur électronique:</strong> {nbr_comp_elect}</p>
                             </Col>
-                            <Col span={12}>
+                            <Col span={24}>
                                 <p><strong>Nombre de compteur gaz:</strong> {nbr_comp_gaz}</p>
                             </Col>
                         </Row>
@@ -171,11 +171,13 @@ const AppointmentDetails = ({ selectedRowData }) => {
                         </Row>
                     </Card>
                 </Col>
-                <Col span={4}>
+                <Col span={24}>
                     <Card title="Notes" size="small" bordered={false} className="carddisplayrdvnote" ref={notesCardRef} style={{ backgroundColor: "#FFF2F0" ,height: cardHeight }}>
                         <p>{note}</p>
                     </Card>
                 </Col>
+                
+                
             </Row>
         </div>
     );

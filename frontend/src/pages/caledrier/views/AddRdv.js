@@ -41,6 +41,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
     haute_tension: false,
     tarification: "",
     commentaire: "",
+    note: "",
     appointment_date: selectedDate
       ? [
         new Date(selectedDate.date),
@@ -118,9 +119,13 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
       console.log("nom", nom)
       console.log("prenom", prenom)
       const tvaValue = formData.tva ? `BE0${formData.tva}` : '';
+      const telValue = formData.tel ? `+32${formData.tel}` : '';
+      const gsmValue = formData.gsm ? `+324${formData.gsm}` : '';
       const formDataToSend = {
         ...formData,
         tva: tvaValue,
+        tel: telValue,
+        gsm: gsmValue,
         nom: nom,
         prenom: prenom,
         start_date: startDateFormatted.toISOString().slice(0, 19).replace("T", " "),
@@ -128,6 +133,8 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
         id_agent: userId,
         id_agenda: agendaId,
         tarification: formData.tarif ? "Variable" : "Fixe",
+        note: formData.note,
+        commentaire: formData.commentaire,
       };
 
       console.log("Sending form data:", formDataToSend);
@@ -296,7 +303,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
               </Col>
               <Col span={24}>
                 <Row gutter={[16, 16]}>
-                  {formData.pro && ( 
+                  {formData.pro && (
                     <>
                       <Col span={24}>
                         <Row gutter={[16, 16]}>
@@ -304,7 +311,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                             <Form.Item
                               label="Nom de Société"
                               name="nom_ste"
-                              
+
                             >
                               <Input
                                 onChange={(e) =>
@@ -321,7 +328,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                               label="TVA"
                               name="tva"
                               rules={[
-                                
+
                                 {
                                   validator: (_, value) => {
                                     const regex = /^\d{9}$/;
@@ -336,7 +343,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                               ]}
                             >
                               <Input
-                              addonBefore="BE0"
+                                addonBefore="BE0"
                                 onChange={(e) =>
                                   setFormData({
                                     ...formData,
@@ -565,8 +572,13 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                     <Form.Item
                       label="Commentaire"
                       name="commentaire"
+
                     >
-                      <Input.TextArea rows={3} />
+                      <Input.TextArea rows={3} onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          commentaire: e.target.value,
+                        })} />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -741,8 +753,13 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                 </Form.Item>
               </Col>
               <Col span={24}>
-                <Form.Item label="Note" name="note">
-                  <Input.TextArea rows={3} />
+                <Form.Item label="Note" name="note" >
+                  <Input.TextArea rows={3} onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      note: e.target.value,
+                    })
+                  } />
                 </Form.Item>
               </Col>
             </Row>

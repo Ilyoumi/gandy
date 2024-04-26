@@ -184,7 +184,7 @@ export const handleAppointmentClick = async (
         // Compare the agent ID with the logged-in user's ID
         if (
             agentId === userContext.userId ||
-            userContext.userRole === "Superviseur"
+            userContext.userRole === "Superviseur" || userContext.userRole === "Agent"
         ) {
             const response = await axiosClient.get(`/api/rdvs/${event.id}`);
             const appointmentDetails = response.data;
@@ -227,10 +227,22 @@ export const handleBlockAppointment = (
     arg,
     userContext,
     setSelectedDate,
-    setShowBlockModal
+    setShowBlockModal,
+    setAgentName
 ) => {
+
     setSelectedDate({ date: arg.date, agentId, agendaId });
     setShowBlockModal(true)
+    try{
+        const agentResponse =  axiosClient.get(`/api/users/${arg.agent}`);
+        const agent = agentResponse.data;
+        const name = `${agent.nom} ${agent.prenom}`;
+
+        // Call fetchAgentName to get the agent name
+        setAgentName(name);
+    }catch{
+
+    }
 };
 
 // Handles form submission for new appointment
