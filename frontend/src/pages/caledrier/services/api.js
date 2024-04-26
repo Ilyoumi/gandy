@@ -73,7 +73,7 @@ export const fetchAgendasAndAppointments = async (
             const contactId = agenda.contact_id;
             try {
                 // Fetch contact details for the agenda
-                
+
                 const appointmentsResponse = await axiosClient.get(
                     `/api/agendas/${agenda.id}/appointments`
                 );
@@ -90,7 +90,7 @@ export const fetchAgendasAndAppointments = async (
                         id_agent: appointment.id_agent,
                         status: appointment.status,
                     }));
-                    
+
                 allAppointments.push(...appointmentsForAgenda);
             } catch (error) {
                 console.error(
@@ -104,7 +104,7 @@ export const fetchAgendasAndAppointments = async (
         // Update state with agendas and appointments
         setAgendas(agendas);
         setAppointments(allAppointments);
-        
+
     } catch (error) {
         console.error("Error fetching agendas:", error.message);
     }
@@ -137,8 +137,8 @@ export const handleAgendaCreated = async (
             fullcalendar_config: config,
             contact_id: contactId,
         });
-        
-        
+
+
         // Check if response is defined before accessing its data property
         if (response && response.data) {
             console.log("Agenda updated with FullCalendar data:", response.data);

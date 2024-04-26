@@ -13,4 +13,13 @@ axiosRetry(axiosClient, {
     retryDelay: axiosRetry.exponentialDelay
 });
 
+axios.interceptors.response.use(
+    response => response,
+    error => {
+      // Show an alert for Axios errors
+      alert(`Axios error: ${error.message}`);
+      return Promise.reject(error);
+    }
+  );
+
 export { axiosClient };

@@ -4,47 +4,36 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Response;
 
 class Handler extends ExceptionHandler
 {
     /**
-     * A list of exception types with their corresponding custom log levels.
+     * Render an exception into an HTTP response.
      *
-     * @var array<class-string<\Throwable>, \Psr\Log\LogLevel::*>
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Throwable  $exception
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
      */
-    protected $levels = [
-        //
-    ];
-
-    /**
-     * A list of the exception types that are not reported.
-     *
-     * @var array<int, class-string<\Throwable>>
-     */
-    protected $dontReport = [
-        //
-    ];
-
-    /**
-     * A list of the inputs that are never flashed to the session on validation exceptions.
-     *
-     * @var array<int, string>
-     */
-    protected $dontFlash = [
-        'current_password',
-        'password',
-        'password_confirmation',
-    ];
-
-    /**
-     * Register the exception handling callbacks for the application.
-     *
-     * @return void
-     */
-    public function register()
+    public function render($request, Throwable $exception)
     {
-        $this->reportable(function (Throwable $e) {
-            //
-        });
+        // Check if the request expects JSON response
+        if ($request->expectsJson()) {
+            // Create an error response
+            $response = [
+                'error' => 'Something went wrong.',
+            ];
+
+            // If the exception has a message, add it to the response
+            if ($exception->getMessage()) {
+                $response['message'] = $exception->getMessage();
+            }
+
+            // Return the JSON response with an error status code
+            return Response::json($response, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return parent::render($request, $exception);
     }
 }
