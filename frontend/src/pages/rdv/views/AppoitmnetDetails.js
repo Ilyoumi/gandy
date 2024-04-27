@@ -96,10 +96,10 @@ const AppointmentDetails = ({ selectedRowData }) => {
                         </Row>
                         <Row>
                             <Col span={12}>
-                                <p><strong>Téléphone:</strong> {tel}</p>
+                                <p><strong>Téléphone:</strong> +32{tel}</p>
                             </Col>
                             <Col span={12}>
-                                <p><strong>GSM:</strong> {gsm}</p>
+                                <p><strong>GSM:</strong>+324{gsm}</p>
                             </Col>
                         </Row>
                         <Row>
@@ -118,7 +118,7 @@ const AppointmentDetails = ({ selectedRowData }) => {
                         </Row>
                         <Row>
                             <Col span={12}>
-                                <p><strong>TVA:</strong> {tva}</p>
+                                <p><strong>TVA:</strong>BE0{tva}</p>
                             </Col>
                             <Col span={12}>
                             <p><strong>Agent:</strong> {agentName}</p>
@@ -172,7 +172,7 @@ const AppointmentDetails = ({ selectedRowData }) => {
                     </Card>
                 </Col>
                 <Col span={24}>
-                    <Card title="Notes" size="small" bordered={false} className="carddisplayrdvnote" ref={notesCardRef} style={{ backgroundColor: "#FFF2F0" ,height: cardHeight }}>
+                    <Card title="Notes" size="small" bordered={false} className="carddisplayrdvnote" ref={notesCardRef} style={{ backgroundColor: "#FFF2F0" , }}>
                         <p>{note}</p>
                     </Card>
                 </Col>

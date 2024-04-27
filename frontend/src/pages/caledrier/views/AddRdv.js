@@ -118,14 +118,10 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
       const [nom, prenom] = formData.nom_prenom ? formData.nom_prenom.split(' ') : ['', ''];
       console.log("nom", nom)
       console.log("prenom", prenom)
-      const tvaValue = formData.tva ? `BE0${formData.tva}` : '';
-      const telValue = formData.tel ? `+32${formData.tel}` : '';
-      const gsmValue = formData.gsm ? `+324${formData.gsm}` : '';
+
+
       const formDataToSend = {
         ...formData,
-        tva: tvaValue,
-        tel: telValue,
-        gsm: gsmValue,
         nom: nom,
         prenom: prenom,
         start_date: startDateFormatted.toISOString().slice(0, 19).replace("T", " "),
@@ -511,6 +507,9 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                         }
                         placeholder="Sélectionner le nombre de compteurs électriques"
                       >
+                        <Select.Option value="0">
+                          0
+                        </Select.Option>
                         <Select.Option value="1">
                           1
                         </Select.Option>
@@ -550,6 +549,9 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                         }
                         placeholder="Sélectionner le nombre de compteurs gaz"
                       >
+                        <Select.Option value="0">
+                          0
+                        </Select.Option>
                         <Select.Option value="1">
                           1
                         </Select.Option>

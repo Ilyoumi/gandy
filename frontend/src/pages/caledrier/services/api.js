@@ -70,7 +70,6 @@ export const fetchAgendasAndAppointments = async (
         // Fetch appointments for each agenda
         const allAppointments = [];
         for (const agenda of agendas) {
-            const contactId = agenda.contact_id;
             try {
                 // Fetch contact details for the agenda
                 
@@ -233,16 +232,7 @@ export const handleBlockAppointment = (
 
     setSelectedDate({ date: arg.date, agentId, agendaId });
     setShowBlockModal(true)
-    try{
-        const agentResponse =  axiosClient.get(`/api/users/${arg.agent}`);
-        const agent = agentResponse.data;
-        const name = `${agent.nom} ${agent.prenom}`;
-
-        // Call fetchAgentName to get the agent name
-        setAgentName(name);
-    }catch{
-
-    }
+    
 };
 
 // Handles form submission for new appointment
