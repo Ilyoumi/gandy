@@ -27,6 +27,7 @@ import {
 } from "../services/api";
 import { RollbackOutlined } from "@ant-design/icons";
 import BlockRdv from "./BlockRdv";
+import CountdownTimer from "./CountdownTimer ";
 
 function MyCalendar() {
     const {
@@ -63,13 +64,13 @@ function MyCalendar() {
         setContactName,
         contactEmail,
         setContactEmail,
-        contactAgendas, setContactAgendas,setAgentName,
+        contactAgendas, setContactAgendas, setAgentName,
         agentName
     } = useCalendar();
     const userContext = useUser();
     const [selectedAppointmentDate, setSelectedAppointmentDate] =
         useState(null);
-        const [showBlockModal, setShowBlockModal] = useState(false);
+    const [showBlockModal, setShowBlockModal] = useState(false);
 
 
 
@@ -127,10 +128,10 @@ function MyCalendar() {
         );
     };
     const handleRollback = () => {
-        setShowUpdateModal(false); 
-        setShowDetailModal(true); 
+        setShowUpdateModal(false);
+        setShowDetailModal(true);
     };
-    
+
     const handleAppointmentClickCallback = (event) => {
         console.log("Appointment ID:", event.id);
 
@@ -148,6 +149,46 @@ function MyCalendar() {
         setSelectedAppointmentDate(event.start);
 
     };
+
+    const dayCellContent = (arg) => {
+        return (
+            <div style={{ backgroundColor: "#219fbbbe", height: "100%", width: "100%" }}>
+                {arg.dayNumberText}
+            </div>
+        );
+    };
+    const handleDeleteAppointment = async (appointmentId) => {
+        console.log("Timer finished for appointment:", appointmentId);
+        
+        try {
+            const appointmentExists = appointments.find(appointment => appointment.id === appointmentId);
+            if (!appointmentExists) {
+                console.log("Appointment with ID", appointmentId, "does not exist. Skipping deletion.");
+                const updatedAppointments = appointments.filter(
+                    (appointment) => appointment.id !== appointmentId
+                );
+            setAppointments(updatedAppointments);
+
+                return; 
+            }
+    
+            await axiosClient.delete(`api/rdvs/${appointmentId}`);
+            const updatedAppointments = appointments.filter(
+                (appointment) => appointment.id !== appointmentId
+            );
+            setAppointments(updatedAppointments);
+        } catch (error) {
+            const updatedAppointments = appointments.filter(
+                (appointment) => appointment.id !== appointmentId
+            );
+            setAppointments(updatedAppointments);
+
+            console.error("Error deleting appointment:", error.response);
+            
+        }
+    };
+    
+    
     const handleAddAppointmentCallback = (arg, userContext) => {
         const currentDate = new Date();
         const selectedDate = new Date(arg.date);
@@ -158,7 +199,7 @@ function MyCalendar() {
             });
             return;
         }
-        
+
         Modal.confirm({
             title: "Sélectionner une action",
             content: "Que voulez-vous faire ?",
@@ -175,7 +216,7 @@ function MyCalendar() {
                     setShowBlockModal,
                     setAgentName
                 );
-                
+
                 console.log("Bloque Crénaux clicked");
                 console.log("Bloque selectedDate", selectedDate);
             },
@@ -192,28 +233,8 @@ function MyCalendar() {
             },
         });
     };
-    
 
-    // const handleAddAppointmentCallback = (arg, userContext) => {
-    //     const currentDate = new Date();
-    //     const selectedDate = new Date(arg.date);
-    //     if (selectedDate < currentDate) {
-    //         Modal.warning({
-    //             title: "Impossible d'ajouter un rendez-vous",
-    //             content: "Vous ne pouvez pas ajouter de rendez-vous à des dates passées.",
-    //         });
-    //         return;
-    //     }
-        
-    //     handleAddAppointment(
-    //         agentId,
-    //         agendaId,
-    //         arg,
-    //         userContext,
-    //         setSelectedDate,
-    //         setShowAddModal
-    //     );
-    // };
+
 
     const handleEventDropCallback = (info) => {
         handleEventDrop(info, appointments, setAppointments);
@@ -221,7 +242,6 @@ function MyCalendar() {
 
     const handleFormSubmitCallback = async (newAppointment) => {
         try {
-            // Call handleFormSubmit
             await handleFormSubmit(
                 newAppointment,
                 setAppointments,
@@ -234,7 +254,6 @@ function MyCalendar() {
                 setSelectedDate
             );
 
-            // Fetch agendas and appointments after successful form submission
             await fetchAgendasAndAppointments(
                 setAgendas,
                 setAppointments,
@@ -316,7 +335,6 @@ function MyCalendar() {
                             <>
                                 {contactAgendas.map((agenda) => {
 
-                                    // Find the user corresponding to the contact ID
                                     const user = agentCommercialUsers.find(
                                         (user) => user.id === agenda.contact_id
                                     );
@@ -332,7 +350,6 @@ function MyCalendar() {
                                     return (
                                         <div key={agenda.id}>
                                             <h2>{userName}</h2>{" "}
-                                            {/* <Card style={{ marginBottom: "30px" }}> */}
                                             {agenda.fullcalendar_config && (
                                                 <FullCalendar
                                                     plugins={[
@@ -344,26 +361,34 @@ function MyCalendar() {
                                                         agenda.fullcalendar_config
                                                     )}
                                                     eventContent={(arg) => {
-                                                        let content = ""; 
-                                                        let backgroundColor = "#219fbbbe"; 
-                                                    
+                                                        let content = "";
+
                                                         if (arg.event.extendedProps.bloquer) {
-                                                            content = `Bloquer / ${arg.event.title}`; 
-                                                            backgroundColor = "red"; 
+                                                            // Display remaining time in French
+                                                            content = `Bloqué / ${arg.event.title}`;
+                                                            
+                                                            return (
+                                                                <div>
+                                                                    <CountdownTimer onTimerFinish={() => handleDeleteAppointment(arg.event.id)} />
+                                                                    <div >
+                                                                        {content}
+                                                                    </div>
+                                                                </div>
+                                                            );
                                                         } else {
-                                                            content = `${arg.event.title} / ${arg.event.extendedProps.status}`; 
-                                                        }
-                                                    
-                                                        return (
-                                                            <div>
-                                                                <div style={{ backgroundColor }}>
+                                                            content = `${arg.event.title} / ${arg.event.extendedProps.status}`;
+                                                            return (
+                                                                <div >
                                                                     {content}
                                                                 </div>
-                                                            </div>
-                                                        );
+                                                            );
+                                                        }
                                                     }}
-                                                    
-                                                    
+                                                    dayCellContent={dayCellContent}
+
+
+
+
                                                     eventDidMount={(arg) => {
                                                         arg.el.style.backgroundColor =
                                                             "#219fbbbe";
@@ -417,7 +442,6 @@ function MyCalendar() {
                                                     slotMaxTime="20:00"
                                                     weekends={false}
                                                     height="auto"
-                                                    style={{ overflow: "visible" }}
                                                 />
                                             )}
                                             {/* </Card> */}
@@ -442,7 +466,7 @@ function MyCalendar() {
                             agendaId={agendaId}
                             selectedAppointmentDate={selectedAppointmentDate}
                         />
-                    </Modal> 
+                    </Modal>
                     <Modal
                         open={showUpdateModal}
                         title={
@@ -468,7 +492,7 @@ function MyCalendar() {
                     >
                         {appointmentDetails && (
                             <>
-                                {console.log("Appointment Details from update modal:", appointmentDetails)}
+
                                 <UpdateRdv
                                     initialValues={appointmentDetails}
                                     agendaId={agendaId}
@@ -522,7 +546,7 @@ function MyCalendar() {
                         )}
                     </Modal>
                     <Modal
-                        open={showBlockModal} 
+                        open={showBlockModal}
                         title="Bloquer Créneaux"
                         onCancel={handleCloseBlockModal}
                         footer={null}

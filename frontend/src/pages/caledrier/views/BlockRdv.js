@@ -62,6 +62,11 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 	const handleBloquerRdv = async () => {
 		setLoading(true);
 		console.log("Received selectedDate from parent component:", selectedDate);
+		if (formData.appointment_date === null) {
+			console.log("Appointment date is null");
+			setLoading(false);
+			return;
+	}
 		console.log("Start Date formData:", formData.appointment_date[0]);
 		console.log("End Date formData:", formData.appointment_date[1]);
 		let startDate, endDate;

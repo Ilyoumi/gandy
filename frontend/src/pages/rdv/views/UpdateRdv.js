@@ -17,7 +17,6 @@ import SaveButton from "../../../constants/SaveButton";
 import moment from "moment";
 import { axiosClient } from "../../../api/axios";
 import SupprimerButton from "../../../constants/SupprimerButton";
-import ModifierButton from "../../../constants/ModifierButton";
 const { Option } = Select;
 
 const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
@@ -49,10 +48,10 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         tarification: "",
         commentaire: "",
         note: "",
+        bloquer: false,
         appointment_date: null,
     });
 
-    console.log("Initial values from update comp:", initialValues);
 
 
     useEffect(() => {
@@ -63,6 +62,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             startTime: moment(initialValues.start_date),
             endTime: moment(initialValues.end_date),
             ppv: Boolean(initialValues.ppv),
+            bloquer: Boolean(initialValues.bloquer),
             pro: Boolean(initialValues.pro),
             tarif: Boolean(initialValues.tarif),
             haute_tension: Boolean(initialValues.haute_tension),
@@ -127,10 +127,14 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
 
         const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
         const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
+        const [nom, prenom] = formData.nom_prenom ? formData.nom_prenom.split(' ') : ['', ''];
 
         // Convert dates to UTC format before sending
         const formDataToSend = {
             ...formData,
+            nom: nom,
+            prenom: prenom,
+            bloquer: false,
             start_date: startDateFormatted.toISOString().slice(0, 19).replace("T", " "),
             end_date: endDateFormatted.toISOString().slice(0, 19).replace("T", " "),
             id_agent: userId,
@@ -144,6 +148,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         console.log("sending data =", formDataToSend);
 
         try {
+
             const response = await axiosClient.put(
                 `/api/rdvs/${initialValues.id}`,
                 formDataToSend
@@ -151,10 +156,12 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             const newAppointment = {
                 ...response.data,
                 id: response.data.id,
+                bloquer: formDataToSend.bloquer,
             };
             setLoadingEnregistrer(false);
             console.log("Form submission successful. Response:", response.data);
             onFormSubmit({ ...response.data, newAppointment });
+
             message.success("Rendez-vous modifié avec succès !");
         } catch (error) {
             if (error.response && error.response.status === 409) {
@@ -169,7 +176,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
 
 
 
-    const handleValidation = async () => {
+    const handleValidation = async (status) => {
         setLoadingValidation(true);
         let startDate, endDate;
 
@@ -198,7 +205,9 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             id_agent: userId,
             id_agenda: agendaId,
             tarification: formData.tarif ? "Variable" : "Fixe",
-            status: "confirmer",
+            status: status,
+            bloquer: false,
+
         };
 
         try {
@@ -209,6 +218,8 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             const newAppointment = {
                 ...response.data,
                 id: response.data.id,
+                bloquer: formDataToSend.bloquer,
+
             };
             setLoadingValidation(false);
             console.log("Form submission with:", formDataToSend);
@@ -216,8 +227,8 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             console.log("Form submission successful. Response:", response.data);
             onFormSubmit({ ...response.data, newAppointment });
 
-            // You may add any further action you want after validation
-            message.success("Rendez-vous validé avec succès !");
+            message.success(`Rendez-vous ${status === 'confirmer' ? 'confirmé' : 'enregistré comme non répondu'} avec succès!`);
+
 
         } catch (error) {
             setLoadingValidation(false);
@@ -228,49 +239,47 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
 
     const handleAnnuler = async () => {
         setLoadingAnnuler(true);
-        let startDate, endDate;
-
-        if (formData && formData.appointment_date && formData.appointment_date.length === 2) {
-            startDate = new Date(formData.appointment_date[0]);
-            endDate = new Date(formData.appointment_date[1]);
-        } else {
-            startDate = new Date(initialValues.start_date);
-            endDate = new Date(initialValues.end_date);
-        }
-        console.log("Start Date selected:", startDate);
-        console.log("End Date selected:", endDate);
-
-        const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
-        const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
-
-
-        const formDataToSend = {
-            ...formData,
-            start_date: startDateFormatted.toISOString().slice(0, 19).replace("T", " "),
-            end_date: endDateFormatted.toISOString().slice(0, 19).replace("T", " "),
-            id_agent: userId,
-            id_agenda: agendaId,
-            tarification: formData.tarif ? "Variable" : "Fixe",
-            status: "annuler",
-        };
-
         try {
-            const response = await axiosClient.put(
-                `/api/rdvs/${initialValues.id}`,
-                formDataToSend
-            );
-            const newAppointment = {
-                ...response.data,
-                id: response.data.id,
-            };
+            // First, delete the appointment
+            await axiosClient.delete(`/api/rdvs/${initialValues.id}`);
             setLoadingAnnuler(false);
-            console.log("Form submission successful. Response:", response.data);
-            onFormSubmit({ ...response.data, newAppointment });
-            message.success("Rendez-vous annulé avec succès !");
         } catch (error) {
             setLoadingAnnuler(false);
-            console.error("Error canceling appointment:", error);
+            if (error.response && error.response.status === 404) {
+                console.error("Appointment not found delete:", error.response.data);
+            } else {
+                console.error("Error deleting appointment:", error);
+            }
+            return;
         }
+    
+        try {
+            // Then, update the appointment status to "annuler"
+            const response = await axiosClient.put(
+                `/api/rdvs/${initialValues.id}`,
+                {
+                    ...initialValues,
+                    status: "annuler",
+                    bloquer: false,
+                }
+            );
+            console.log("Form submission successful. Response:", response.data);
+            // Assuming onFormSubmit updates the state with the new appointment data
+            onFormSubmit(response.data);
+            message.success("Rendez-vous annulé avec succès !");
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                console.error("Appointment not found update:", error.response.data);
+            } else {
+                console.error("Error updating appointment:", error);
+            }
+        }
+    };
+    
+    
+    
+    const handleStatusChange = (value) => {
+        handleValidation(value);
     };
 
 
@@ -336,12 +345,20 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                         </ConfigProvider>
                     </Col>
                     <Col span={4}>
-                        <ModifierButton
-                            loading={loadingValidation}
-                            buttonText="Confirmer"
-                            onClick={handleValidation}
 
-                        />
+                        <Select
+                            onChange={handleStatusChange}
+                            placeholder="Statuer RDV"
+                            style={{
+                                width: '150px',
+                                marginBottom: '20px',
+                                height:"40px !important"
+                            }}
+                        >
+                            <Select.Option value="confirmer">Confirmer</Select.Option>
+                            <Select.Option value="NRP">NRP</Select.Option>
+                        </Select>
+
                     </Col>
 
                     <Col span={4}>
@@ -360,7 +377,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                         />
                     </Col>
                     <Col span={4}>
-                        
+
                     </Col>
                 </Row>
             </Card>
@@ -390,7 +407,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                                     if (e.target.value) {
                                                         form.setFieldsValue({ nom_ste: "", tva: "" });
                                                     }
-                                                    
+
                                                 }}
                                             >
 
@@ -412,16 +429,12 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                                             ]}
                                         >
                                             <Input
-                                                onChange={(e) => {
-                                                    const values = e.target.value.split(' ');
-                                                    const nom = values.shift();
-                                                    const prenom = values.join(' ');
+                                                onChange={(e) =>
                                                     setFormData({
                                                         ...formData,
-                                                        nom: nom,
-                                                        prenom: prenom,
-                                                    });
-                                                }}
+                                                        nom_prenom: e.target.value,
+                                                    })
+                                                }
                                             />
                                         </Form.Item>
                                     </Col>
