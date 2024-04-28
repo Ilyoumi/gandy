@@ -496,6 +496,8 @@ function MyCalendar() {
                                 <UpdateRdv
                                     initialValues={appointmentDetails}
                                     agendaId={agendaId}
+                            agentId={agentId}
+
                                     onFormSubmit={handleFormSubmitCallback}
                                 />
                             </>

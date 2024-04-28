@@ -12,23 +12,24 @@
   * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useHistory, NavLink } from "react-router-dom";
 import { axiosClient } from "../../api/axios";
+import user from '../../assets/images/user.png'
+import dropdown from '../../assets/images/down-arrow.png'
 
 import {
     Row,
     Col,
     Breadcrumb,
-    Badge,
     Dropdown,
     Button,
     List,
     Avatar,
-    Input,
     Drawer,
     Typography,
     Switch,
+    Menu,
 } from "antd";
 
 import {
@@ -264,10 +265,19 @@ function Header({
     const { Title, Text } = Typography;
 
     const [visible, setVisible] = useState(false);
+    const [profileVisible, setProfileVisible] = useState(false);
     const [sidenavType, setSidenavType] = useState("transparent");
     const { isLogged, username } = useAuth();
-    const [userRole, setUserRole] = useState("");
+    const [setUserRole] = useState("");
     const history = useHistory();
+    const dropdownRef = React.createRef();
+    const [menuWidth, setMenuWidth] = useState(null);
+
+    useEffect(() => {
+        if (dropdownRef.current) {
+            setMenuWidth(dropdownRef.current.offsetWidth);
+        }
+    }, [dropdownRef.current]);
 
     const logoutSubmit = async () => {
         try {
@@ -285,10 +295,31 @@ function Header({
             console.error('Error occurred during logout:', error);
         }
     };
-    
-    
-    
-    
+
+    const handleMenuClick = (e) => {
+        if (e.key === "logout") {
+            logoutSubmit();
+        }
+        setVisible(false);
+    };
+    const menuStyle = {
+        width: menuWidth,
+        position: "absolute",
+        right: '-25px',
+        marginTop: "-2px", // Adjust as needed
+    };
+
+    const menu = (
+        <Menu onClick={handleMenuClick} style={menuStyle} >
+            <Menu.Item key="logout">
+                <LogoutOutlined /> Logout
+            </Menu.Item>
+        </Menu>
+    );
+
+
+
+
     useEffect(() => {
         fetchUserData();
     }, []); // Run only once on component mount
@@ -308,7 +339,7 @@ function Header({
             const { role, name } = response.data;
             console.log('fetchUserData response.data', response.data);
             setUserRole(role);
-            
+
         } catch (error) {
             console.error("Error fetching user data:", error);
         }
@@ -348,7 +379,7 @@ function Header({
                     </div>
                 </Col>
                 <Col span={24} md={18} className="header-control">
-                    <Badge size="small" count={4}>
+                    {/* <Badge size="small" count={4}>
                         <Dropdown overlay={menu} trigger={["click"]}>
                             <a
                                 href="#pablo"
@@ -358,7 +389,7 @@ function Header({
                                 {bell}
                             </a>
                         </Dropdown>
-                    </Badge>
+                    </Badge> */}
 
                     <Button
                         type="link"
@@ -498,33 +529,40 @@ function Header({
                             </div>
                         </div>
                     </Drawer>
-                    {isLogged ? ( // Display username if logged in
-                        <div
-                            style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignContent: "center",
-                                alignItems: "center",
-                                gap: 10,
-                            }}
-                        >
-                            {profile}
-
-                            <span>{username}</span>
-                            <Button
-                                onClick={logoutSubmit}
-                                style={{
-                                    border: "none",
-                                    backgroundColor: "transparent",
-                                    boxShadow: "none",
-                                    padding: 0,
-                                    margin: 0,
-                                }}
+                    {isLogged ? (
+                        <div style={{ backgroundColor: '#219EBA', padding: '0 25px', color: 'white' }} ref={dropdownRef}>
+                            <Dropdown
+                                overlay={menu}
+                                trigger={["click"]}
+                                visible={profileVisible}
+                                onVisibleChange={(flag) => setProfileVisible(flag)}
+                                placement="bottomRight"
                             >
-                                <LogoutOutlined
-                                    style={{ marginRight: "10px" }}
-                                />
-                            </Button>
+                                <Button
+                                    style={{
+                                        border: "none",
+                                        backgroundColor: "transparent",
+                                        boxShadow: "none",
+                                        padding: 0,
+                                        margin: 0,
+                                        display: "flex",
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <img
+                                        src={user}
+                                        alt="User"
+                                        style={{ width: 20, height: 20, marginRight: 10 }}
+                                    />
+                                    <span style={{ color: 'white' }}>{username}</span>
+                                    <img
+                                        src={dropdown}
+                                        alt="dropdown"
+                                        style={{ width: 20, height: 20, marginLeft: 10 }}
+                                    />
+                                    
+                                </Button>
+                            </Dropdown>
                         </div>
                     ) : (
                         <Link to="/sign-in" className="btn-sign-in">

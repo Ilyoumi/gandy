@@ -27,6 +27,16 @@ export const CalendarProvider = ({ children }) => {
     const [selectedContacts, setSelectedContacts] = useState(null);
     const [contactAgendas, setContactAgendas] = useState([]);
 
+    // rdv table state
+    const [rdvLoading, setRdvLoading] = useState(false);
+    const [selectedAgent, setSelectedAgent] = useState(undefined);
+    const [selectedAgenda, setSelectedAgenda] = useState(undefined);
+    const [selectedDateRange, setSelectedDateRange] = useState([]);
+    const [agentOptions, setAgentOptions] = useState([]);
+    const [agendaOptions, setAgendaOptions] = useState([]);
+
+
+
 
 
 
@@ -37,6 +47,12 @@ export const CalendarProvider = ({ children }) => {
     return (
         <CalendarContext.Provider
             value={{
+                rdvLoading, setRdvLoading,
+                selectedAgent, setSelectedAgent,
+                selectedAgenda, setSelectedAgenda,
+                selectedDateRange, setSelectedDateRange,
+                agentOptions, setAgentOptions,
+                agendaOptions, setAgendaOptions,
                 showAddModal,
                 setShowAddModal,
                 appointments,

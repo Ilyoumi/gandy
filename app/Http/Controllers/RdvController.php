@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\rdv;
 use Illuminate\Http\Request;
-use App\Models\Agenda;
-use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -288,7 +287,7 @@ class RdvController extends Controller
             'note' => 'nullable|string',
             'status' => 'nullable|string',
             'pro' => 'required|boolean',
-
+            'modifiedBy'=> 'required|exists:users,id',
         ]);
 
         try {
@@ -316,6 +315,8 @@ class RdvController extends Controller
                     'received_data' => $validatedData // Include received data in the response
                 ], 409); // 409 Conflict status code indicates a conflict with the current state of the resource
             }
+            $validatedData['updatedAt'] = Carbon::now(); // Add current timestamp
+
 
             // Update the Rdv with the validated data
             $rdv->update($validatedData);
