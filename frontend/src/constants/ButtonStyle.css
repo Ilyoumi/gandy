@@ -20,7 +20,8 @@
   background-color: #1A252F!important; /* Custom background color */
   border-color: #1A252F!important; /* Custom border color */
   color: #fff!important; /* Text color */
-  width: 150px!important;
+  min-width: 150px!important;
+	width: auto;
   margin-bottom: 20px!important;
 }
 

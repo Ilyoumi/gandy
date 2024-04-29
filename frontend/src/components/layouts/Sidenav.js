@@ -183,7 +183,7 @@ const Sidenav = ({ color }) => {
             { key: "calendrier", label: "Calendrier", icon: user }
         ],
         "Agent Commercial": [
-            { key: "agent-calendrier", label: "Calendrier", icon: user }
+            { key: "agent-commercial-calendrier", label: "Calendrier", icon: user }
         ]
     };
 

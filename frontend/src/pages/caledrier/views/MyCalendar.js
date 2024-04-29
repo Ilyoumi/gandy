@@ -24,7 +24,6 @@ import {
 	handleEventDrop,
 	handleFormSubmit,
 	handleBlockAppointment,
-
 } from "../services/api";
 import { RollbackOutlined, EditOutlined } from "@ant-design/icons";
 import BlockRdv from "./BlockRdv";
@@ -481,7 +480,6 @@ function MyCalendar() {
 													height="auto"
 												/>
 											)}
-											{/* </Card> */}
 										</div>
 									);
 								})}
@@ -552,20 +550,20 @@ function MyCalendar() {
 						title={
 							<Row justify="space-between" align="middle">
 								<Col>
-										{selectedRowData?.bloquer ? (
-											<p style={{ fontSize: "16px" }}>
-												Modifier rendez-vous : {contactName} - {contactEmail}
-											</p>
-										) : (
-											<p style={{ fontSize: "16px" }}>
-												Détails de rendez-vous : {contactName} - {contactEmail}
-											</p>
-										)}
+									{selectedRowData?.bloquer ? (
+										<p style={{ fontSize: "16px" }}>
+											Modifier rendez-vous : {contactName} - {contactEmail}
+										</p>
+									) : (
+										<p style={{ fontSize: "16px" }}>
+											Détails de rendez-vous : {contactName} - {contactEmail}
+										</p>
+									)}
 
 								</Col>
 								<Col style={{ marginRight: "40px" }}>
 									{(userContext.userRole === "Admin" ||
-										agentId === userContext.userId) &&  !selectedRowData?.bloquer &&(
+										agentId === userContext.userId) && !selectedRowData?.bloquer && (
 											<Button
 												onClick={() => handleUpdateClick(selectedRowData.id)}
 												style={{ marginRight: "10px" }}

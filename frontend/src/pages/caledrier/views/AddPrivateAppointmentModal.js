@@ -1,95 +1,57 @@
-import React, { useEffect, useState } from "react";
-import { Card, Input, Form, Row, Col, ConfigProvider, DatePicker, message, Alert } from "antd";
+import React, { useState } from "react";
+import { DatePicker, Input, Form, ConfigProvider, Card, Row, Col, message, Alert } from "antd";
 import frFR from "antd/lib/locale/fr_FR";
 import moment from "moment";
+import NewButton from "../../../constants/NewButton";
 import { axiosClient } from "../../../api/axios";
-import SaveButton from "../../../constants/SaveButton";
 
-const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
-	const [userId, setUserId] = useState(null);
-	const [loading, setLoading] = useState(false);
-	const [showAlert, setShowAlert] = useState(false);
-
+const AddPrivateAppointmentModal = ({ userId, agendaId, onFormSubmit, selectedDate, }) => {
 
 	const [formData, setFormData] = useState({
 		postal: "",
-		commentaire: "",
-		bloquer: true,
 		appointment_date: selectedDate
 			? [
-				new Date(selectedDate.date),
-				new Date(selectedDate.date.getTime() + 3600000),
+				moment(selectedDate.date).utcOffset("+0100"),
+				moment(selectedDate.date).add(1, "hour").utcOffset("+0100"),
 			]
 			: null,
 	});
-
 	
+	const [loading, setLoading] = useState(false);
+	const [showAlert, setShowAlert] = useState(false);
+
 	const handleClick = () => {
 		setLoading(true);
+		handleFormSubmit();
 		setTimeout(() => {
 			setLoading(false);
 		}, 2000);
 	};
-	const fetchUserData = async () => {
-		try {
-			// Check if the user is logged in
-			const authToken = localStorage.getItem("auth_token");
-			if (!authToken) {
-				// User is not logged in, do nothing
-				console.log("User is not logged in");
-				return;
-			}
-
-			// User is logged in, fetch user data
-			const response = await axiosClient.get("/api/user", {
-				headers: {
-					Authorization: `Bearer ${authToken}`,
-				},
-			});
-			const { id } = response.data;
-			setUserId(id);
-		} catch (error) {
-			console.error("Error fetching user data:", error);
-		}
-	};
-	useEffect(() => {
-		fetchUserData();
-	}, []);
-
-
-
-
-	const handleBloquerRdv = async () => {
+	const handleFormSubmit = async () => {
 		setLoading(true);
 		console.log("Received selectedDate from parent component:", selectedDate);
+		console.log("formData.appointment_date:", formData.appointment_date);
 		if (formData.appointment_date === null) {
 			console.log("Appointment date is null");
 			setLoading(false);
 			return;
 	}
-		console.log("Start Date formData:", formData.appointment_date[0]);
-		console.log("End Date formData:", formData.appointment_date[1]);
 		let startDate, endDate;
 
 		if (!formData.appointment_date) {
-						// Use the default selected date from the calendar if an appointment date is not selected
-						startDate = selectedDate.date;
-						endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+			startDate = selectedDate.date.toDate();
+			endDate = startDate.getTime() + 60 * 60 * 1000;
+			endDate = new Date(endDate);
 		} else {
-						startDate = formData.appointment_date[0];
-						endDate = formData.appointment_date[1];
+			startDate = formData.appointment_date[0].toDate();
+			endDate = formData.appointment_date[1].toDate();
 		}
-
-		console.log("Start Date before formatting:", startDate);
-		console.log("End Date before formatting:", endDate);
 
 		// Check if startDate is a Date object
 		if (startDate instanceof Date || !isNaN(startDate.getTime())) {
 						const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
 						const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
-
-						console.log("Start Date after formatting:", startDateFormatted.toISOString().slice(0, 19).replace("T", " "));
-						console.log("End Date after formatting:", endDateFormatted.toISOString().slice(0, 19).replace("T", " "));
+						
 
 						try {
 										const formDataToSend = {
@@ -102,7 +64,7 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 										console.log("Sending form data:", formDataToSend);
 
 										// Make the HTTP request to bloquer-rdv endpoint
-										const response = await axiosClient.post("api/rdvs/bloquer-rdv", formDataToSend);
+										const response = await axiosClient.post("api/rdvs/add-rdv-prv", formDataToSend);
 										const newAppointment = {
 														...response.data,
 														id: response.data.id,
@@ -112,12 +74,7 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 										console.log("Response block:", response.data);
 										message.success("Rendez-vous bloqué avec succès !");
 										setShowAlert(false);
-										setFormData({
-											postal: "",
-											commentaire: "",
-											bloquer: true,
-											appointment_date: null,
-							});
+										
 
 						} catch (error) {
 										if (error.response && error.response.status === 409) {
@@ -142,12 +99,9 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 
 	return (
 
-		<Form
-			initialValues={{ bloquer: true }}
-			onFinish={handleBloquerRdv}
-
-		>
-			{showAlert && (
+			
+			<Form layout="vertical" onFinish={handleFormSubmit} >
+				{showAlert && (
 				<Alert
 					message="La date sélectionnée est déjà réservée."
 					type="warning"
@@ -156,13 +110,10 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 					onClose={() => setShowAlert(false)}
 				/>
 			)}
-			<Card>
+			<Card style={{ marginTop: "40px" }}>
 				<Row gutter={[16, 16]} style={{ marginBottom: "40px" }}>
-					<Col span={16}>
-
+					<Col span={24}>
 						<ConfigProvider locale={frFR}>
-					<p><span style={{ color: 'red' }}>* </span> Choisir la date :</p>
-
 							<DatePicker.RangePicker
 								rules={[
 									{
@@ -198,75 +149,56 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 								}}
 								format="YYYY-MM-DD HH:mm"
 								onChange={(dates) => {
-									console.log("Selected dates in range picker:", dates);
-									if (dates && dates.length === 2) {
-										setFormData({
-											...formData,
-											appointment_date: dates,
-										});
-									} else {
-										setFormData({
-											...formData,
-											appointment_date: null,
-										});
-									}
+									console.log("Selected dates:", dates);
+  if (dates && dates.length === 2) {
+    setFormData({
+      ...formData,
+      appointment_date: dates,
+    });
+  } else {
+    setFormData({
+      ...formData,
+      appointment_date: null,
+    });
+  }
 								}}
 							/>
 						</ConfigProvider>
-					</Col>
 
-					<Col span={6}>
-						<SaveButton
-							onClick={handleClick}
-							loading={loading}
-							buttonText="Bloquer"
-						/>
 					</Col>
-				</Row>
-				<Row gutter={[16, 16]}>
 					<Col span={24}>
-						<p><span style={{ color: 'red' }}>* </span> Entrez le code postal :</p>
+					<p><span style={{ color: 'red' }}>* </span> Entrez le code postal :</p>
+
 						<Form.Item name="postal" rules={[{ required: true, message: 'Veuillez entrer le code postal' }]}>
 							<Input
 								placeholder="Code Postal"
 								onChange={(e) => {
 									const { value } = e.target;
 									setFormData({
-											...formData,
-											postal: value,
+										...formData,
+										postal: value,
 									});
-							}}
+								}}
 							/>
 						</Form.Item>
+
 					</Col>
-				</Row>
-				<Row gutter={[16, 16]}>
-					<Col span={24}>
-						<p style={{ marginTop: "10px" }}><span style={{ color: 'red' }}>* </span> Ajoutez un commentaire :</p>
-						<Form.Item name="commentaire" rules={[{ required: true, message: 'Veuillez entrer le code postal' }]}>
-							<Input.TextArea
-								rows={4}
-								placeholder="Commentaire"
-								onChange={(e) => {
-									const { value } = e.target;
-									setFormData({
-													...formData,
-													commentaire: value, 
-									});
-					}}
-							/>
-						</Form.Item>
+					<Col span={8} offset={15}>
+						<NewButton
+							onClick={handleClick}
+							loading={loading}
+							buttonText="Ajouter"
+						/>
 					</Col>
+					
+
+
 				</Row>
-
-
-
 
 
 			</Card>
 		</Form>
-
 	);
 };
 
-export default BlockRdv;
+export default AddPrivateAppointmentModal;
