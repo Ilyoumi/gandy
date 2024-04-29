@@ -368,7 +368,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit,agentId }) => {
                     <Col span={4}>
                         <SaveButton
                             loading={loadingEnregistrer}
-                            buttonText="Enregistrer"
+                            buttonText="Modifier"
                         />
                     </Col>
                     <Col span={4}>

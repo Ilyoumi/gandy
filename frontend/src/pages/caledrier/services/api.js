@@ -3,6 +3,21 @@
 import { axiosClient } from "../../../api/axios";
 import { fullCalendarConfig } from "../services/calendarConfig";
 
+export const handleDeleteAppointment = (appointmentId, appointments, setAppointments, setShowUpdateModal) => {
+	try {
+			// Update the appointments state to remove the appointment
+			const updatedAppointments = appointments.filter(
+					(appointment) => appointment.id !== appointmentId
+			);
+			setAppointments(updatedAppointments);
+			// Close the update modal
+			setShowUpdateModal(false);
+	} catch (error) {
+			console.error("Error deleting appointment:", error);
+	}
+};
+
+
 // Fetches the agenda for the logged-in user (agent) and sets agenda ID and appointments
 export const fetchAgentAgenda = async (
     userContext,

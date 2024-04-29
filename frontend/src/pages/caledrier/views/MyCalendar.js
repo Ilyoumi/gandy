@@ -24,6 +24,7 @@ import {
 	handleEventDrop,
 	handleFormSubmit,
 	handleBlockAppointment,
+
 } from "../services/api";
 import { RollbackOutlined, EditOutlined } from "@ant-design/icons";
 import BlockRdv from "./BlockRdv";
@@ -72,7 +73,18 @@ function MyCalendar() {
 	const [selectedAppointmentDate, setSelectedAppointmentDate] =
 		useState(null);
 	const [showBlockModal, setShowBlockModal] = useState(false);
-	const [loadingAnnuler, setLoadingAnnuler] = useState(false);
+	const [deletedAppointmentIds, setDeletedAppointmentIds] = useState([]);
+
+	useEffect(() => {
+		// Load deleted appointment IDs from storage on component mount
+		const storedDeletedIds = JSON.parse(localStorage.getItem("deletedAppointmentIds")) || [];
+		setDeletedAppointmentIds(storedDeletedIds);
+	}, []);
+
+	useEffect(() => {
+		// Save deleted appointment IDs to storage whenever it changes
+		localStorage.setItem("deletedAppointmentIds", JSON.stringify(deletedAppointmentIds));
+	}, [deletedAppointmentIds]);
 
 
 
@@ -275,16 +287,30 @@ function MyCalendar() {
 	};
 
 
-	const handleDeleteClick = () => {
-		try{
-			setLoadingAnnuler(true);
+	const handleDeleteClick = (appointmentId) => {
+		try {
+			console.log("Deleting appointment with ID:", appointmentId);
 
-		}catch{
-			setLoadingAnnuler(false);
+			// Update the appointments state to remove the appointment
+			const updatedAppointments = appointments.filter(
+				(appointment) => appointment.id !== appointmentId
+			);
+			setAppointments(updatedAppointments);
 
+			// Add the deleted appointment ID to the list
+			setDeletedAppointmentIds((prevIds) => [...prevIds, appointmentId]);
+
+			// Close the details modal
+			setShowDetailModal(false);
+		} catch (error) {
+			console.error("Error deleting appointment:", error);
 		}
-		
 	};
+
+	const filteredAppointments = appointments.filter(
+		(appointment) => !deletedAppointmentIds.includes(appointment.id)
+	);
+
 
 	return (
 		<div
@@ -373,14 +399,14 @@ function MyCalendar() {
 													eventContent={(arg) => {
 														let content = "";
 
-														if (arg.event.extendedProps.bloquer) {
+														if (arg.event.extendedProps && arg.event.extendedProps.bloquer) {
 															// Display remaining time in French
 															content = `Bloqué / ${arg.event.title}`;
 
 															return (
 																<div>
 																	<CountdownTimer onTimerFinish={() => handleDeleteAppointment(arg.event.id)} />
-																	<div >
+																	<div>
 																		{content}
 																	</div>
 																</div>
@@ -388,12 +414,13 @@ function MyCalendar() {
 														} else {
 															content = `${arg.event.title} / ${arg.event.extendedProps.status}`;
 															return (
-																<div >
+																<div>
 																	{content}
 																</div>
 															);
 														}
 													}}
+
 													dayCellContent={dayCellContent}
 
 
@@ -419,7 +446,7 @@ function MyCalendar() {
 															info.event
 														)
 													}
-													events={appointments
+													events={filteredAppointments
 														.filter(
 															(appointment) =>
 																appointment.agendaId ===
@@ -525,13 +552,20 @@ function MyCalendar() {
 						title={
 							<Row justify="space-between" align="middle">
 								<Col>
-									<p style={{
-										fontSize: "16px"
-									}} >Détails de rendez-vous : {contactName} - {contactEmail}</p>
+										{selectedRowData?.bloquer ? (
+											<p style={{ fontSize: "16px" }}>
+												Modifier rendez-vous : {contactName} - {contactEmail}
+											</p>
+										) : (
+											<p style={{ fontSize: "16px" }}>
+												Détails de rendez-vous : {contactName} - {contactEmail}
+											</p>
+										)}
+
 								</Col>
 								<Col style={{ marginRight: "40px" }}>
 									{(userContext.userRole === "Admin" ||
-										agentId === userContext.userId) && (
+										agentId === userContext.userId) &&  !selectedRowData?.bloquer &&(
 											<Button
 												onClick={() => handleUpdateClick(selectedRowData.id)}
 												style={{ marginRight: "10px" }}
@@ -539,27 +573,36 @@ function MyCalendar() {
 												Modifier <EditOutlined />
 											</Button>
 										)}
-									{userContext.userRole === "Admin" && (
+									{userContext.userRole === "Admin" && selectedRowData && !selectedRowData.bloquer && (
 										<SupprimerButton
-											loading={loadingAnnuler}
 											buttonText="Annuler"
-											onClick={handleDeleteClick}
-
-
+											onClick={() => handleDeleteClick(selectedRowData.id)}
 											danger
 										/>
-
 									)}
 								</Col>
 							</Row>
 						}
 					>
 						{showDetailsModal && selectedRowData && (
-							<AppointmentDetails
-								selectedRowData={selectedRowData}
-							/>
+							<>
+								{!selectedRowData.bloquer && (
+									<AppointmentDetails
+										selectedRowData={selectedRowData}
+									/>
+								)}
+								{selectedRowData.bloquer && (
+									<UpdateRdv
+										initialValues={selectedRowData}
+										agendaId={agendaId}
+										agentId={agentId}
+										onFormSubmit={handleFormSubmitCallback}
+									/>
+								)}
+							</>
 						)}
 					</Modal>
+
 					<Modal
 						open={showBlockModal}
 						title="Bloquer Créneaux"
