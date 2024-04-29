@@ -169,6 +169,18 @@ const DataTable = () => {
                 return highlightText(formattedDate);
             },
         },
+				{
+					title: "Total par jour",
+					dataIndex: "totalPerDay",
+					key: "totalPerDay",
+					width: "15%",
+			},
+			{
+					title: "Total par semaine",
+					dataIndex: "totalPerWeek",
+					key: "totalPerWeek",
+					width: "15%",
+			},
 
         {
             title: "Action",
@@ -214,27 +226,56 @@ const DataTable = () => {
     };
 
 
-
+		const calculateTotalPerDay = (date) => {
+			if (!date) return 0;
+			const currentDate = new Date(date);
+			const totalPerDay = tableData.filter(item => {
+					const itemDate = new Date(item.start_date);
+					return itemDate.getDate() === currentDate.getDate() &&
+							itemDate.getMonth() === currentDate.getMonth() &&
+							itemDate.getFullYear() === currentDate.getFullYear();
+			}).length;
+			return totalPerDay;
+	};
+	
+	const calculateTotalPerWeek = (date) => {
+			if (!date) return 0;
+			const currentDate = new Date(date);
+			const weekStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
+			const weekEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay() + 6);
+			const totalPerWeek = tableData.filter(item => {
+					const itemDate = new Date(item.start_date);
+					return itemDate >= weekStart && itemDate <= weekEnd;
+			}).length;
+			return totalPerWeek;
+	};
 
     const filteredTableData = searchText
-        ? tableData.filter(item =>
-            searchText
-                .toLowerCase()
-                .split(' ')
-                .every(word =>
-                    Object.values(item).some(value => {
-                        if (!value) return false;
-                        const lowerCaseValue = typeof value === "string" ? value.toLowerCase() : value.toLocaleString().toLowerCase();
-                        const trimmedWord = word.trim();
-                        const wordParts = trimmedWord.split('/');
-                        const includesWord = lowerCaseValue.includes(trimmedWord);
-                        const includesWordWithSlash = lowerCaseValue.includes(wordParts[0]);
-                        const includesWordWithAnotherValue = wordParts.length > 1 && lowerCaseValue.includes(wordParts[1]);
-                        return includesWord || includesWordWithSlash || includesWordWithAnotherValue;
-                    })
-                )
-        )
-        : tableData;
+    ? tableData.filter(item =>
+        searchText
+            .toLowerCase()
+            .split(' ')
+            .every(word =>
+                Object.values(item).some(value => {
+                    if (!value) return false;
+                    const lowerCaseValue = typeof value === "string" ? value.toLowerCase() : value.toLocaleString().toLowerCase();
+                    const trimmedWord = word.trim();
+                    const wordParts = trimmedWord.split('/');
+                    const includesWord = lowerCaseValue.includes(trimmedWord);
+                    const includesWordWithSlash = lowerCaseValue.includes(wordParts[0]);
+                    const includesWordWithAnotherValue = wordParts.length > 1 && lowerCaseValue.includes(wordParts[1]);
+                    return includesWord || includesWordWithSlash || includesWordWithAnotherValue;
+                })
+            )
+    )
+    : tableData.map(item => ({
+        ...item,
+        totalPerDay: calculateTotalPerDay(item.start_date),
+        totalPerWeek: calculateTotalPerWeek(item.start_date),
+    }));
+
+
+
 
 
 
@@ -298,6 +339,7 @@ const DataTable = () => {
                 dataSource={filteredTableData}
                 loading={rdvLoading}
                 pagination={{ pageSize: 5 }}
+								scroll={{ x: true }}
 
             />
             <Modal
