@@ -202,6 +202,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit,agentId }) => {
             tarification: formData.tarif ? "Variable" : "Fixe",
             status: status,
             bloquer: false,
+            modifiedBy: userId
 
         };
 
@@ -254,6 +255,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit,agentId }) => {
                     ...initialValues,
                     status: "annuler",
                     bloquer: false,
+                    modifiedBy: userId
                 }
             );
             console.log("Form submission successful. Response:", response.data);

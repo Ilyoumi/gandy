@@ -55,6 +55,7 @@ Route::post('/rdvs/bloquer-rdv', [RdvController::class, 'bloquerRdv']);
 
 Route::post('/rdvs', [RdvController::class, 'store']);
 Route::get('/rdvs', [RdvController::class, 'index']);
+Route::get('/rdvs/stats', [RdvController::class, 'getAppointmentStatisticsByMonth']);
 Route::put('/rdvs/{id}', [RdvController::class, 'update']);
 Route::delete('/rdvs/{id}', [RdvController::class, 'destroy']);
 Route::get('/rdvs/{id}', [RdvController::class, 'show']);

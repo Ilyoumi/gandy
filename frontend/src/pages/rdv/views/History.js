@@ -37,15 +37,11 @@ const History = () => {
         }
     }, [filtersChanged]);
 
-    
-
-
     const columns = [
         {
             title: "Client",
             dataIndex: "client",
             key: "client",
-            width: "25%",
             render: (_, record) => (
                 <span>
                     {record.nom}
@@ -58,7 +54,6 @@ const History = () => {
             title: "Agent",
             dataIndex: "agent",
             key: "agent",
-            width: "15%",
             render: (_, record) => (
                 <span>
                     {record.agent ? (record.agent.nom) : "N/A"}
@@ -71,7 +66,6 @@ const History = () => {
             title: "Agent Commercial",
             dataIndex: "agentCommercial",
             key: "agentCommercial",
-            width: "20%",
             render: (_, record) => (
                 <span>
                     {record.agentCommercial ? (record.agentCommercial.nom) : "N/A"}
@@ -80,13 +74,10 @@ const History = () => {
                 </span>
             ),
         },
-
-
         {
             title: "Date",
             dataIndex: "start_date",
             key: "start_date",
-            width: "20%",
             render: (text) => {
                 const formattedDate = text ? new Date(text).toLocaleString() : "-";
                 return (formattedDate);
@@ -105,13 +96,17 @@ const History = () => {
         {
             title: "Modifié par",
             dataIndex: "modifiedBy",
+            render: (text, record) => {
+                if (record.modifiedBy) {
+                    return record.modifiedBy;
+                } else {
+                    return "N/A";
+                }
+            },
         },
     ];
 
-
-
     return (
-
         <div style={{ overflowX: "auto" }}>
             <Card style={{ marginBottom: "20px" }}>
                 <Row>
@@ -161,13 +156,8 @@ const History = () => {
                         />
                     </Col>
                 </Row>
-
-
-
-
             </Card>
-            <Table columns={columns} dataSource={tableData} loading={rdvLoading}
-                pagination={{ pageSize: 5 }} />
+            <Table columns={columns} dataSource={tableData} loading={rdvLoading} pagination={{ pageSize: 5 }} />
         </div>
     );
 };

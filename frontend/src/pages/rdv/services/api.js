@@ -1,19 +1,17 @@
 import { message } from "antd";
 import { axiosClient } from "../../../api/axios";
 
-export const fetchRdvData = async (selectedAgent,selectedAgenda,selectedDateRange,setTableData, setRdvLoading,) => {
+export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRange, setTableData, setRdvLoading) => {
 	setRdvLoading(true);
 	try {
 					const queryParams = {};
 					if (selectedAgent) {
 									queryParams.agent_id = selectedAgent;
-									console.log("selectedAgent", selectedAgent)
-
+									console.log("selectedAgent", selectedAgent);
 					}
 					if (selectedAgenda) {
 									queryParams.agenda_id = selectedAgenda;
-									console.log("selectedAgenda", selectedAgenda)
-
+									console.log("selectedAgenda", selectedAgenda);
 					}
 					if (selectedDateRange.length === 1) {
 									const startDate = selectedDateRange[0].startOf('day').toISOString();
@@ -26,8 +24,6 @@ export const fetchRdvData = async (selectedAgent,selectedAgenda,selectedDateRang
 									queryParams.start_date = startDate;
 									queryParams.end_date = endDate;
 					}
-
-					console.log("query", queryParams)
 
 					const response = await axiosClient.get("/api/rdvs", {
 									params: queryParams,
@@ -53,12 +49,9 @@ export const fetchRdvData = async (selectedAgent,selectedAgenda,selectedDateRang
 					const agentCommercialPromises = uniqueAgendaIds.map(async (agendaId) => {
 									try {
 													const agendaResponse = await axiosClient.get(`/api/agendas/${agendaId}`);
-													console.log("agenda det", agendaResponse.data)
 													const contactId = agendaResponse.data.agenda.contact_id;
 													try {
 																	const contactResponse = await axiosClient.get(`/api/users/${contactId}`);
-																	console.log("comm det", contactResponse.data)
-
 																	return contactResponse.data;
 													} catch (error) {
 																	console.error("Error fetching agent commercial details:", error);
@@ -71,22 +64,44 @@ export const fetchRdvData = async (selectedAgent,selectedAgenda,selectedDateRang
 					});
 					const agentCommercials = await Promise.all(agentCommercialPromises);
 
+					const modifiedByUserIds = appointments.map(appointment => appointment.modifiedBy);
+					const uniqueModifiedByUserIds = [...new Set(modifiedByUserIds)];
+					const modifiedByUserPromises = uniqueModifiedByUserIds
+    .filter(userId => userId !== null) 
+    .map(async (userId) => {
+        try {
+            const userResponse = await axiosClient.get(`/api/users/${userId}`);
+            return userResponse.data;
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+            throw error;
+        }
+    });
+
+					const modifiedByUsers = await Promise.all(modifiedByUserPromises);
+
 					const appointmentsWithAgentsAndCommercials = appointments.map(appointment => {
 									const agent = agents.find(agent => agent.id === appointment.id_agent);
 									const agentCommercial = agentCommercials.find(contact => contact.id === appointment.id_agenda);
-									return { ...appointment, agent, agentCommercial };
+									const modifiedByUser = modifiedByUsers.find(user => user.id === appointment.modifiedBy);
+
+									return {
+													...appointment,
+													agent,
+													agentCommercial,
+													modifiedBy: modifiedByUser ? `${modifiedByUser.nom} ${modifiedByUser.prenom}` : "N/A"
+									};
 					});
 
-					console.log("Filtered Appointments:", appointmentsWithAgentsAndCommercials);
 
 					setTableData(appointmentsWithAgentsAndCommercials);
 	} catch (error) {
 					console.error("Error fetching appointments:", error);
-					message.error("Failed to fetch appointments");
 	} finally {
-		setRdvLoading(false);
+					setRdvLoading(false);
 	}
 };
+
 
 export const fetchAgentOptions = async (setAgentOptions) => {
 	try {

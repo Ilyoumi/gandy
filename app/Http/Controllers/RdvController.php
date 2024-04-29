@@ -66,6 +66,41 @@ class RdvController extends Controller
     }
 
 
+    public function getAppointmentStatisticsByMonth(Request $request)
+    {
+        try {
+            $statistics = [];
+    
+            $currentMonth = Carbon::now()->month;
+            $currentYear = Carbon::now()->year;
+    
+            $firstDayOfMonth = Carbon::create($currentYear, $currentMonth, 1)->startOfDay();
+            $lastDayOfMonth = Carbon::create($currentYear, $currentMonth, 1)->endOfMonth();
+    
+            $appointments = Rdv::whereBetween('start_date', [$firstDayOfMonth, $lastDayOfMonth])->get();
+            
+            $annulerCount = $appointments->where('status', 'annuler')->count();
+            $confirmerCount = $appointments->where('status', 'confirmer')->count();
+            $nrpCount = $appointments->where('status', 'NRP')->count();
+            $totalCount = $appointments->count();
+            
+            $statistics[] = [
+                'month' => $firstDayOfMonth->format('F Y'),
+                'annuler_count' => $annulerCount,
+                'confirmer_count' => $confirmerCount,
+                'nrp_count' => $nrpCount,
+                'total_appointments' => $totalCount,
+            ];
+    
+            return response()->json($statistics);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred while fetching appointment statistics.'], 500);
+        }
+    }
+    
+
+
+
 
 
 
