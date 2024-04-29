@@ -6,6 +6,8 @@ import { pencil, deletebtn } from "../../../constants/icons";
 import { useHistory } from "react-router-dom";
 import { axiosClient } from "../../../api/axios";
 import SearchInput from "../../../constants/SearchInput";
+import { UserAddOutlined } from "@ant-design/icons";
+
 
 const DisplayUsers = () => {
     const [users, setUsers] = useState([]);
@@ -222,6 +224,7 @@ const DisplayUsers = () => {
                             onClick={handleButtonClick}
                         >
                             Nouveau utilisateur
+																												<UserAddOutlined />
                         </Button>
                     </Col>
                 </Row>

@@ -5,7 +5,7 @@ import UpdateContactModal from "./UpdateContact";
 import { axiosClient } from "../../../api/axios";
 import { pencil, deletebtn } from "../../../constants/icons";
 import useColumnSearch from "../../../constants/tableSearchLogin";
-import { EyeOutlined } from "@ant-design/icons";
+import { EyeOutlined,UserAddOutlined } from "@ant-design/icons";
 
 const Contacts = () => {
     const [visible, setVisible] = useState(false);
@@ -163,6 +163,7 @@ const Contacts = () => {
                         }}
                     >
                         Ajouter Utilisateur
+																								
                     </Col>
                     <Col span={12} style={{ textAlign: "right" }}>
                         <Button
@@ -171,6 +172,8 @@ const Contacts = () => {
                             onClick={handleButtonClick}
                         >
                             Ajouter utilisateur
+																												<UserAddOutlined />
+
                         </Button>
                     </Col>
                 </Row>
