@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
-const CountdownTimer = ({ onTimerFinish } ) => {
-  const initialMinutes = parseInt(localStorage.getItem("timerMinutes")) || 1; 
+const CountdownTimer = ({ appointmentId,onDelete  } ) => {
+  const initialMinutes = parseInt(localStorage.getItem(`timerMinutes_${appointmentId}`)) || 1; 
   const [minutes, setMinutes] = useState(initialMinutes);
   const [seconds, setSeconds] = useState(0);
   const [isFlashing, setIsFlashing] = useState(false); 
@@ -12,7 +12,7 @@ const CountdownTimer = ({ onTimerFinish } ) => {
         if (minutes === 0) {
           clearInterval(intervalId);
 										if (typeof onTimerFinish === 'function') {
-											onTimerFinish(); 
+											onDelete(); 
 									}else{
 										console.log("typeof onTimerFinish", typeof onTimerFinish)
 									}
@@ -28,7 +28,7 @@ const CountdownTimer = ({ onTimerFinish } ) => {
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [minutes, seconds,onTimerFinish]);
+  }, [minutes, seconds,onDelete,appointmentId])
 
   useEffect(() => {
     localStorage.setItem("timerMinutes", minutes.toString());

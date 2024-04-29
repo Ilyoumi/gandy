@@ -397,6 +397,8 @@ function MyCalendar() {
 													)}
 													eventContent={(arg) => {
 														let content = "";
+														const appointment = arg.event.extendedProps;
+														console.log("89859", appointment)
 
 														if (arg.event.extendedProps && arg.event.extendedProps.bloquer) {
 															// Display remaining time in French
@@ -404,7 +406,7 @@ function MyCalendar() {
 
 															return (
 																<div>
-																	<CountdownTimer onTimerFinish={() => handleDeleteAppointment(arg.event.id)} />
+																	<CountdownTimer appointmentId={appointment.id} onDelete={() => handleDeleteAppointment(appointment.id)} />
 																	<div>
 																		{content}
 																	</div>
