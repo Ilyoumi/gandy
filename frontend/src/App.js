@@ -17,6 +17,7 @@ import Agenda from "./pages/caledrier/views/DisplayAgenda";
 import HomeCompanies from "./pages/home/HomeCompanies";
 import DisplayUsers from "./pages/user/views/DisplayUsers";
 import MyCalendar from "./pages/caledrier/views/MyCalendar";
+import AgentCommercialCal from './pages/caledrier/views/AgentCommercialCal'
 import { CalendarProvider } from "./CalendarContext";
 import { UserProvider } from "./GlobalContext";
 import NotAuthorizedPage from "./pages/NotAuthorizedPage";
@@ -50,13 +51,15 @@ function App() {
                     <Main>
                       <PrivateRoute exact path="/dashboard" component={Home} allowedRoles={["Admin"]}  />
                       <Route exact path="/calendrier" component={MyCalendar} />
+                      <Route exact path="/agent-commercial-calendrier" component={AgentCommercialCal} />
                       <PrivateRoute exact path="/rdv" component={Tables} allowedRoles={["Admin", "Superviseur"]} />
                       <PrivateRoute exact path="/history" component={History} allowedRoles={["Admin"]} />
                       <PrivateRoute exact path="/contact" component={Contacts} allowedRoles={["Admin", "Superviseur"]} />
                       <PrivateRoute exact path="/agenda" component={Agenda} allowedRoles={["Admin", "Superviseur"]} />
                       <PrivateRoute exact path="/creer-utilisateur" component={AddUserForm} allowedRoles={["Admin", "Superviseur"]} />
                       <PrivateRoute exact path="/utilisateurs" component={DisplayUsers} allowedRoles={["Admin", "Superviseur"]} />
-                      <PrivateRoute exact path="/agent-calendrier" component={DisplayUsers} allowedRoles={["Admin", "Superviseur", "Agent Commercial"]} />
+                      <PrivateRoute exact path="/agent-calendrier" component={DisplayUsers} allowedRoles={["Admin", "Superviseur", ]} />
+
                       {/* <Redirect from="*" to="/calendrier" /> */}
                     </Main>
                   </Switch>

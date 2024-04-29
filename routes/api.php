@@ -52,10 +52,12 @@ Route::post('/calendars', [CalendarController::class, 'store']);
 
 // Routes pour les rendez-vous (RDVs)
 Route::post('/rdvs/bloquer-rdv', [RdvController::class, 'bloquerRdv']);
+Route::post('/rdvs/add-rdv-prv', [RdvController::class, 'addRdvPrv']);
 
 Route::post('/rdvs', [RdvController::class, 'store']);
 Route::get('/rdvs', [RdvController::class, 'index']);
 Route::get('/rdvs/stats', [RdvController::class, 'getAppointmentStatisticsByMonth']);
+Route::get('/users/{userId}/agenda-with-appointments', [RdvController::class, 'getUserAgendaWithAppointments']);
 Route::put('/rdvs/{id}', [RdvController::class, 'update']);
 Route::delete('/rdvs/{id}', [RdvController::class, 'destroy']);
 Route::get('/rdvs/{id}', [RdvController::class, 'show']);

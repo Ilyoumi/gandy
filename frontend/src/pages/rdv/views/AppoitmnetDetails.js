@@ -7,7 +7,7 @@ import { axiosClient } from "../../../api/axios";
 const { Text } = Typography;
 
 const AppointmentDetails = ({ selectedRowData }) => {
-    const { start_date, end_date, note, commentaire, nom, prenom, pro, status, nom_ste, tva, tel, gsm, adresse, postal, fournisseur, nbr_comp_elect, nbr_comp_gaz, ppv, tarif, tarification, haute_tension } = selectedRowData;
+    const { start_date,note, commentaire, nom, prenom, pro, status, nom_ste, tva, tel, gsm, adresse, postal, fournisseur, nbr_comp_elect, nbr_comp_gaz, ppv, tarif, tarification, haute_tension } = selectedRowData;
     const [agentName, setAgentName] = useState("N/A");
     const [cardHeight, setCardHeight] = useState("auto");
 
@@ -17,11 +17,11 @@ const AppointmentDetails = ({ selectedRowData }) => {
 
     useEffect(() => {
         fetchAgentName();
-        updateCardHeight(); // Calculate initial card heights
+        updateCardHeight(); 
     }, []);
 
     useEffect(() => {
-        updateCardHeight(); // Recalculate card heights when data changes
+        updateCardHeight(); 
     }, [selectedRowData]);
 
     const fetchAgentName = async () => {
@@ -110,16 +110,22 @@ const AppointmentDetails = ({ selectedRowData }) => {
                         </Row>
                         <Row>
                         <Col span={12}>
-                                <p><strong>Code postal:</strong> {agentName}</p>
+                                <p><strong>Code postal:</strong> {postal}</p>
                             </Col>
+														{pro && (
                             <Col span={12}>
                                 <p><strong>Société:</strong> {nom_ste}</p>
                             </Col>
+														)}
                         </Row>
                         <Row>
+												{pro && (
+
                             <Col span={12}>
                                 <p><strong>TVA:</strong>BE0{tva}</p>
                             </Col>
+															)}
+													
                             <Col span={12}>
                             <p><strong>Agent:</strong> {agentName}</p>
                             </Col>
@@ -136,7 +142,7 @@ const AppointmentDetails = ({ selectedRowData }) => {
                         </Row>
                         <Row>
                             <Col span={24}>
-                                <p><strong>Nombre de compteur électronique:</strong> {nbr_comp_elect}</p>
+                                <p><strong>Nombre de compteur électrique:</strong> {nbr_comp_elect}</p>
                             </Col>
                             <Col span={24}>
                                 <p><strong>Nombre de compteur gaz:</strong> {nbr_comp_gaz}</p>
