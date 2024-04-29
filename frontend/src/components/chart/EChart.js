@@ -19,20 +19,20 @@ function EChart() {
 
   const items = [
     {
-      Title: "3,6K",
-      user: "Users",
+      Title: "31",
+      user: "Clients",
     },
     {
-      Title: "2m",
-      user: "Clicks",
+      Title: "6",
+      user: "Annuler",
     },
     {
-      Title: "$772",
-      user: "Sales",
+      Title: "3",
+      user: "Confirmer",
     },
     {
-      Title: "82",
-      user: "Items",
+      Title: "0",
+      user: "NRP",
     },
   ];
 

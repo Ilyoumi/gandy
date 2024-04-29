@@ -19,7 +19,7 @@ import { axiosClient } from "../../../api/axios";
 import SupprimerButton from "../../../constants/SupprimerButton";
 const { Option } = Select;
 
-const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
+const UpdateRdv = ({ initialValues, agendaId, onFormSubmit,agentId }) => {
     const [form] = Form.useForm();
     const [loadingValidation, setLoadingValidation] = useState(false);
     const [loadingAnnuler, setLoadingAnnuler] = useState(false);
@@ -107,7 +107,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         setLoadingEnregistrer(true);
         let startDate, endDate;
 
-        // Check if formData and formData.appointment_date are defined
         if (formData && formData.appointment_date && formData.appointment_date.length === 2) {
             // If new dates are selected, use them
             startDate = new Date(formData.appointment_date[0]);
@@ -121,7 +120,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         console.log("Start Date selected:", startDate);
         console.log("End Date selected:", endDate);
 
-        // Add a check to ensure formData.appointment_date is defined
         console.log("Start Date initial value:", formData.appointment_date ? formData.appointment_date[0] : 'Not provided');
         console.log("End Date initial value:", formData.appointment_date ? formData.appointment_date[1] : 'Not provided');
 
@@ -129,7 +127,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
         const [nom, prenom] = formData.nom_prenom ? formData.nom_prenom.split(' ') : ['', ''];
 
-        // Convert dates to UTC format before sending
         const formDataToSend = {
             ...formData,
             nom: nom,
@@ -137,11 +134,12 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             bloquer: false,
             start_date: startDateFormatted.toISOString().slice(0, 19).replace("T", " "),
             end_date: endDateFormatted.toISOString().slice(0, 19).replace("T", " "),
-            id_agent: userId,
+            id_agent: agentId,
             id_agenda: agendaId,
             tarification: formData.tarif ? "Variable" : "Fixe",
             note: formData.note,
             commentaire: formData.commentaire,
+            modifiedBy: userId
 
         };
 
@@ -180,13 +178,10 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         setLoadingValidation(true);
         let startDate, endDate;
 
-        // Check if formData and formData.appointment_date are defined
         if (formData && formData.appointment_date && formData.appointment_date.length === 2) {
-            // If new dates are selected, use them
             startDate = new Date(formData.appointment_date[0]);
             endDate = new Date(formData.appointment_date[1]);
         } else {
-            // Otherwise, use initial values
             startDate = new Date(initialValues.start_date);
             endDate = new Date(initialValues.end_date);
         }
@@ -207,6 +202,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             tarification: formData.tarif ? "Variable" : "Fixe",
             status: status,
             bloquer: false,
+            modifiedBy: userId
 
         };
 
@@ -233,14 +229,12 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
         } catch (error) {
             setLoadingValidation(false);
             console.error("Error validating appointment:", error);
-            // Handle error if needed
         }
     };
 
     const handleAnnuler = async () => {
         setLoadingAnnuler(true);
         try {
-            // First, delete the appointment
             await axiosClient.delete(`/api/rdvs/${initialValues.id}`);
             setLoadingAnnuler(false);
         } catch (error) {
@@ -252,7 +246,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             }
             return;
         }
-    
+
         try {
             // Then, update the appointment status to "annuler"
             const response = await axiosClient.put(
@@ -261,6 +255,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                     ...initialValues,
                     status: "annuler",
                     bloquer: false,
+                    modifiedBy: userId
                 }
             );
             console.log("Form submission successful. Response:", response.data);
@@ -275,9 +270,9 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
             }
         }
     };
-    
-    
-    
+
+
+
     const handleStatusChange = (value) => {
         handleValidation(value);
     };
@@ -352,7 +347,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit }) => {
                             style={{
                                 width: '150px',
                                 marginBottom: '20px',
-                                height:"40px !important"
+                                height: "40px !important"
                             }}
                         >
                             <Select.Option value="confirmer">Confirmer</Select.Option>

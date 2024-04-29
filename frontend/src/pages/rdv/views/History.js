@@ -1,512 +1,163 @@
-import React, { useState,useRef } from "react";
-import { Table, Input, Space, Button, Avatar, Typography } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
-import face from "../../../assets/images/face-1.jpg";
+import React, { useState, useEffect } from "react";
+import { Table, Select, DatePicker, Card, Row, Col } from "antd";
 
-import Highlighter from "react-highlight-words";
+import moment from "moment";
+import { fetchRdvData, fetchAgentOptions, fetchAgendaOptions } from "../services/api";
+import { useCalendar } from "../../../CalendarContext";
+import { axiosClient } from "../../../api/axios";
 
-const { Title } = Typography;
+const { Option } = Select;
+const { RangePicker } = DatePicker;
+
 const History = () => {
-    const [searchText, setSearchText] = useState("");
-    const [searchedColumn, setSearchedColumn] = useState("");
-    const searchInputRef = useRef(null);
+    const [tableData, setTableData] = useState([]);
+    const [modifiedUserInfo, setModifiedUserInfo] = useState({});
 
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        setSearchedColumn(dataIndex);
-    };
+    const {
+        rdvLoading, setRdvLoading,
+        selectedAgent, setSelectedAgent,
+        selectedAgenda, setSelectedAgenda,
+        selectedDateRange, setSelectedDateRange,
+        agentOptions, setAgentOptions,
+        agendaOptions, setAgendaOptions,
+    } = useCalendar();
+    const [filtersChanged, setFiltersChanged] = useState(false);
 
 
-    const getColumnSearchProps = (dataIndex) => ({
-        filterDropdown: ({
-            setSelectedKeys,
-            selectedKeys,
-            confirm,
-            clearFilters,
-        }) => (
-            <div style={{ padding: 8 }}>
-                <Input
-                    placeholder={`Search ${dataIndex}`}
-                    value={selectedKeys[0]}
-                    onChange={(e) =>
-                        setSelectedKeys(e.target.value ? [e.target.value] : [])
-                    }
-                    onPressEnter={() =>
-                        handleSearch(selectedKeys, confirm, dataIndex)
-                    }
-                    style={{ width: 188, marginBottom: 8, display: "block" }}
-                />
-                <Space>
-                    <Button
-                        type="primary"
-                        onClick={() =>
-                            handleSearch(selectedKeys, confirm, dataIndex)
-                        }
-                        icon={<SearchOutlined />}
-                        size="small"
-                        style={{ width: 90 }}
-                    >
-                        Search
-                    </Button>
-                </Space>
-            </div>
-        ),
-        filterIcon: (filtered) => (
-            <SearchOutlined
-                style={{ color: filtered ? "#1890ff" : undefined }}
-            />
-        ),
-        onFilter: (value, record) =>
-            record[dataIndex]
-                .toString()
-                .toLowerCase()
-                .includes(value.toLowerCase()),
-        onFilterDropdownVisibleChange: (visible) => {
-            if (visible) {
-                setTimeout(() => searchInputRef.current && searchInputRef.current.select(), 100);
+    useEffect(() => {
+        fetchRdvData(selectedAgent, selectedAgenda, selectedDateRange, setTableData, setRdvLoading,);
+        fetchAgentOptions(setAgentOptions);
+        fetchAgendaOptions(setAgendaOptions);
+    }, []);
 
-            }
-        },
-        render: (text) =>
-            searchedColumn === dataIndex ? (
-                <Highlighter
-                    highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-                    searchWords={[searchText]}
-                    autoEscape
-                    textToHighlight={text.toString()}
-                />
-            ) : (
-                text
-            ),
-    });
+    useEffect(() => {
+        if (filtersChanged) {
+            fetchRdvData(selectedAgent, selectedAgenda, selectedDateRange, setTableData, setRdvLoading,);
+            setFiltersChanged(false);
+        }
+    }, [filtersChanged]);
 
     const columns = [
         {
-            title: "NOM",
-            dataIndex: "name",
-            key: "name",
-            width: "32%",
-            ...getColumnSearchProps("name"),
-        },
-        {
-            title: "SOCIETE",
-            dataIndex: "societe",
-            key: "societe",
-            ...getColumnSearchProps("societe"),
-        },
-
-        {
-            title: "GSM",
-            key: "gsm",
-            dataIndex: "gsm",
-            ...getColumnSearchProps("gsm"),
-        },
-        {
-            title: "TVA",
-            key: "tva",
-            dataIndex: "tva",
-            ...getColumnSearchProps("tva"),
-        },
-        {
-            title: "SUPERVISEUR",
-            key: "Superviseur",
-            dataIndex: "Superviseur",
-            ...getColumnSearchProps("Superviseur"),
-        },
-    ];
-
-    const data = [
-        {
-            key: "1",
-            name: (
-                <>
-                    <Avatar.Group>
-                        <Avatar
-                            className="shape-avatar"
-                            shape="square"
-                            size={40}
-                            src={face}
-                        ></Avatar>
-                        <div className="avatar-info">
-                            <Title level={5}>Michael John</Title>
-                            <p>michael@mail.com</p>
-                        </div>
-                    </Avatar.Group>{" "}
-                </>
-            ),
-            societe: (
-                <>
-                    <div className="author-info">
-                        <Title level={5}>BlueTech Solutions</Title>
-                        <p>Organization</p>
-                    </div>
-                </>
-            ),
-            tel: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 123-4567
-                    </Button>
-                </>
-            ),
-            gsm: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 987-6543
-                    </Button>
-                </>
-            ),
-            tva: (
-                <>
-                    <div className="ant-financial-info">
-                        <span>ES543210987</span>
-                    </div>
-                </>
-            ),
-            Superviseur: (
-                <>
-                    <Avatar.Group>
-                        <Avatar
-                            className="shape-avatar"
-                            shape="square"
-                            size={40}
-                            src={face}
-                        ></Avatar>
-                        <div className="avatar-info">
-                            <Title level={5}>Noah Thompson</Title>
-                            <p>noah@example.com</p>
-                        </div>
-                    </Avatar.Group>{" "}
-                </>
-            )
-        },
-        {
-            key: "1",
-            name: (
-                <>
-                    <Avatar.Group>
-                        <Avatar
-                            className="shape-avatar"
-                            shape="square"
-                            size={40}
-                            src={face}
-                        ></Avatar>
-                        <div className="avatar-info">
-                            <Title level={5}>Michael John</Title>
-                            <p>michael@mail.com</p>
-                        </div>
-                    </Avatar.Group>{" "}
-                </>
-            ),
-            societe: (
-                <>
-                    <div className="author-info">
-                        <Title level={5}>BlueTech Solutions</Title>
-                        <p>Organization</p>
-                    </div>
-                </>
-            ),
-            tel: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 123-4567
-                    </Button>
-                </>
-            ),
-            gsm: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 987-6543
-                    </Button>
-                </>
-            ),
-            tva: (
-                <>
-                    <div className="ant-financial-info">
-                        <span>IT765432109</span>
-                    </div>
-                </>
-            ),
-            Superviseur: (
-                <>
-                    <Avatar.Group>
-                        <Avatar
-                            className="shape-avatar"
-                            shape="square"
-                            size={40}
-                            src={face}
-                        ></Avatar>
-                        <div className="avatar-info">
-                            <Title level={5}>Olivia Smith</Title>
-                            <p>olivia@example.com</p>
-                        </div>
-                    </Avatar.Group>{" "}
-                </>
-            )
-        },
-        {
-            key: "1",
-            name: (
-                <>
-                    <Avatar.Group>
-                        <Avatar
-                            className="shape-avatar"
-                            shape="square"
-                            size={40}
-                            src={face}
-                        ></Avatar>
-                        <div className="avatar-info">
-                            <Title level={5}>Michael John</Title>
-                            <p>michael@mail.com</p>
-                        </div>
-                    </Avatar.Group>{" "}
-                </>
-            ),
-            societe: (
-                <>
-                    <div className="author-info">
-                        <Title level={5}>BlueTech Solutions</Title>
-                        <p>Organization</p>
-                    </div>
-                </>
-            ),
-            tel: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 123-4567
-                    </Button>
-                </>
-            ),
-            gsm: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 987-6543
-                    </Button>
-                </>
-            ),
-            tva: (
-                <>
-                    <div className="ant-financial-info">
-                        <span>FR876543210</span>
-                    </div>
-                </>
-            ),
-            Superviseur: (
-                <>
-                    <Avatar.Group>
-                        <Avatar
-                            className="shape-avatar"
-                            shape="square"
-                            size={40}
-                            src={face}
-                        ></Avatar>
-                        <div className="avatar-info">
-                            <Title level={5}>Emma Wilson</Title>
-                            <p>emma@example.com</p>
-                        </div>
-                    </Avatar.Group>{" "}
-                </>
-            )
-        },
-        {
-            key: "1",
-            name: (
-                <>
-                    <Avatar.Group>
-                        <Avatar
-                            className="shape-avatar"
-                            shape="square"
-                            size={40}
-                            src={face}
-                        ></Avatar>
-                        <div className="avatar-info">
-                            <Title level={5}>Michael John</Title>
-                            <p>michael@mail.com</p>
-                        </div>
-                    </Avatar.Group>{" "}
-                </>
-            ),
-            societe: (
-                <>
-                    <div className="author-info">
-                        <Title level={5}>BlueTech Solutions</Title>
-                        <p>Organization</p>
-                    </div>
-                </>
-            ),
-            tel: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 123-4567
-                    </Button>
-                </>
-            ),
-            gsm: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 987-6543
-                    </Button>
-                </>
-            ),
-            date: (
-                <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
-                    </div>
-                </>
-            ),
-            agent: (
-                <>
-                    <div className="ant-employed">
-                        <span>Jennifer Smith</span>
-                    </div>
-                </>
-            ),
-            agenda: (
-                <>
-                    <div className="ant-employed">
-                        <span>23/04/18</span>
-                        <a href="#pablo" style={{ color: "#FFC700" }}>
-                            Editer
-                        </a>
-                    </div>
-                </>
+            title: "Client",
+            dataIndex: "client",
+            key: "client",
+            render: (_, record) => (
+                <span>
+                    {record.nom}
+                    &nbsp;
+                    {record.prenom}
+                </span>
             ),
         },
         {
-            key: "1",
-            name: (
-                <>
-                    <Avatar.Group>
-                        <Avatar
-                            className="shape-avatar"
-                            shape="square"
-                            size={40}
-                            src={face}
-                        ></Avatar>
-                        <div className="avatar-info">
-                            <Title level={5}>Michael John</Title>
-                            <p>michael@mail.com</p>
-                        </div>
-                    </Avatar.Group>{" "}
-                </>
-            ),
-            societe: (
-                <>
-                    <div className="author-info">
-                        <Title level={5}>BlueTech Solutions</Title>
-                        <p>Organization</p>
-                    </div>
-                </>
-            ),
-            tel: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 123-4567
-                    </Button>
-                </>
-            ),
-            gsm: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 987-6543
-                    </Button>
-                </>
-            ),
-            tva: (
-                <>
-                    <div className="ant-financial-info">
-                        <span>FR123456789</span>
-                    </div>
-                </>
-            ),
-            Superviseur: (
-                <>
-                    <Avatar.Group>
-                        <Avatar
-                            className="shape-avatar"
-                            shape="square"
-                            size={40}
-                            src={face} // Replace this with the actual path to the supervisor's avatar image
-                        ></Avatar>
-                        <div className="avatar-info">
-                            <Title level={5}>Sophie Turner</Title>
-                            <p>sophie.turner@example.com</p>
-                        </div>
-                    </Avatar.Group>
-                </>
+            title: "Agent",
+            dataIndex: "agent",
+            key: "agent",
+            render: (_, record) => (
+                <span>
+                    {record.agent ? (record.agent.nom) : "N/A"}
+                    &nbsp;
+                    {record.agent ? (record.agent.prenom) : ""}
+                </span>
             ),
         },
         {
-            key: "1",
-            name: (
-                <>
-                    <Avatar.Group>
-                        <Avatar
-                            className="shape-avatar"
-                            shape="square"
-                            size={40}
-                            src={face}
-                        ></Avatar>
-                        <div className="avatar-info">
-                            <Title level={5}>Michael John</Title>
-                            <p>michael@mail.com</p>
-                        </div>
-                    </Avatar.Group>{" "}
-                </>
+            title: "Agent Commercial",
+            dataIndex: "agentCommercial",
+            key: "agentCommercial",
+            render: (_, record) => (
+                <span>
+                    {record.agentCommercial ? (record.agentCommercial.nom) : "N/A"}
+                    &nbsp;
+                    {record.agentCommercial ? (record.agentCommercial.prenom) : ""}
+                </span>
             ),
-            societe: (
-                <>
-                    <div className="author-info">
-                        <Title level={5}>BlueTech Solutions</Title>
-                        <p>Organization</p>
-                    </div>
-                </>
-            ),
-            tel: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 123-4567
-                    </Button>
-                </>
-            ),
-            gsm: (
-                <>
-                    <Button type="primary" className="tag-primary">
-                        +1 (555) 987-6543
-                    </Button>
-                </>
-            ),
-            tva: (
-                <>
-                    <div className="ant-financial-info">
-                        <span>DE987654321</span>
-                    </div>
-                </>
-            ),
-            Superviseur: (
-                <>
-                    <Avatar.Group>
-                        <Avatar
-                            className="shape-avatar"
-                            shape="square"
-                            size={40}
-                            src={face}
-                        ></Avatar>
-                        <div className="avatar-info">
-                            <Title level={5}>Daniel Brown</Title>
-                            <p>daniel@example.com</p>
-                        </div>
-                    </Avatar.Group>{" "}
-                </>
-            )
+        },
+        {
+            title: "Date",
+            dataIndex: "start_date",
+            key: "start_date",
+            render: (text) => {
+                const formattedDate = text ? new Date(text).toLocaleString() : "-";
+                return (formattedDate);
+            },
+        },
+        {
+            title: "Créé le",
+            dataIndex: "createdAt",
+            render: (text) => moment(text).format("YYYY-MM-DD HH:mm:ss"),
+        },
+        {
+            title: "Dernière modification",
+            dataIndex: "updated_at",
+            render: (text) => moment(text).format("YYYY-MM-DD HH:mm:ss"),
+        },
+        {
+            title: "Modifié par",
+            dataIndex: "modifiedBy",
+            render: (text, record) => {
+                if (record.modifiedBy) {
+                    return record.modifiedBy;
+                } else {
+                    return "N/A";
+                }
+            },
         },
     ];
 
     return (
         <div style={{ overflowX: "auto" }}>
-            <Table columns={columns} dataSource={data} scroll={{ x: 'max-content' }} />
+            <Card style={{ marginBottom: "20px" }}>
+                <Row>
+                    <Col span={8}>
+                        <Select
+                            style={{ width: 200, marginRight: "10px" }}
+                            placeholder="Sélectionner un Agent"
+                            onChange={(value) => {
+                                setSelectedAgent(value);
+                                setFiltersChanged(true);
+                            }}
+                            allowClear
+                            value={selectedAgent}
+                        >
+                            {agentOptions.map(agent => (
+                                <Option key={agent.id} value={agent.id}>{`${agent.nom} ${agent.prenom}`}</Option>
+                            ))}
+                        </Select>
+                    </Col>
+                    <Col span={8}>
+                        <Select
+                            style={{ width: 200, marginRight: "10px" }}
+                            placeholder="Sélectionner un Agenda"
+                            onChange={(value) => {
+                                setSelectedAgenda(value);
+                                setFiltersChanged(true);
+                            }}
+                            allowClear
+                            value={selectedAgenda}
+                        >
+                            {agendaOptions.map(agenda => (
+                                <Option key={agenda.id} value={agenda.id}>
+                                    {`${agenda.contact_nom} ${agenda.contact_prenom}`}
+                                </Option>
+                            ))}
+                        </Select>
+                    </Col>
+                    <Col span={8}>
+                        <RangePicker
+                            style={{ marginRight: "10px" }}
+                            placeholder={['Date de début', 'Date de fin']}
+                            onChange={(dates) => {
+                                setSelectedDateRange(dates)
+                                setFiltersChanged(true);
+                            }}
+                            value={selectedDateRange}
+                        />
+                    </Col>
+                </Row>
+            </Card>
+            <Table columns={columns} dataSource={tableData} loading={rdvLoading} pagination={{ pageSize: 5 }} />
         </div>
     );
 };
