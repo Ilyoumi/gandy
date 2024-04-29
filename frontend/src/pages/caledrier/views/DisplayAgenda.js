@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Button, Col, Row, Table, Modal, Space } from "antd";
 import { pencil, deletebtn } from "../../../constants/icons";
+import { FileAddOutlined } from "@ant-design/icons";
+
 import AddAgendaModal from "./AddAgenda";
 import UpdateForm from "./UpdateAgenda";
 import { axiosClient } from "../../../api/axios";
@@ -195,12 +197,14 @@ const DisplayAgenda = () => {
                     Ajouter Agenda
                 </Col>
                 <Col span={12} style={{ textAlign: "right" }}>
+																	
                     <Button
                         type="primary"
                         htmlType="submit"
                         onClick={handleOpenAddAgendaModal}
                     >
                         Ajouter Agenda
+																								<FileAddOutlined />
                     </Button>
                 </Col>
             </Row>

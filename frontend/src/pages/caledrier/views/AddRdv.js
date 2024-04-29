@@ -180,8 +180,8 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
         />
       )}
       <Card style={{ marginBottom: "10px" }}>
-        <Row gutter={[16, 16]}>
-          <Col span={12}>
+        <Row gutter={[16, 16]} justify="space-between" align="middle">
+          <Col span={18}>
             <ConfigProvider locale={frFR}>
               <DatePicker.RangePicker
                 rules={[
@@ -234,7 +234,7 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
               />
             </ConfigProvider>
           </Col>
-          <Col span={12}>
+          <Col span={4}>
             <SaveButton
               onClick={handleClick}
               loading={loading}

@@ -183,7 +183,7 @@ export const handleAppointmentClick = async (
         // Compare the agent ID with the logged-in user's ID
         if (
             agentId === userContext.userId ||
-            userContext.userRole === "Superviseur" || userContext.userRole === "Agent"
+            userContext.userRole === "Superviseur" || userContext.userRole === "Agent" || userContext.userRole === "Admin"
         ) {
             const response = await axiosClient.get(`/api/rdvs/${event.id}`);
             const appointmentDetails = response.data;
