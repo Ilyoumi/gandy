@@ -204,34 +204,34 @@ function MyCalendar() {
 
 	const handleDeleteAppointment = async (appointmentId) => {
     try {
-        console.log("Deleting blocked appointment", appointmentId);
+        console.log("Deleting blocked appointment");
         
+        // Convert appointmentId to an integer
+        const id = parseInt(appointmentId);
+
         // Check if the appointment exists in the local state
-        const appointmentExists = appointments.find(appointment => appointment.id === parseInt(appointmentId));
+        const appointmentExists = filteredAppointments.find(appointment => appointment.id === id);
 
-				console.log("appointmentExists", appointmentExists)
-				console.log("appointments", appointments)
-				console.log("type of id ", typeof appointmentId)
-				console.log("type of appointmentExists ", typeof appointmentExists)
-
-        
         if (!appointmentExists) {
-            console.log("Appointment with ID", appointmentId, "does not exist. Skipping deletion.");
+            console.log("Appointment with ID", id, "does not exist. Skipping deletion.");
             return;
         }  
 
         // If the appointment exists, delete it
-        await axiosClient.delete(`api/rdvs/${appointmentId}`);
+        await axiosClient.delete(`api/rdvs/${id}`);
         
         // Update the local state to remove the deleted appointment
-        const updatedAppointments = appointments.filter(
-            (appointment) => appointment.id !== appointmentId
+        const updatedAppointments = filteredAppointments.filter(
+            (appointment) => appointment.id !== id
         );
         setAppointments(updatedAppointments);
     } catch (error) {
         console.error("Error deleting appointment:", error.response);
     }
 };
+
+
+
 
 
 
