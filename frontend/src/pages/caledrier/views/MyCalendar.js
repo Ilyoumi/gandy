@@ -171,36 +171,69 @@ function MyCalendar() {
 			</div>
 		);
 	};
+	// const handleDeleteAppointment = async (appointmentId) => {
+	// 	console.log("Timer finished for appointment:", appointmentId);
+
+	// 	try {
+	// 		const appointmentExists = appointments.find(appointment => appointment.id === appointmentId);
+	// 		if (!appointmentExists) {
+	// 			console.log("Appointment with ID", appointmentId, "does not exist. Skipping deletion.");
+	// 			const updatedAppointments = appointments.filter(
+	// 				(appointment) => appointment.id !== appointmentId
+	// 			);
+	// 			setAppointments(updatedAppointments);
+
+	// 			return;
+	// 		}
+
+	// 		await axiosClient.delete(`api/rdvs/${appointmentId}`);
+	// 		const updatedAppointments = appointments.filter(
+	// 			(appointment) => appointment.id !== appointmentId
+	// 		);
+	// 		setAppointments(updatedAppointments);
+	// 	} catch (error) {
+	// 		const updatedAppointments = appointments.filter(
+	// 			(appointment) => appointment.id !== appointmentId
+	// 		);
+	// 		setAppointments(updatedAppointments);
+
+	// 		console.error("Error deleting appointment:", error.response);
+
+	// 	}
+	// };
+
 	const handleDeleteAppointment = async (appointmentId) => {
-		console.log("Timer finished for appointment:", appointmentId);
+    try {
+        console.log("Deleting blocked appointment");
+        
+        // Check if the appointment exists in the local state
+        const appointmentExists = appointments.find(appointment => appointment.id === parseInt(appointmentId));
 
-		try {
-			const appointmentExists = appointments.find(appointment => appointment.id === appointmentId);
-			if (!appointmentExists) {
-				console.log("Appointment with ID", appointmentId, "does not exist. Skipping deletion.");
-				const updatedAppointments = appointments.filter(
-					(appointment) => appointment.id !== appointmentId
-				);
-				setAppointments(updatedAppointments);
+				console.log("appointmentExists", appointmentExists)
+				console.log("appointments", appointments)
+				console.log("type of id ", typeof appointmentId)
+				console.log("type of appointmentExists ", typeof appointmentExists)
 
-				return;
-			}
+        
+        if (!appointmentExists) {
+            console.log("Appointment with ID", appointmentId, "does not exist. Skipping deletion.");
+            return;
+        }  
 
-			await axiosClient.delete(`api/rdvs/${appointmentId}`);
-			const updatedAppointments = appointments.filter(
-				(appointment) => appointment.id !== appointmentId
-			);
-			setAppointments(updatedAppointments);
-		} catch (error) {
-			const updatedAppointments = appointments.filter(
-				(appointment) => appointment.id !== appointmentId
-			);
-			setAppointments(updatedAppointments);
+        // If the appointment exists, delete it
+        await axiosClient.delete(`api/rdvs/${appointmentId}`);
+        
+        // Update the local state to remove the deleted appointment
+        const updatedAppointments = appointments.filter(
+            (appointment) => appointment.id !== appointmentId
+        );
+        setAppointments(updatedAppointments);
+    } catch (error) {
+        console.error("Error deleting appointment:", error.response);
+    }
+};
 
-			console.error("Error deleting appointment:", error.response);
 
-		}
-	};
 
 
 	const handleAddAppointmentCallback = (arg, userContext) => {
@@ -397,6 +430,7 @@ function MyCalendar() {
 													)}
 													eventContent={(arg) => {
 														let content = "";
+														const appointmentId =  arg.event.id;
 
 														if (arg.event.extendedProps && arg.event.extendedProps.bloquer) {
 															// Display remaining time in French
@@ -404,7 +438,7 @@ function MyCalendar() {
 
 															return (
 																<div>
-																	<CountdownTimer onTimerFinish={() => handleDeleteAppointment(arg.event.id)} />
+																	<CountdownTimer appointmentId={appointmentId} onDelete={() => handleDeleteAppointment(appointmentId)} />
 																	<div>
 																		{content}
 																	</div>
@@ -421,9 +455,6 @@ function MyCalendar() {
 													}}
 
 													dayCellContent={dayCellContent}
-
-
-
 
 													eventDidMount={(arg) => {
 														arg.el.style.backgroundColor =
