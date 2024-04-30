@@ -204,7 +204,7 @@ function MyCalendar() {
 
 	const handleDeleteAppointment = async (appointmentId) => {
     try {
-        console.log("Deleting blocked appointment");
+        console.log("Deleting blocked appointment", appointmentId);
         
         // Check if the appointment exists in the local state
         const appointmentExists = appointments.find(appointment => appointment.id === parseInt(appointmentId));
