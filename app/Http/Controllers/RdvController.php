@@ -83,43 +83,6 @@ class RdvController extends Controller
 			// Get all appointments
 			$rdvs = $query->get();
 
-			// // Calculate statistics
-			// $stats = [
-			// 	'rdv_per_day' => [],
-			// 	'rdv_per_week' => [],
-			// 	'rdv_per_month' => [],
-			// ];
-
-			// foreach ($rdvs as $rdv) {
-			// 	// Get start date of the appointment
-			// 	$startDate = Carbon::parse($rdv->start_date);
-
-			// 	// Calculate statistics per day
-			// 	$dayKey = $startDate->format('Y-m-d');
-			// 	if (!isset($stats['rdv_per_day'][$dayKey])) {
-			// 		$stats['rdv_per_day'][$dayKey] = 1;
-			// 	} else {
-			// 		$stats['rdv_per_day'][$dayKey]++;
-			// 	}
-
-			// 	// Calculate statistics per week (assuming Monday to Friday is a week)
-			// 	$weekKey = $startDate->startOfWeek()->format('Y-m-d');
-			// 	if (!isset($stats['rdv_per_week'][$weekKey])) {
-			// 		$stats['rdv_per_week'][$weekKey] = 1;
-			// 	} else {
-			// 		$stats['rdv_per_week'][$weekKey]++;
-			// 	}
-
-			// 	// Calculate statistics per month
-			// 	$monthKey = $startDate->format('Y-m');
-			// 	if (!isset($stats['rdv_per_month'][$monthKey])) {
-			// 		$stats['rdv_per_month'][$monthKey] = 1;
-			// 	} else {
-			// 		$stats['rdv_per_month'][$monthKey]++;
-			// 	}
-			// }
-
-			// return response()->json(['rdvs' => $rdvs, 'statistics' => $stats]);
 			return response()->json($rdvs);
 
 		} catch (\Exception $e) {

@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 
 const CountdownTimer = ({ appointmentId, onDelete }) => {
   // Get initial minutes from cookies if exists, otherwise set default
-  const initialMinutes = parseInt(Cookies.get(`timerMinutes_${appointmentId}`)) || 15;
+  const initialMinutes = parseInt(Cookies.get(`timerMinutes_${appointmentId}`)) || 1;
   const [timeLeft, setTimeLeft] = useState({ minutes: initialMinutes, seconds: 0 });
   const [isFlashing, setIsFlashing] = useState(false);
 

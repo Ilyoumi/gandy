@@ -26,6 +26,8 @@ function Home() {
             console.error('Error fetching appointment statistics:', error);
         }
     };
+		const currentDate = new Date();
+		const currentMonthName = currentDate.toLocaleDateString('en-US', { month: 'long' });
 
     const count = appointmentStatistics.length > 0 ? [
       {
@@ -78,7 +80,7 @@ function Home() {
                                         <Col xs={18}>
                                             <span>{c.today}</span>
                                             <Title level={3}>
-                                                {c.title !== undefined ? c.title : null}{" "}
+                                                {c.title !== undefined ? c.title : null}{" "} <span style={{fontSize:"15px"}}>  /  {currentMonthName}</span>
                                                 <small className={c.bnb}>
                                                     {c.persent}
                                                 </small>

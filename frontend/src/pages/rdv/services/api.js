@@ -6,7 +6,7 @@ function getWeekNumber(date) {
 	return Math.ceil((((date - onejan) / millisecsInDay) + onejan.getDay() + 1) / 7);
 }
 
-export const fetchRdvData = async (selectedAgent, selectedAgenda ,selectedDateRange, setTableData, setRdvLoading,setStatistics) => {
+export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRange, setTableData, setRdvLoading, setStatistics) => {
 	setRdvLoading(true);
 	try {
 		const queryParams = {};
@@ -36,57 +36,25 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda ,selectedDateRa
 		const appointments = response.data;
 		console.log("Response Data:", response.data);
 
-		const currentDate = new Date();
-        const currentDay = currentDate.toLocaleDateString('en-US', { day: 'numeric', month: 'numeric', year: 'numeric' });
-        const currentWeek = getWeekNumber(currentDate) + '-' + currentDate.getFullYear();
-        const currentMonth = currentDate.toLocaleDateString('en-US', { month: 'long' });
+		// Initialize statistics variables
+		let totalAppointments = 0;
+		let appointmentsByDay = {};
+		let appointmentsByWeek = {};
+		let appointmentsByMonth = {};
 
-        let appointmentsByDay = {};
-        let appointmentsByWeek = {};
-        let appointmentsByMonth = {};
+		// Loop through appointments to calculate statistics
+		appointments.forEach(appointment => {
+			totalAppointments++;
 
-        appointments.forEach(appointment => {
-            const date = new Date(appointment.start_date); // Assuming start_date is the correct field name for the appointment date
-            if (isNaN(date.getTime())) {
-                console.error("Invalid date:", appointment.start_date);
-                return; // Skip processing this appointment
-            }
+			const date = new Date(appointment.start_date);
+			const day = date.toLocaleDateString('en-US', { day: 'numeric', month: 'numeric', year: 'numeric' });
+			const week = getWeekNumber(date) + '-' + date.getFullYear();
+			const month = date.toLocaleDateString('en-US', { month: 'long' });
 
-            const day = date.toLocaleDateString('en-US', { day: 'numeric', month: 'numeric', year: 'numeric' });
-            const week = getWeekNumber(date) + '-' + date.getFullYear();
-            const month = date.toLocaleDateString('en-US', { month: 'long' });
-
-            // By day
-            if (!appointmentsByDay[day]) {
-                appointmentsByDay[day] = 1;
-            } else {
-                appointmentsByDay[day]++;
-            }
-
-            // By week (Monday to Friday)
-            if (date.getDay() >= 1 && date.getDay() <= 5) {
-                if (!appointmentsByWeek[week]) {
-                    appointmentsByWeek[week] = 1;
-                } else {
-                    appointmentsByWeek[week]++;
-                }
-            }
-
-            // By month
-            if (!appointmentsByMonth[month]) {
-                appointmentsByMonth[month] = 1;
-            } else {
-                appointmentsByMonth[month]++;
-            }
-        });
-
-        const totalAppointments = appointments.length;
-				console.log("tyoe of setStatistics", typeof setStatistics)
-				
-				console.log("Appointments by Day (Current):", appointmentsByDay[currentDay] || 0);
-        console.log("Appointments by Week (Current):", appointmentsByWeek[currentWeek] || 0);
-        console.log("Appointments by Month (Current):", appointmentsByMonth[currentMonth] || 0);
-        console.log("Total Appointments:", totalAppointments);
+			appointmentsByDay[day] = (appointmentsByDay[day] || 0) + 1;
+			appointmentsByWeek[week] = (appointmentsByWeek[week] || 0) + 1;
+			appointmentsByMonth[month] = (appointmentsByMonth[month] || 0) + 1;
+		});
 
 		const agentIds = appointments.map(appointment => appointment.id_agent);
 		const uniqueAgentIds = [...new Set(agentIds)];
@@ -142,7 +110,7 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda ,selectedDateRa
 			const agent = agents.find(agent => agent.id === appointment.id_agent);
 			const agentCommercial = agentCommercials.find(contact => contact.id === appointment.id_agenda);
 			const modifiedByUser = modifiedByUsers.find(user => user.id === appointment.modifiedBy);
-			
+
 
 			return {
 				...appointment,
@@ -152,16 +120,29 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda ,selectedDateRa
 			};
 		});
 
+		const modifiedAppointmentsWithAgentsAndCommercials = appointments
+  .filter(appointment => appointment.modifiedBy !== null)
+  .map(appointment => {
+    const agent = agents.find(agent => agent.id === appointment.id_agent);
+    const agentCommercial = agentCommercials.find(contact => contact.id === appointment.id_agenda);
+    const modifiedByUser = modifiedByUsers.find(user => user.id === appointment.modifiedBy);
+
+    return {
+      ...appointment,
+      agent,
+      agentCommercial,
+      modifiedBy: modifiedByUser ? `${modifiedByUser.nom} ${modifiedByUser.prenom}` : "Pas encore modifié",
+    };
+  });
+
 
 		setTableData({
-			appointments: appointmentsWithAgentsAndCommercials,
-			appointmentsByDay,
-			appointmentsByWeek,
-			appointmentsByMonth,
-			totalAppointments,
-	});
-	
-		
+			appointmentsWithAgentsAndCommercials,
+			appointmentsByDay: appointmentsByDay,
+			appointmentsByWeek: appointmentsByWeek,
+			appointmentsByMonth: appointmentsByMonth,
+			totalAppointments: totalAppointments,
+		});
 
 	} catch (error) {
 		console.error("Error fetching appointments:", error);

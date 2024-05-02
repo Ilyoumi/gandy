@@ -7,7 +7,7 @@ import { axiosClient } from "../../../api/axios";
 const { Text } = Typography;
 
 const AppointmentDetails = ({ selectedRowData }) => {
-    const { start_date,note, commentaire, nom, prenom, pro, status, nom_ste, tva, tel, gsm, adresse, postal, fournisseur, nbr_comp_elect, nbr_comp_gaz, ppv, tarif, tarification, haute_tension } = selectedRowData;
+    const { start_date,note, commentaire, nom, prenom, pro, status, nom_ste, tva, tel, gsm, adresse, postal, fournisseur, nbr_comp_elect, nbr_comp_gaz, ppv, tarif, tarification, haute_tension,updated_at,modifiedBy } = selectedRowData;
     const [agentName, setAgentName] = useState("N/A");
     const [cardHeight, setCardHeight] = useState("auto");
 
@@ -76,6 +76,14 @@ const AppointmentDetails = ({ selectedRowData }) => {
                     <Col>
                         <Text strong>Date de rendez-vous:</Text>
                         <Text>{formatDate(start_date)}</Text>
+                    </Col>
+										<Col>
+                        <Text strong>Dernière modification:</Text>
+                        <Text>{formatDate(updated_at)}</Text>
+                    </Col>
+										<Col>
+                        <Text strong>Modifié par:</Text>
+                        <Text>{modifiedBy}</Text>
                     </Col>
                     <Col>
                         <Tag color={statusColor}>{status}</Tag>

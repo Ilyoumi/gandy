@@ -16,7 +16,13 @@ const DataTable = () => {
     const [updateModalVisible, setUpdateModalVisible] = useState(false);
     const [detailsModalVisible, setDetailsModalVisible] = useState(false);
     const [selectedRowData, setSelectedRowData] = useState(null);
-    const [tableData, setTableData] = useState([]);
+    const [tableData, setTableData] = useState({
+			appointments: [],
+			appointmentsByDay: 0,
+			appointmentsByWeek: 0,
+			appointmentsByMonth: 0,
+			totalAppointments: 0,
+		});
     const [filtersChanged, setFiltersChanged] = useState(false);
     const [searchText, setSearchText] = useState("");
     const {
@@ -229,7 +235,7 @@ const DataTable = () => {
 		const calculateTotalPerDay = (date) => {
 			if (!date) return 0;
 			const currentDate = new Date(date);
-			const totalPerDay = tableData.filter(item => {
+			const totalPerDay = tableData.appointmentsWithAgentsAndCommercials.filter(item => {
 					const itemDate = new Date(item.start_date);
 					return itemDate.getDate() === currentDate.getDate() &&
 							itemDate.getMonth() === currentDate.getMonth() &&
@@ -243,15 +249,15 @@ const DataTable = () => {
 			const currentDate = new Date(date);
 			const weekStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay());
 			const weekEnd = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - currentDate.getDay() + 6);
-			const totalPerWeek = tableData.filter(item => {
+			const totalPerWeek = tableData.appointmentsWithAgentsAndCommercials.filter(item => {
 					const itemDate = new Date(item.start_date);
 					return itemDate >= weekStart && itemDate <= weekEnd;
 			}).length;
 			return totalPerWeek;
 	};
 
-    const filteredTableData = searchText
-    ? tableData.filter(item =>
+	const filteredTableData = searchText
+    ? tableData.appointmentsWithAgentsAndCommercials?.filter(item =>
         searchText
             .toLowerCase()
             .split(' ')
@@ -268,11 +274,13 @@ const DataTable = () => {
                 })
             )
     )
-    : tableData.map(item => ({
+    : tableData.appointmentsWithAgentsAndCommercials?.map(item => ({
         ...item,
         totalPerDay: calculateTotalPerDay(item.start_date),
         totalPerWeek: calculateTotalPerWeek(item.start_date),
-    }));
+    })) || [];
+
+
 
 
 
@@ -339,7 +347,6 @@ const DataTable = () => {
                 dataSource={filteredTableData}
                 loading={rdvLoading}
                 pagination={{ pageSize: 5 }}
-								scroll={{ x: true }}
 
             />
             <Modal
