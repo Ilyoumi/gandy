@@ -14,6 +14,32 @@ const AppointmentDetails = ({ selectedRowData }) => {
     const clientInfoCardRef = useRef(null);
     const appointmentInfoCardRef = useRef(null);
     const notesCardRef = useRef(null);
+		const [role, setRole] = useState("");
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const authToken = localStorage.getItem("auth_token");
+                if (!authToken) {
+                    console.log("User is not logged in");
+                    return;
+                }
+
+                const response = await axiosClient.get("/api/user", {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`,
+                    },
+                });
+                const { role } = response.data;
+                setRole(role);
+                console.log("User role:", role);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
 
     useEffect(() => {
         fetchAgentName();
@@ -77,14 +103,18 @@ const AppointmentDetails = ({ selectedRowData }) => {
                         <Text strong>Date de rendez-vous:</Text>
                         <Text>{formatDate(start_date)}</Text>
                     </Col>
-										<Col>
+										{role === 'Admin' || role === 'Superviseur' ? (
+                <>
+                    <Col>
                         <Text strong>Dernière modification:</Text>
                         <Text>{formatDate(updated_at)}</Text>
                     </Col>
-										<Col>
+                    <Col>
                         <Text strong>Modifié par:</Text>
                         <Text>{modifiedBy}</Text>
                     </Col>
+                </>
+            ) : null}
                     <Col>
                         <Tag color={statusColor}>{status}</Tag>
                     </Col>
