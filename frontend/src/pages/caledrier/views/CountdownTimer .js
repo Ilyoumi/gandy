@@ -1,41 +1,50 @@
 import React, { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 
 const CountdownTimer = ({ appointmentId, onDelete }) => {
-  // Get initial minutes from local storage if exists, otherwise set default
-  const initialMinutes = parseInt(localStorage.getItem(`timerMinutes_${appointmentId}`)) || 1;
-  const [minutes, setMinutes] = useState(initialMinutes);
-  const [seconds, setSeconds] = useState(0);
+  // Get initial minutes from cookies if exists, otherwise set default
+  const initialMinutes = parseInt(Cookies.get(`timerMinutes_${appointmentId}`)) || 15;
+  const [timeLeft, setTimeLeft] = useState({ minutes: initialMinutes, seconds: 0 });
   const [isFlashing, setIsFlashing] = useState(false);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      if (seconds === 0) {
-        if (minutes === 0) {
+      setTimeLeft(prevTimeLeft => {
+        // Calculate new time left
+        const newSeconds = prevTimeLeft.seconds - 1;
+        const newMinutes = prevTimeLeft.minutes - (newSeconds < 0 ? 1 : 0);
+
+        // Check if timer reached 0
+        if (newMinutes === 0 && newSeconds === -1) {
           clearInterval(intervalId);
-          if (onDelete && minutes === 0) {
+          if (onDelete) {
             onDelete();
           }
-        } else {
-          setMinutes((prevMinutes) => prevMinutes - 1);
-          setSeconds(59);
+          return prevTimeLeft;
         }
-      } else {
-        setSeconds((prevSeconds) => prevSeconds - 1);
-      }
 
-      setIsFlashing((prevIsFlashing) => !prevIsFlashing);
+        // Flash animation every second
+        setIsFlashing(prevIsFlashing => !prevIsFlashing);
+
+        // Return updated time left
+        return {
+          minutes: newMinutes >= 0 ? newMinutes : 0,
+          seconds: newSeconds >= 0 ? newSeconds : 59
+        };
+      });
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [minutes, seconds, onDelete, appointmentId]);
+  }, [onDelete, appointmentId]);
 
   useEffect(() => {
-    localStorage.setItem(`timerMinutes_${appointmentId}`, minutes.toString());
-  }, [minutes, appointmentId]);
+    // Set cookies to store timer minutes
+    Cookies.set(`timerMinutes_${appointmentId}`, timeLeft.minutes.toString(), { expires: 7 }); // Expires in 7 days
+  }, [timeLeft.minutes, appointmentId]);
 
   return (
     <div className={`countdown-timer ${isFlashing ? "flash-animation" : ""}`} style={{ color: "#FFC100", fontSize: "13px", fontWeight: "bold", position: "relative", left: "60%" }}>
-      {minutes < 10 ? `0${minutes}` : minutes}:{seconds < 10 ? `0${seconds}` : seconds} s
+      {timeLeft.minutes < 10 ? `0${timeLeft.minutes}` : timeLeft.minutes}:{timeLeft.seconds < 10 ? `0${timeLeft.seconds}` : timeLeft.seconds} s
     </div>
   );
 };
