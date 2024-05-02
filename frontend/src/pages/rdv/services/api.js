@@ -31,10 +31,8 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 		const response = await axiosClient.get("/api/rdvs", {
 			params: queryParams,
 		});
-		console.log("params", queryParams)
 
 		const appointments = response.data;
-		console.log("Response Data:", response.data);
 
 		// Initialize statistics variables
 		let totalAppointments = 0;
@@ -61,6 +59,7 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 		const agentPromises = uniqueAgentIds.map(async (agentId) => {
 			try {
 				const agentResponse = await axiosClient.get(`/api/users/${agentId}`);
+
 				return agentResponse.data;
 
 			} catch (error) {
@@ -76,8 +75,10 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 			try {
 				const agendaResponse = await axiosClient.get(`/api/agendas/${agendaId}`);
 				const contactId = agendaResponse.data.agenda.contact_id;
+
 				try {
 					const contactResponse = await axiosClient.get(`/api/users/${contactId}`);
+
 					return contactResponse.data;
 				} catch (error) {
 					console.error("Error fetching agent commercial details:", error);
@@ -88,7 +89,10 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 				throw error;
 			}
 		});
+
 		const agentCommercials = await Promise.all(agentCommercialPromises);
+		console.log("Response Data agentCommercials:", agentCommercials);
+
 
 		const modifiedByUserIds = appointments.map(appointment => appointment.modifiedBy);
 		const uniqueModifiedByUserIds = [...new Set(modifiedByUserIds)];
@@ -97,6 +101,7 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 			.map(async (userId) => {
 				try {
 					const userResponse = await axiosClient.get(`/api/users/${userId}`);
+
 					return userResponse.data;
 				} catch (error) {
 					console.error("Error fetching user details:", error);
@@ -108,36 +113,54 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 
 		const appointmentsWithAgentsAndCommercials = appointments.map(appointment => {
 			const agent = agents.find(agent => agent.id === appointment.id_agent);
-			const agentCommercial = agentCommercials.find(contact => contact.id === appointment.id_agenda);
+	
+			// Find the corresponding agent commercial
+			const agenda = uniqueAgendaIds.find(id => id === appointment.id_agenda);
+			console.log("agenda ****** :", agenda);
+
+	
+			const agentCommercial = agentCommercials.find(agent => {
+					console.log("Current Agent c ID ****** :", agent.id);
+					console.log("Current Contact ID in agenda ***** :", agenda.contact_id);
+					return agent.id === agenda.contact_id;
+			});
+			console.log("Agent Commercial:", agentCommercial);
+	
 			const modifiedByUser = modifiedByUsers.find(user => user.id === appointment.modifiedBy);
-
-
+	
+			console.log("Modified By User:", modifiedByUser);
+	
 			return {
-				...appointment,
-				agent,
-				agentCommercial,
-				modifiedBy: modifiedByUser ? `${modifiedByUser.nom} ${modifiedByUser.prenom}` : "Pas encore modifié",
+					...appointment,
+					agent,
+					agentCommercial: agentCommercial ? `${agentCommercial.nom} ${agentCommercial.prenom}` : "Agent commercial non trouvé",
+					modifiedBy: modifiedByUser ? `${modifiedByUser.nom} ${modifiedByUser.prenom}` : "Pas encore modifié",
 			};
-		});
+	});
+	
+	
+
+
 
 		const modifiedAppointmentsWithAgentsAndCommercials = appointments
-  .filter(appointment => appointment.modifiedBy !== null)
-  .map(appointment => {
-    const agent = agents.find(agent => agent.id === appointment.id_agent);
-    const agentCommercial = agentCommercials.find(contact => contact.id === appointment.id_agenda);
-    const modifiedByUser = modifiedByUsers.find(user => user.id === appointment.modifiedBy);
+			.filter(appointment => appointment.modifiedBy !== null)
+			.map(appointment => {
+				const agent = agents.find(agent => agent.id === appointment.id_agent);
+				const agentCommercial = agentCommercials.find(contact => contact.id === appointment.id_agenda);
+				const modifiedByUser = modifiedByUsers.find(user => user.id === appointment.modifiedBy);
 
-    return {
-      ...appointment,
-      agent,
-      agentCommercial,
-      modifiedBy: modifiedByUser ? `${modifiedByUser.nom} ${modifiedByUser.prenom}` : "Pas encore modifié",
-    };
-  });
+				return {
+					...appointment,
+					agent,
+					agentCommercial,
+					modifiedBy: modifiedByUser ? `${modifiedByUser.nom} ${modifiedByUser.prenom}` : "Pas encore modifié",
+				};
+			});
 
 
 		setTableData({
 			appointmentsWithAgentsAndCommercials,
+			modifiedAppointmentsWithAgentsAndCommercials,
 			appointmentsByDay: appointmentsByDay,
 			appointmentsByWeek: appointmentsByWeek,
 			appointmentsByMonth: appointmentsByMonth,

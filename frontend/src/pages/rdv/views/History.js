@@ -16,6 +16,7 @@ const { RangePicker } = DatePicker;
 const History = () => {
 	const [tableData, setTableData] = useState({
 		appointments: [],
+		modifiedAppointments: [],
 		appointmentsByDay: 0,
 		appointmentsByWeek: 0,
 		appointmentsByMonth: 0,
@@ -172,7 +173,6 @@ const History = () => {
 		},
 		onChange(info) {
 			if (info.file.status !== "uploading") {
-				console.log(info.file, info.fileList);
 			}
 			if (info.file.status === "done") {
 				message.success(`${info.file.name} file uploaded successfully`);
@@ -256,7 +256,6 @@ const History = () => {
 
 
 
-	console.log("dataSource", dataSource);
 
 
 
@@ -268,7 +267,7 @@ const History = () => {
 			<Row style={{alignItems:"center"}}>
 
 					<Col span={6}>
-					<h4>Les render-vous modifiés</h4>
+					<h4>Les rendez-vous modifiés</h4>
 					</Col>
 					<Col span={6}>
 						<Select
@@ -316,7 +315,7 @@ const History = () => {
 						/>
 					</Col>
 				</Row>
-				<Table columns={columns} dataSource={tableData.appointmentsWithAgentsAndCommercials} loading={rdvLoading} pagination={{ pageSize: 5 }} />
+				<Table columns={columns} dataSource={tableData.modifiedAppointmentsWithAgentsAndCommercials} loading={rdvLoading} pagination={{ pageSize: 5 }} />
 			</Card>
 
 
@@ -334,7 +333,7 @@ const History = () => {
 			<Card>
 				<Row style={{alignItems:"center"}}>
 				<Col span={6}>
-					<h4>Les statistiques des render-vous</h4>
+					<h4>Les statistiques des rendez-vous</h4>
 					</Col>
 					<Col span={6}>
 						<Select

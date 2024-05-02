@@ -20,7 +20,6 @@ function Home() {
     const fetchAppointmentStatistics = async () => {
         try {
             const response = await axiosClient.get('/api/rdvs/stats');
-            console.log('rdvsss',response.data)
             setAppointmentStatistics(response.data);
         } catch (error) {
             console.error('Error fetching appointment statistics:', error);
