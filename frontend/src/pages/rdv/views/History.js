@@ -71,13 +71,14 @@ const History = () => {
 			dataIndex: "agentCommercial",
 			key: "agentCommercial",
 			render: (_, record) => (
-				<span style={columnStyle}>
-					{record.agentCommercial ? record.agentCommercial.nom : "N/A"}
-					&nbsp;
-					{record.agentCommercial ? record.agentCommercial.prenom : ""}
-				</span>
+					<span style={columnStyle}>
+							{record.agentCommercial ? record.agentCommercial.nom : "N/A"}
+							&nbsp;
+							{record.agentCommercial ? record.agentCommercial.prenom : ""}
+					</span>
 			),
-		},
+	},
+	
 		{
 			title: "Date",
 			dataIndex: "start_date",
@@ -181,78 +182,76 @@ const History = () => {
 			}
 		},
 	};
+
+	function getWeekNumber(date) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+    const week1 = new Date(d.getFullYear(), 0, 4);
+    return 1 + Math.round(((d - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+}
+
 	const columns2 = [
 		{
 			title: "Agent",
 			dataIndex: "agent",
 			key: "agent",
-			render: (_, record) => (
-				<span style={columnStyle}>
-					{record.agent ? record.agent.nom : "N/A"}
-					&nbsp;
-					{record.agent ? record.agent.prenom : ""}
-				</span>
-			),
-		},
-		{
-			title: "Agent Commercial",
-			dataIndex: "agentCommercial",
-			key: "agentCommercial",
-			render: (_, record) => (
-				<span style={columnStyle}>
-					{record.agentCommercial ? record.agentCommercial.nom : "N/A"}
-					&nbsp;
-					{record.agentCommercial ? record.agentCommercial.prenom : ""}
-				</span>
-			),
-		},
-		{
-			title: 'Rendez-vous/jour',
-			dataIndex: 'appointmentsByDay',
-			key: 'appointmentsByDay',
-		},
-		{
-			title: 'Rendez-vous/semaine',
-			dataIndex: 'appointmentsByWeek',
-			key: 'appointmentsByWeek',
-		},
-		{
-			title: 'Rendez-vous/mois',
-			dataIndex: 'appointmentsByMonth',
-			key: 'appointmentsByMonth',
-		},
-		{
-			title: 'Total des rendez-vous',
-			dataIndex: 'totalAppointments',
-			key: 'totalAppointments',
-		},
-	];
-
-	let  dataSource 
-	if (tableData.appointmentsWithAgentsAndCommercials && tableData.appointmentsWithAgentsAndCommercials.length > 0) {
-    const uniqueAgentAgendaPairs = tableData.appointmentsWithAgentsAndCommercials.reduce((uniquePairs, appointment) => {
-        const pairKey = `${appointment.agent.id}_${appointment.id_agenda}`;
-        if (!uniquePairs.has(pairKey)) {
-            uniquePairs.set(pairKey, {
-                agent: appointment.agent,
-                agentCommercial: appointment.agentCommercial,
-                appointmentsByDay: tableData.appointmentsByDay,
-                appointmentsByWeek: tableData.appointmentsByWeek,
-                appointmentsByMonth: tableData.appointmentsByMonth,
-                totalAppointments: 0,
-                agendaId: appointment.id_agenda
-            });
-        }
-        const pair = uniquePairs.get(pairKey);
-        pair.totalAppointments++;
-        uniquePairs.set(pairKey, pair);
-        return uniquePairs;
-    }, new Map());
-
-    dataSource = Array.from(uniqueAgentAgendaPairs.values());
-}
-
+			render: (agent) => {
+					return (
+							<span style={columnStyle}>
+									{agent ? `${agent.nom} ${agent.prenom}` : null}
+							</span>
+					);
+			},
+	},
 	
+    {
+        title: "Agent Commercial",
+        dataIndex: "agentCommercial",
+        key: "agentCommercial",
+        render: (_, record) => (
+            <span style={columnStyle}>
+                {record.agentCommercial ? `${record.agentCommercial.nom} ${record.agentCommercial.prenom}` : "N/A"}
+            </span>
+        ),
+    },
+    {
+        title: "Rendez-vous/jour",
+        dataIndex: "appointmentsByDay",
+        key: "appointmentsByDay",
+        render: (appointmentsByDay) => {
+            const today = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'numeric', year: 'numeric' });
+            return appointmentsByDay && appointmentsByDay[today] ? appointmentsByDay[today] : 0;
+        },
+    },
+    {
+        title: "Rendez-vous/semaine",
+        dataIndex: "appointmentsByWeek",
+        key: "appointmentsByWeek",
+        render: (appointmentsByWeek) => {
+            const currentWeek = `W${getWeekNumber(new Date())}-${new Date().getFullYear()}`;
+            return appointmentsByWeek && appointmentsByWeek[currentWeek] ? appointmentsByWeek[currentWeek] : 0;
+        },
+    },
+    {
+        title: "Rendez-vous/mois",
+        dataIndex: "appointmentsByMonth",
+        key: "appointmentsByMonth",
+        render: (appointmentsByMonth) => {
+            const currentMonth = new Date().toLocaleDateString('en-US', { month: 'long' });
+            return appointmentsByMonth && appointmentsByMonth[currentMonth] ? appointmentsByMonth[currentMonth] : 0;
+        },
+    },
+    {
+        title: "Total des rendez-vous",
+        dataIndex: "totalAppointments",
+        key: "totalAppointments",
+    },
+];
+const filteredData = tableData.modifiedAppointmentsWithAgentsAndCommercials?.filter(record => record.agent);
+
+
+	console.log("modifiedAppointmentsWithAgentsAndCommercials", tableData.modifiedAppointmentsWithAgentsAndCommercials)
 
 
 
@@ -381,7 +380,7 @@ const History = () => {
 						/>
 					</Col>
 				</Row>
-				<Table columns={columns2} dataSource={dataSource} loading={rdvLoading} pagination={{ pageSize: 5 }} />
+				<Table columns={columns2} dataSource={filteredData} loading={rdvLoading} pagination={{ pageSize: 5 }} />
 			</Card>
 			<Modal
                 title="Consulter rendez-vous"

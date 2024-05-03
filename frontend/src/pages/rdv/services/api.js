@@ -6,7 +6,7 @@ function getWeekNumber(date) {
 	return Math.ceil((((date - onejan) / millisecsInDay) + onejan.getDay() + 1) / 7);
 }
 
-export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRange, setTableData, setRdvLoading, setStatistics) => {
+export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRange, setTableData, setRdvLoading) => {
 	setRdvLoading(true);
 	try {
 		const queryParams = {};
@@ -40,18 +40,26 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 		let appointmentsByWeek = {};
 		let appointmentsByMonth = {};
 
-		// Loop through appointments to calculate statistics
 		appointments.forEach(appointment => {
-			totalAppointments++;
-
+			const agentId = appointment.id_agent;
 			const date = new Date(appointment.start_date);
 			const day = date.toLocaleDateString('en-US', { day: 'numeric', month: 'numeric', year: 'numeric' });
 			const week = getWeekNumber(date) + '-' + date.getFullYear();
 			const month = date.toLocaleDateString('en-US', { month: 'long' });
+			console.log("Date:", date);
+			console.log("Day:", day);
+			console.log("Week:", week);
+			console.log("Month:", month);
 
-			appointmentsByDay[day] = (appointmentsByDay[day] || 0) + 1;
-			appointmentsByWeek[week] = (appointmentsByWeek[week] || 0) + 1;
-			appointmentsByMonth[month] = (appointmentsByMonth[month] || 0) + 1;
+
+			if (!appointmentsByDay[agentId]) appointmentsByDay[agentId] = {};
+			if (!appointmentsByWeek[agentId]) appointmentsByWeek[agentId] = {};
+			if (!appointmentsByMonth[agentId]) appointmentsByMonth[agentId] = {};
+
+			appointmentsByDay[agentId][day] = (appointmentsByDay[agentId][day] || 0) + 1;
+			appointmentsByWeek[agentId][week] = (appointmentsByWeek[agentId][week] || 0) + 1;
+			appointmentsByMonth[agentId][month] = (appointmentsByMonth[agentId][month] || 0) + 1;
+
 		});
 
 		const agentIds = appointments.map(appointment => appointment.id_agent);
@@ -110,43 +118,62 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 			});
 
 		const modifiedByUsers = await Promise.all(modifiedByUserPromises);
+		const agendaPromises = uniqueAgendaIds.map(async (agendaId) => {
+			try {
+				const agendaResponse = await axiosClient.get(`/api/agendas/${agendaId}`);
+				return agendaResponse.data;
+			} catch (error) {
+				console.error("Error fetching agenda details:", error);
+				throw error;
+			}
+		});
 
-		const appointmentsWithAgentsAndCommercials = appointments.map(appointment => {
+		const agendas = await Promise.all(agendaPromises);
+
+		const appointmentsWithAgentsAndCommercials = appointments
+		.filter(appointment => appointment.modifiedBy !== null)
+		.map(appointment => {
 			const agent = agents.find(agent => agent.id === appointment.id_agent);
-	
-			// Find the corresponding agent commercial
-			const agenda = uniqueAgendaIds.find(id => id === appointment.id_agenda);
-			console.log("agenda ****** :", agenda);
 
-	
+			// Find the corresponding agent commercial
+			const agenda = agendas.find(item => item.agenda.id === appointment.id_agenda);
+			const contactId = agenda ? agenda.agenda.contact_id : null;
+
 			const agentCommercial = agentCommercials.find(agent => {
-					console.log("Current Agent c ID ****** :", agent.id);
-					console.log("Current Contact ID in agenda ***** :", agenda.contact_id);
-					return agent.id === agenda.contact_id;
+				return agent.id === contactId;
 			});
-			console.log("Agent Commercial:", agentCommercial);
-	
+
 			const modifiedByUser = modifiedByUsers.find(user => user.id === appointment.modifiedBy);
-	
-			console.log("Modified By User:", modifiedByUser);
-	
+
+
 			return {
-					...appointment,
-					agent,
-					agentCommercial: agentCommercial ? `${agentCommercial.nom} ${agentCommercial.prenom}` : "Agent commercial non trouvé",
-					modifiedBy: modifiedByUser ? `${modifiedByUser.nom} ${modifiedByUser.prenom}` : "Pas encore modifié",
+				...appointment,
+				agent,
+				agentCommercial: agentCommercial ? `${agentCommercial.prenom} ${agentCommercial.nom}` : "Agent commercial non trouvé",
+				modifiedBy: modifiedByUser ? `${modifiedByUser.prenom} ${modifiedByUser.nom}` : "Pas encore modifié",
 			};
-	});
-	
-	
+
+		});
+
+
 
 
 
 		const modifiedAppointmentsWithAgentsAndCommercials = appointments
 			.filter(appointment => appointment.modifiedBy !== null)
 			.map(appointment => {
-				const agent = agents.find(agent => agent.id === appointment.id_agent);
-				const agentCommercial = agentCommercials.find(contact => contact.id === appointment.id_agenda);
+				const agentId = appointment.id_agent;
+				const agentDetails = agents.find(agent => agent.id === agentId);
+				console.log("Agent Details:", agentDetails);
+				const agentRole = agentDetails ? agentDetails.role : null;
+				console.log("Agent Role:", agentRole);
+
+				// Check if the agent is not null and does not have the role "Agent Commercial"
+				const agent = agentDetails && agentRole !== "Agent Commercial" ? agentDetails : null;
+
+				const agenda = agendas.find(item => item.agenda.id === appointment.id_agenda);
+				const contactId = agenda ? agenda.agenda.contact_id : null;
+				const agentCommercial = agentCommercials.find(contact => contact.id === contactId);
 				const modifiedByUser = modifiedByUsers.find(user => user.id === appointment.modifiedBy);
 
 				return {
@@ -154,17 +181,18 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 					agent,
 					agentCommercial,
 					modifiedBy: modifiedByUser ? `${modifiedByUser.nom} ${modifiedByUser.prenom}` : "Pas encore modifié",
+					appointmentsByDay: appointmentsByDay[agentId] || {},
+					appointmentsByWeek: appointmentsByWeek[agentId] || {},
+					appointmentsByMonth: appointmentsByMonth[agentId] || {},
 				};
 			});
+
 
 
 		setTableData({
 			appointmentsWithAgentsAndCommercials,
 			modifiedAppointmentsWithAgentsAndCommercials,
-			appointmentsByDay: appointmentsByDay,
-			appointmentsByWeek: appointmentsByWeek,
-			appointmentsByMonth: appointmentsByMonth,
-			totalAppointments: totalAppointments,
+
 		});
 
 	} catch (error) {
