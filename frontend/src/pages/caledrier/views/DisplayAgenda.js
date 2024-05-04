@@ -36,7 +36,6 @@ const DisplayAgenda = () => {
             const response = await axiosClient.get("/api/agendas");
             const fetchedAgendas = response.data.agendas;
 
-            console.log("Fetched agendas:", fetchedAgendas);
 
             // Fetch contact name and number of appointments for each agenda
             const updatedAgendas = await Promise.all(
@@ -47,7 +46,6 @@ const DisplayAgenda = () => {
                             `/api/users/${agenda.contact_id}`
                         );
 
-                        console.log("Contact response:", contactResponse.data);
 
                         const contactName = `${contactResponse.data.prenom} ${contactResponse.data.nom}`;
 
@@ -73,14 +71,12 @@ const DisplayAgenda = () => {
                 })
             );
 
-            console.log("Updated agendas:", updatedAgendas);
 
             // Filter out any null values (agendas with errors)
             const filteredAgendas = updatedAgendas.filter(
                 (agenda) => agenda !== null
             );
 
-            console.log("Filtered agendas:", filteredAgendas);
 
             setAgendas(filteredAgendas);
         } catch (error) {
@@ -110,7 +106,6 @@ const DisplayAgenda = () => {
                         "Erreur lors de la suppression de l'agenda :",
                         error
                     );
-                    console.log("Réponse d'erreur :", error.response);
                     Modal.error({
                         title: "Échec",
                         content:

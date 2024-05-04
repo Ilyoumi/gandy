@@ -77,13 +77,11 @@ class UserController extends Controller
                 'received_data' => $validatedData
             ], 201);
     } catch (\Exception $e) {
-        // Log the error message
         Log::error('Failed to create user: ' . $e->getMessage());
 
-        // Return a response with error message if an exception occurs
         return response()->json([
             'message' => 'Failed to create user: ' . $e->getMessage(),
-            'received_data' => $request->all() // Include received data in the response
+            'received_data' => $request->all()
         ], 500);
     }
 }

@@ -33,7 +33,6 @@ const Contacts = () => {
                 "/api/users/agent-commercial"
             );
             setAgentCommercialUsers(response.data.users);
-            console.log("agentCommercialUsers", response.data.users);
         } catch (error) {
             console.error("Error fetching agent commercial users:", error);
         }finally {
@@ -82,7 +81,6 @@ const Contacts = () => {
                 }
             },
             onCancel() {
-                console.log("Suppression annulée");
             },
         });
     };

@@ -36,7 +36,6 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 			const authToken = localStorage.getItem("auth_token");
 			if (!authToken) {
 				// User is not logged in, do nothing
-				console.log("User is not logged in");
 				return;
 			}
 
@@ -61,14 +60,10 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 
 	const handleBloquerRdv = async () => {
 		setLoading(true);
-		console.log("Received selectedDate from parent component:", selectedDate);
 		if (formData.appointment_date === null) {
-			console.log("Appointment date is null");
 			setLoading(false);
 			return;
 	}
-		console.log("Start Date formData:", formData.appointment_date[0]);
-		console.log("End Date formData:", formData.appointment_date[1]);
 		let startDate, endDate;
 
 		if (!formData.appointment_date) {
@@ -80,16 +75,12 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 						endDate = formData.appointment_date[1];
 		}
 
-		console.log("Start Date before formatting:", startDate);
-		console.log("End Date before formatting:", endDate);
 
 		// Check if startDate is a Date object
 		if (startDate instanceof Date || !isNaN(startDate.getTime())) {
 						const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
 						const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
 
-						console.log("Start Date after formatting:", startDateFormatted.toISOString().slice(0, 19).replace("T", " "));
-						console.log("End Date after formatting:", endDateFormatted.toISOString().slice(0, 19).replace("T", " "));
 
 						try {
 										const formDataToSend = {
@@ -99,7 +90,6 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 														id_agent: userId,
 														id_agenda: agendaId,
 										};
-										console.log("Sending form data:", formDataToSend);
 
 										// Make the HTTP request to bloquer-rdv endpoint
 										const response = await axiosClient.post("api/rdvs/bloquer-rdv", formDataToSend);
@@ -109,7 +99,6 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 										};
 										setLoading(false);
 										onFormSubmit({ ...response.data, newAppointment });
-										console.log("Response block:", response.data);
 										message.success("Rendez-vous bloqué avec succès !");
 										setShowAlert(false);
 										setFormData({
@@ -133,7 +122,6 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 
 						}
 		} else {
-						console.log("Invalid startDate:", startDate);
 						setLoading(false);
 		}
 };
@@ -198,7 +186,6 @@ const BlockRdv = ({ selectedDate, onFormSubmit, agendaId }) => {
 								}}
 								format="YYYY-MM-DD HH:mm"
 								onChange={(dates) => {
-									console.log("Selected dates in range picker:", dates);
 									if (dates && dates.length === 2) {
 										setFormData({
 											...formData,

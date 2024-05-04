@@ -72,7 +72,6 @@ const RdvStatsTable = ({ tableData, setTableData }) => {
 			wordBreak: "normal",
 			fontWeight: "bold",
 	};
-	console.log("tableData", tableData);
 	return (
 			<>
 					<Table columns={columns} dataSource={tableData} loading={rdvLoading} pagination={{ pageSize: 5 }} />

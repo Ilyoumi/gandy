@@ -6,7 +6,7 @@ import moment from "moment";
 import { fetchRdvData, fetchAgentOptions, fetchAgendaOptions } from "../services/api";
 import { useCalendar } from "../../../CalendarContext";
 import {
-	ToTopOutlined,EyeOutlined
+	DownloadOutlined,EyeOutlined
 } from "@ant-design/icons";
 import AppointmentDetails from "./AppoitmnetDetails";
 
@@ -242,16 +242,10 @@ const History = () => {
             return appointmentsByMonth && appointmentsByMonth[currentMonth] ? appointmentsByMonth[currentMonth] : 0;
         },
     },
-    {
-        title: "Total des rendez-vous",
-        dataIndex: "totalAppointments",
-        key: "totalAppointments",
-    },
+  
 ];
 const filteredData = tableData.modifiedAppointmentsWithAgentsAndCommercials?.filter(record => record.agent);
 
-
-	console.log("modifiedAppointmentsWithAgentsAndCommercials", tableData.modifiedAppointmentsWithAgentsAndCommercials)
 
 
 
@@ -315,20 +309,21 @@ const filteredData = tableData.modifiedAppointmentsWithAgentsAndCommercials?.fil
 					</Col>
 				</Row>
 				<Table columns={columns} dataSource={tableData.modifiedAppointmentsWithAgentsAndCommercials} loading={rdvLoading} pagination={{ pageSize: 5 }} />
-			</Card>
-
-
-			<div className="uploadfile shadow-none" style={{ marginBottom: "20px" }}  >
+				<div className="uploadfile shadow-none" style={{ marginBottom: "20px" }}  >
 				<Upload {...uploadProps}>
 					<Button
 						type="dashed"
 						className="ant-full-box"
-						icon={<ToTopOutlined />}
+						icon={<DownloadOutlined />}
 					>
-						<span className="click">Click to Upload</span>
+						<span className="click">Cliquer pour télécharger</span>
 					</Button>
 				</Upload>
 			</div>
+			</Card>
+
+
+			
 			<Card>
 				<Row style={{alignItems:"center"}}>
 				<Col span={6}>

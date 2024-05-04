@@ -65,7 +65,6 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
       const authToken = localStorage.getItem("auth_token");
       if (!authToken) {
         // User is not logged in, do nothing
-        console.log("User is not logged in");
         return;
       }
 
@@ -89,9 +88,6 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
   const handleFormSubmit = async () => {
     setLoading(true);
 
-    console.log("Received selectedDate from parent component:", selectedDate);
-    console.log("Start Date formData:", formData.appointment_date[0]);
-    console.log("End Date formData:", formData.appointment_date[1]);
 
     let startDate, endDate;
 
@@ -104,20 +100,14 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
       endDate = formData.appointment_date[1]
     }
 
-    console.log("Start Date before formatting:", startDate);
-    console.log("End Date before formatting:", endDate);
 
 
     const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
     const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
 
-    console.log("Start Date after formatting:", startDateFormatted.toISOString().slice(0, 19).replace("T", " "));
-    console.log("End Date after formatting:", endDateFormatted.toISOString().slice(0, 19).replace("T", " "));
 
     try {
       const [nom, prenom] = formData.nom_prenom ? formData.nom_prenom.split(' ') : ['', ''];
-      console.log("nom", nom)
-      console.log("prenom", prenom)
 
 
       const formDataToSend = {
@@ -133,7 +123,6 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
         commentaire: formData.commentaire,
       };
 
-      console.log("Sending form data:", formDataToSend);
 
       const submissionResponse = await axiosClient.post(
         "/api/rdvs",
@@ -218,7 +207,6 @@ const AddAppointment = ({ onFormSubmit, agendaId, selectedDate }) => {
                 }}
                 format="YYYY-MM-DD HH:mm"
                 onChange={(dates) => {
-                  console.log("Selected dates in range picker:", dates);
                   if (dates && dates.length === 2) {
                     setFormData({
                       ...formData,

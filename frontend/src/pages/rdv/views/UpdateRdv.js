@@ -86,7 +86,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit,agentId }) => {
             const authToken = localStorage.getItem("auth_token");
             if (!authToken) {
                 // User is not logged in, do nothing
-                console.log("User is not logged in");
                 return;
             }
 
@@ -117,11 +116,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit,agentId }) => {
             endDate = new Date(initialValues.end_date);
         }
 
-        console.log("Start Date selected:", startDate);
-        console.log("End Date selected:", endDate);
 
-        console.log("Start Date initial value:", formData.appointment_date ? formData.appointment_date[0] : 'Not provided');
-        console.log("End Date initial value:", formData.appointment_date ? formData.appointment_date[1] : 'Not provided');
 
         const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
         const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
@@ -143,7 +138,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit,agentId }) => {
 
         };
 
-        console.log("sending data =", formDataToSend);
 
         try {
 
@@ -157,7 +151,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit,agentId }) => {
                 bloquer: formDataToSend.bloquer,
             };
             setLoadingEnregistrer(false);
-            console.log("Form submission successful. Response:", response.data);
             onFormSubmit({ ...response.data, newAppointment });
 
             message.success("Rendez-vous modifié avec succès !");
@@ -186,8 +179,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit,agentId }) => {
             endDate = new Date(initialValues.end_date);
         }
 
-        console.log("Start Date selected:", startDate);
-        console.log("End Date selected:", endDate);
 
         const startDateFormatted = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000);
         const endDateFormatted = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
@@ -218,9 +209,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit,agentId }) => {
 
             };
             setLoadingValidation(false);
-            console.log("Form submission with:", formDataToSend);
 
-            console.log("Form submission successful. Response:", response.data);
             onFormSubmit({ ...response.data, newAppointment });
 
             message.success(`Rendez-vous ${status === 'confirmer' ? 'confirmé' : 'enregistré comme non répondu'} avec succès!`);
@@ -258,8 +247,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit,agentId }) => {
                     modifiedBy: userId
                 }
             );
-            console.log("Form submission successful. Response:", response.data);
-            // Assuming onFormSubmit updates the state with the new appointment data
             onFormSubmit(response.data);
             message.success("Rendez-vous annulé avec succès !");
         } catch (error) {
@@ -302,7 +289,6 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit,agentId }) => {
                                     moment(initialValues.end_date, "YYYY-MM-DD HH:mm:ss")
                                 ]}
                                 onChange={(dates) => {
-                                    console.log("New dates:", dates);
                                     if (dates && dates.length === 2) {
                                         setFormData((prevState) => ({
                                             ...prevState,
@@ -318,9 +304,7 @@ const UpdateRdv = ({ initialValues, agendaId, onFormSubmit,agentId }) => {
                                         });
                                     }
                                 }}
-                                onCalendarChange={(value) =>
-                                    console.log("Calendar value:", value)
-                                }
+                                
                                 showTime={{
                                     format: "HH:mm",
                                     minuteStep: 15,

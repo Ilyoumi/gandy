@@ -21,7 +21,6 @@ const AppointmentDetails = ({ selectedRowData }) => {
             try {
                 const authToken = localStorage.getItem("auth_token");
                 if (!authToken) {
-                    console.log("User is not logged in");
                     return;
                 }
 
@@ -32,7 +31,6 @@ const AppointmentDetails = ({ selectedRowData }) => {
                 });
                 const { role } = response.data;
                 setRole(role);
-                console.log("User role:", role);
             } catch (error) {
                 console.error("Error fetching user data:", error);
             }

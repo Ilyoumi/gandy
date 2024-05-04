@@ -29,10 +29,7 @@ const AddPrivateAppointmentModal = ({ userId, agendaId, onFormSubmit, selectedDa
 	};
 	const handleFormSubmit = async () => {
 		setLoading(true);
-		console.log("Received selectedDate from parent component:", selectedDate);
-		console.log("formData.appointment_date:", formData.appointment_date);
 		if (formData.appointment_date === null) {
-			console.log("Appointment date is null");
 			setLoading(false);
 			return;
 	}
@@ -61,7 +58,6 @@ const AddPrivateAppointmentModal = ({ userId, agendaId, onFormSubmit, selectedDa
 														id_agent: userId,
 														id_agenda: agendaId,
 										};
-										console.log("Sending form data:", formDataToSend);
 
 										// Make the HTTP request to bloquer-rdv endpoint
 										const response = await axiosClient.post("api/rdvs/add-rdv-prv", formDataToSend);
@@ -71,7 +67,6 @@ const AddPrivateAppointmentModal = ({ userId, agendaId, onFormSubmit, selectedDa
 										};
 										setLoading(false);
 										onFormSubmit({ ...response.data, newAppointment });
-										console.log("Response block:", response.data);
 										message.success("Rendez-vous bloqué avec succès !");
 										setShowAlert(false);
 										
@@ -90,7 +85,6 @@ const AddPrivateAppointmentModal = ({ userId, agendaId, onFormSubmit, selectedDa
 
 						}
 		} else {
-						console.log("Invalid startDate:", startDate);
 						setLoading(false);
 		}
 };
@@ -149,7 +143,6 @@ const AddPrivateAppointmentModal = ({ userId, agendaId, onFormSubmit, selectedDa
 								}}
 								format="YYYY-MM-DD HH:mm"
 								onChange={(dates) => {
-									console.log("Selected dates:", dates);
   if (dates && dates.length === 2) {
     setFormData({
       ...formData,

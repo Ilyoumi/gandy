@@ -29,7 +29,6 @@ function AgentCommercialCalendar() {
 			try {
 				const authToken = localStorage.getItem("auth_token");
 				if (!authToken) {
-					console.log("User is not logged in");
 					return;
 				}
 
@@ -40,7 +39,6 @@ function AgentCommercialCalendar() {
 				});
 				const { id } = response.data;
 				setUserId(id);
-				console.log("User id:", userId);
 			} catch (error) {
 				console.error("Error fetching user data:", error);
 			}
@@ -51,10 +49,8 @@ function AgentCommercialCalendar() {
 
 	useEffect(() => {
 		if (userId !== "") {
-			console.log("Fetching user agenda and appointments...");
 			axiosClient.get(`api/users/${userId}/agenda-with-appointments`)
 				.then(response => {
-					console.log("User agenda and appointments fetched successfully:", response.data);
 					setUserAgenda(response.data.agenda);
 					setUserAppointments(response.data.rdvs);
 					setLoading(false);
@@ -94,11 +90,9 @@ function AgentCommercialCalendar() {
 	};
 
 	const handleAppointmentClick = (event) => {
-		console.log("Clicked appointment:", event);
 	};
 
 	const handleFormSubmitCallback = async (formData) => {
-		console.log("Form data:", formData);
 		setAddPrivateModalVisible(false);
 	};
 

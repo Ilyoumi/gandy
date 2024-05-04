@@ -66,12 +66,7 @@ const DisplayUsers = () => {
     const fetchUsersData = async () => {
         try {
             setLoading(true);
-
             const userData = await fetchUsers();
-            console.log('Type of users:', typeof userData.users);
-            console.log('Users data:', userData.users)
-            console.log('Response data:', userData);
-
             setUsers(userData.users);
         } catch (error) {
             console.error("Error fetching users:", error);
@@ -80,28 +75,16 @@ const DisplayUsers = () => {
         }
     };
 
-
     const showUpdateModal = (record) => {
         setUpdateData(record);
         setUpdateModalVisible(true);
     };
-
-
 
     const updateModalProps = {
         visible: updateModalVisible,
         onCancel: () => setUpdateModalVisible(false),
         onUpdate: handleUpdate,
         userData: updateData,
-    };
-
-
-
-    const roleColors = {
-        1: 'success',
-        2: 'processing',
-        3: 'error',
-        4: 'warning',
     };
 
     const handleDeleteUser = async (id) => {
@@ -132,11 +115,23 @@ const DisplayUsers = () => {
                 }
             },
             onCancel() {
-                console.log("Suppression annulée");
             },
         });
     };
-
+		function getColorForRole(role) {
+			switch(role) {
+					case 'Admin':
+							return '#ABC9FF'; 
+					case 'Agent':
+							return '#74E291'; 
+					case 'Superviseur':
+							return '#FFA447';
+							case 'Agent Commercial':
+							return '#FF8F8F';
+					default:
+							return '#A5DD9B'; 
+			}
+	}
 
     const columns = [
         {
@@ -146,7 +141,7 @@ const DisplayUsers = () => {
             width: "32%",
             render: (text, record) => (
                 <div>
-                    <Avatar src={record.image} />
+                    <Avatar src={`http://localhost:8000/images/${record.image}`} />
                     <span style={{ marginLeft: 8 }}>{highlightText(text)}</span>
                 </div>
             ),
@@ -157,12 +152,16 @@ const DisplayUsers = () => {
             key: "email",
             render: (text) => highlightText(text),
         },
-        {
-            title: "ROLE",
-            dataIndex: "role",
-            key: "role",
-            render: (text) => highlightText(text),
-        },
+				{
+					title: "ROLE",
+					dataIndex: "role",
+					key: "role",
+					render: (text) => (
+							<span style={{ backgroundColor: getColorForRole(text), padding: '2px 8px', borderRadius: '4px', color: '#fff', fontSize:"12px" }}>
+									{text}
+							</span>
+					),
+			},
         {
             title: "ACTION",
             key: "action",
@@ -185,11 +184,11 @@ const DisplayUsers = () => {
             name: `${user.nom} ${user.prenom}`
         };
     });
-    // Function to handle search
+
     const handleSearch = (value) => {
         setSearchText(value);
     };
-    // Function to highlight search text
+
     const highlightText = (text) => {
         if (!searchText) return text;
         const regex = new RegExp(`(${searchText})`, 'gi');
@@ -198,8 +197,6 @@ const DisplayUsers = () => {
         });
     };
     
-
-    // Filter users based on search text
     const filteredUsers = searchText ? modifiedUsers.filter(user =>
         user.nom.toLowerCase().includes(searchText.toLowerCase()) ||
         user.email.toLowerCase().includes(searchText.toLowerCase()) ||

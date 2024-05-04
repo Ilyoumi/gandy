@@ -18,7 +18,6 @@ const UpdateAgenda = ({ initialValues, onSubmit, onClose, updateAgendas }) => {
                 "/api/users/agent-commercial"
             );
             setAgentCommercialUsers(response.data.users);
-            console.log("agentCommercialUsers", response.data.users);
         } catch (error) {
             console.error("Error fetching agent commercial users:", error);
         }
@@ -33,13 +32,11 @@ const UpdateAgenda = ({ initialValues, onSubmit, onClose, updateAgendas }) => {
             );
 
             // Handle success response
-            console.log("Agenda updated successfully:", response.data);
             
             try {
                 const response = await axiosClient.get(
                     "http://localhost:8000/api/agendas"
                 );
-            console.log("Agenda updated :", response.data);
             updateAgendas();
             onClose();
             

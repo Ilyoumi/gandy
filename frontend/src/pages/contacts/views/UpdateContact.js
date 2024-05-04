@@ -26,7 +26,6 @@ const UpdateContactModal = ({ visible, onCancel, onUpdate, initialValues }) => {
                 axios
                     .put(`/api/users/${initialValues.id}`, updatedValues)
                     .then((response) => {
-                        console.log("User updated successfully:", response.data);
                     })
                     .catch((error) => {
                         console.error("Error updating user:", error);

@@ -5,12 +5,10 @@ import { fullCalendarConfig } from "../services/calendarConfig";
 
 export const handleDeleteAppointment = (appointmentId, appointments, setAppointments, setShowUpdateModal) => {
 	try {
-			// Update the appointments state to remove the appointment
 			const updatedAppointments = appointments.filter(
 					(appointment) => appointment.id !== appointmentId
 			);
 			setAppointments(updatedAppointments);
-			// Close the update modal
 			setShowUpdateModal(false);
 	} catch (error) {
 			console.error("Error deleting appointment:", error);
@@ -71,22 +69,18 @@ export const fetchAgentCommercialUsers = async (setAgentCommercialUsers) => {
 };
 
 
-
 // Fetches agendas and appointments for all agendas, updates state with them
 export const fetchAgendasAndAppointments = async (
     setAgendas,
     setAppointments,
 ) => {
     try {
-        // Fetch all agendas
         const agendasResponse = await axiosClient.get("/api/agendas");
         const agendas = agendasResponse.data.agendas;
 
-        // Fetch appointments for each agenda
         const allAppointments = [];
         for (const agenda of agendas) {
             try {
-                // Fetch contact details for the agenda
 
                 const appointmentsResponse = await axiosClient.get(
                     `/api/agendas/${agenda.id}/appointments`
@@ -115,7 +109,6 @@ export const fetchAgendasAndAppointments = async (
         }
 
 
-        // Update state with agendas and appointments
         setAgendas(agendas);
         setAppointments(allAppointments);
 
@@ -136,7 +129,6 @@ export const handleAgendaCreated = async (
     setAppointments
 ) => {
     try {
-        // Combine the default event with existing events from the database
         const updatedEvents = [...appointments];
         const config = fullCalendarConfig(
             appointments,
@@ -145,7 +137,6 @@ export const handleAgendaCreated = async (
             agendaId,
             handleEventDrop
         );
-        // Update existing agenda with FullCalendar data
         const response = await axiosClient.put(`/api/agendas/${agendaId}`, {
             name: agendaName,
             fullcalendar_config: config,
@@ -153,21 +144,16 @@ export const handleAgendaCreated = async (
         });
 
 
-        // Check if response is defined before accessing its data property
         if (response && response.data) {
-            console.log("Agenda updated with FullCalendar data:", response.data);
-            // Update appointments state with the updated events
             setAppointments(updatedEvents);
         } else {
             console.error("Unexpected response from server:", response);
         }
 
-        // Update appointments state with the updated events
         setAppointments(updatedEvents);
     } catch (error) {
 
         console.error("Error updating agenda with FullCalendar data:", error);
-        // Handle error
     }
 };
 
@@ -186,16 +172,13 @@ export const handleAppointmentClick = async (
 ) => {
 
     try {
-        // Make a GET request to fetch the agent ID by appointment ID
         const response = await axiosClient.get(
             `/api/appointments/${event.id}/agent`
         );
 
-        // Extract the agent ID from the response data
         const agentId = response.data.agentId;
         setAgentId(agentId);
 
-        // Compare the agent ID with the logged-in user's ID
         if (
             agentId === userContext.userId ||
             userContext.userRole === "Superviseur" || userContext.userRole === "Agent" || userContext.userRole === "Admin"
@@ -203,8 +186,6 @@ export const handleAppointmentClick = async (
             const response = await axiosClient.get(`/api/rdvs/${event.id}`);
             const appointmentDetails = response.data;
             setAppointmentDetails(appointmentDetails);
-            console.log("appointmentDetails", appointmentDetails)
-            console.log("appointmentDetails id", event.id)
             setSelectedRowData(appointmentDetails);
             setShowDetailModal(true);
             setSelectedAppointment(event);
@@ -250,7 +231,6 @@ export const handleBlockAppointment = (
     
 };
 
-// Handles form submission for new appointment
 export const handleFormSubmit = async (
     newAppointment,
     setAppointments,
@@ -264,13 +244,11 @@ export const handleFormSubmit = async (
 ) => {
     try {
 
-        // Update appointments state using the state updater function
         setAppointments((prevAppointments) => [
             ...prevAppointments,
             newAppointment,
         ]);
 
-        // Fetch agendas and appointments after updating appointments state
         fetchAgendasAndAppointments(setAgendas, setAppointments, agendaId);
 
         handleCloseModal();
@@ -292,13 +270,11 @@ export const handleEventDrop = async (info, appointments, setAppointments) => {
             end_date: event.end.toISOString(),
         };
 
-        // Update appointment in the database
         const response = await axiosClient.put(
             `/api/rdvs/${event.id}`,
             updatedAppointment
         );
 
-        // Update appointments state with the updated event
         const updatedAppointments = appointments.map((appointment) => {
             if (appointment.id === event.id) {
                 return {

@@ -34,8 +34,6 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 
 		const appointments = response.data;
 
-		// Initialize statistics variables
-		let totalAppointments = 0;
 		let appointmentsByDay = {};
 		let appointmentsByWeek = {};
 		let appointmentsByMonth = {};
@@ -46,10 +44,6 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 			const day = date.toLocaleDateString('en-US', { day: 'numeric', month: 'numeric', year: 'numeric' });
 			const week = getWeekNumber(date) + '-' + date.getFullYear();
 			const month = date.toLocaleDateString('en-US', { month: 'long' });
-			console.log("Date:", date);
-			console.log("Day:", day);
-			console.log("Week:", week);
-			console.log("Month:", month);
 
 
 			if (!appointmentsByDay[agentId]) appointmentsByDay[agentId] = {};
@@ -63,6 +57,7 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 		});
 
 		const agentIds = appointments.map(appointment => appointment.id_agent);
+		
 		const uniqueAgentIds = [...new Set(agentIds)];
 		const agentPromises = uniqueAgentIds.map(async (agentId) => {
 			try {
@@ -99,8 +94,6 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 		});
 
 		const agentCommercials = await Promise.all(agentCommercialPromises);
-		console.log("Response Data agentCommercials:", agentCommercials);
-
 
 		const modifiedByUserIds = appointments.map(appointment => appointment.modifiedBy);
 		const uniqueModifiedByUserIds = [...new Set(modifiedByUserIds)];
@@ -129,22 +122,17 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 		});
 
 		const agendas = await Promise.all(agendaPromises);
-
 		const appointmentsWithAgentsAndCommercials = appointments
 		.filter(appointment => appointment.modifiedBy !== null)
 		.map(appointment => {
 			const agent = agents.find(agent => agent.id === appointment.id_agent);
 
-			// Find the corresponding agent commercial
 			const agenda = agendas.find(item => item.agenda.id === appointment.id_agenda);
 			const contactId = agenda ? agenda.agenda.contact_id : null;
-
 			const agentCommercial = agentCommercials.find(agent => {
 				return agent.id === contactId;
 			});
-
 			const modifiedByUser = modifiedByUsers.find(user => user.id === appointment.modifiedBy);
-
 
 			return {
 				...appointment,
@@ -152,7 +140,6 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 				agentCommercial: agentCommercial ? `${agentCommercial.prenom} ${agentCommercial.nom}` : "Agent commercial non trouvé",
 				modifiedBy: modifiedByUser ? `${modifiedByUser.prenom} ${modifiedByUser.nom}` : "Pas encore modifié",
 			};
-
 		});
 
 
@@ -164,11 +151,8 @@ export const fetchRdvData = async (selectedAgent, selectedAgenda, selectedDateRa
 			.map(appointment => {
 				const agentId = appointment.id_agent;
 				const agentDetails = agents.find(agent => agent.id === agentId);
-				console.log("Agent Details:", agentDetails);
 				const agentRole = agentDetails ? agentDetails.role : null;
-				console.log("Agent Role:", agentRole);
 
-				// Check if the agent is not null and does not have the role "Agent Commercial"
 				const agent = agentDetails && agentRole !== "Agent Commercial" ? agentDetails : null;
 
 				const agenda = agendas.find(item => item.agenda.id === appointment.id_agenda);
@@ -212,12 +196,12 @@ export const fetchAgentOptions = async (setAgentOptions) => {
 	}
 };
 
+
 export const fetchAgendaOptions = async (setAgendaOptions) => {
 	try {
 		const response = await axiosClient.get("/api/agendas");
 		const agendas = response.data.agendas;
 
-		// Map through agendas and fetch contact name for each agenda
 		const agendaOptionsWithContactNames = await Promise.all(
 			agendas.map(async (agenda) => {
 				try {
@@ -231,8 +215,6 @@ export const fetchAgendaOptions = async (setAgendaOptions) => {
 			})
 		);
 
-
-		// Set the agenda options with contact names
 		setAgendaOptions(agendaOptionsWithContactNames);
 	} catch (error) {
 		console.error("Error fetching agenda options:", error);

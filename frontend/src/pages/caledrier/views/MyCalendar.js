@@ -147,7 +147,6 @@ function MyCalendar() {
 	};
 
 	const handleAppointmentClickCallback = (event) => {
-		console.log("Appointment ID:", event.id);
 
 		handleAppointmentClick(
 			event,
@@ -204,7 +203,6 @@ function MyCalendar() {
 
 	const handleDeleteAppointment = async (appointmentId) => {
     try {
-        console.log("Deleting blocked appointment");
         
         // Convert appointmentId to an integer
         const id = parseInt(appointmentId);
@@ -213,7 +211,6 @@ function MyCalendar() {
         const appointmentExists = filteredAppointments.find(appointment => appointment.id === id);
 
         if (!appointmentExists) {
-            console.log("Appointment with ID", id, "does not exist. Skipping deletion.");
             return;
         }  
 
@@ -264,8 +261,6 @@ function MyCalendar() {
 					setAgentName
 				);
 
-				console.log("Bloque Crénaux clicked");
-				console.log("Bloque selectedDate", selectedDate);
 			},
 			onCancel: () => {
 				setShowAddModal(true);
@@ -314,14 +309,12 @@ function MyCalendar() {
 	const handleUpdateClick = (appointmentId) => {
 		setShowDetailModal(false);
 		setShowUpdateModal(true);
-		console.log("appio", appointmentId)
 
 	};
 
 
 	const handleDeleteClick = (appointmentId) => {
 		try {
-			console.log("Deleting appointment with ID:", appointmentId);
 
 			// Update the appointments state to remove the appointment
 			const updatedAppointments = appointments.filter(

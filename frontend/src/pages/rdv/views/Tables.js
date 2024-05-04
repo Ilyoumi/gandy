@@ -104,7 +104,7 @@ const DataTable = () => {
                     fetchRdvData(selectedAgent,selectedAgenda,selectedDateRange,setTableData, setRdvLoading,);
                 } catch (error) {
                     console.error("Erreur lors de la suppression du Rdv :", error);
-                    console.log("Réponse d'erreur :", error.response);
+                    console.error("Réponse d'erreur :", error.response);
                     message.error("Échec de la suppression du Rdv");
                 }
             },
@@ -138,6 +138,7 @@ const DataTable = () => {
                 </span>
             ),
         },
+				
         {
             title: "Agent Commercial",
             dataIndex: "agentCommercial",
@@ -279,19 +280,6 @@ const DataTable = () => {
         totalPerDay: calculateTotalPerDay(item.start_date),
         totalPerWeek: calculateTotalPerWeek(item.start_date),
     })) || [];
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     return (
         <div>

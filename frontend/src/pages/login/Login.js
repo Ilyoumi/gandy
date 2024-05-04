@@ -114,7 +114,6 @@ const Login = () => {
 
 	const onFinishFailed = (errorInfo) => {
 		setAlertVisible(true);
-		console.log("Failed:", errorInfo);
 	};
 
 

@@ -101,7 +101,6 @@ const AddUserForm = () => {
 					formData.password
 				);
 			}
-			console.log("Sending data:", formData);
 			const response = await axios.post(
 				"http://localhost:8000/api/users",
 				formData,
@@ -120,8 +119,6 @@ const AddUserForm = () => {
 				content: "L'utilisateur a été ajouté avec succès.",
 			});
 
-			// Optionally, you can access the data from the response
-			console.log("Response data:", response.data);
 
 			// Reset form fields if needed
 			form.resetFields();
